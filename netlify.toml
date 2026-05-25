@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy: redirige /api/* al backend en Render (sin exponer la URL en el cliente)
+[[redirects]]
+  from   = "/api/*"
+  to     = "https://moremoney-backend.onrender.com/api/:splat"
+  status = 200
+  force  = true
+
+# SPA: cualquier ruta desconocida sirve index.html (evita 404 al refrescar)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
