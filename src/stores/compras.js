@@ -48,6 +48,11 @@ export const useComprasStore = defineStore('compras', () => {
     return data
   }
 
+  async function updateTasaCero(id, payload) {
+    const { data } = await api.put(`/compras/tasa-cero/${id}`, payload)
+    return data
+  }
+
   async function deleteTasaCero(id) {
     await api.delete(`/compras/tasa-cero/${id}`)
   }
@@ -55,6 +60,6 @@ export const useComprasStore = defineStore('compras', () => {
   return {
     normales, tasaCero, loading, error,
     fetchNormales, createNormal, deleteNormal,
-    fetchTasaCero, createTasaCero, deleteTasaCero,
+    fetchTasaCero, createTasaCero, updateTasaCero, deleteTasaCero,
   }
 })

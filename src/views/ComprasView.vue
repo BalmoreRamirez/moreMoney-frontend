@@ -58,7 +58,7 @@
           v-else
           class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
           style="background:#10B981"
-          @click="showTasaCeroModal = true"
+          @click="openCreateTasaCero"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
           Nueva tasa cero
@@ -168,11 +168,19 @@
             </div>
 
             <!-- Monto y acciones -->
-            <div class="flex items-center gap-3">
-              <div class="text-right">
+            <div class="flex items-center gap-2">
+              <div class="text-right mr-1">
                 <p class="font-mono text-lg font-bold text-white">{{ formatCurrency(c.monto_total) }}</p>
                 <p class="text-xs text-slate-500">{{ formatCurrency(cuotaMonto(c)) }}/mes</p>
               </div>
+              <!-- Botón editar -->
+              <button
+                class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+                title="Editar"
+                @click="openEditTasaCero(c)"
+              >
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+              </button>
               <!-- Botón eliminar — deshabilitado si tiene cuotas pagadas -->
               <button
                 class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
@@ -222,6 +230,7 @@
     <CompraTasaCeroFormModal
       v-model="showTasaCeroModal"
       :tarjetas="tarjetasStore.tarjetas"
+      :editData="editTasaCeroTarget"
       @saved="onSaveTasaCero"
     />
 
@@ -326,15 +335,19 @@ function setFiltroEstado(val) {
   comprasStore.fetchTasaCero(tcParams)
 }
 
-// ── Modales creación ──────────────────────────────────────────────
-const showNormalModal   = ref(false)
-const showTasaCeroModal = ref(false)
+// ── Modales creación / edición ────────────────────────────────────
+const showNormalModal      = ref(false)
+const showTasaCeroModal    = ref(false)
+const editTasaCeroTarget   = ref(null)
+
+function openCreateTasaCero() { editTasaCeroTarget.value = null; showTasaCeroModal.value = true }
+function openEditTasaCero(c)  { editTasaCeroTarget.value = c;    showTasaCeroModal.value = true }
 
 async function onSaveNormal(payload) {
   try {
     await comprasStore.createNormal(payload)
-    await recargarTodo()
-    await tarjetasStore.fetchTarjetas()       // refresca saldos disponibles
+    recargarTodo()
+    tarjetasStore.fetchTarjetas()
   } catch (e) {
     console.error(e)
   }
@@ -342,9 +355,13 @@ async function onSaveNormal(payload) {
 
 async function onSaveTasaCero(payload) {
   try {
-    await comprasStore.createTasaCero(payload)
-    await recargarTodo()
-    await tarjetasStore.fetchTarjetas()
+    if (editTasaCeroTarget.value) {
+      await comprasStore.updateTasaCero(editTasaCeroTarget.value.id, payload)
+    } else {
+      await comprasStore.createTasaCero(payload)
+    }
+    recargarTodo()
+    tarjetasStore.fetchTarjetas()
   } catch (e) {
     console.error(e)
   }
