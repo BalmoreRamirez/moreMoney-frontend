@@ -53,8 +53,23 @@
           <span class="text-sm font-semibold text-slate-200">{{ currentNav?.label }}</span>
         </div>
 
-        <!-- Indicador de fecha -->
-        <span class="text-xs tabular-nums" style="color: #4B5563">{{ todayLabel }}</span>
+        <!-- Fecha + usuario + logout -->
+        <div class="flex items-center gap-4">
+          <span class="text-xs tabular-nums" style="color: #4B5563">{{ todayLabel }}</span>
+          <div class="flex items-center gap-2" style="border-left: 1px solid rgba(255,255,255,0.08); padding-left: 1rem">
+            <span class="material-symbols-outlined text-[18px]" style="color: #4B5563">account_circle</span>
+            <span class="text-xs font-medium" style="color: #94A3B8">{{ authStore.usuario?.usuario }}</span>
+            <button
+              @click="handleLogout"
+              class="flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all"
+              style="color: #4B5563; border: 1px solid rgba(255,255,255,0.06)"
+              title="Cerrar sesión"
+            >
+              <span class="material-symbols-outlined text-[15px]">logout</span>
+              <span>Salir</span>
+            </button>
+          </div>
+        </div>
       </header>
 
       <!-- Contenido de la ruta activa -->
@@ -67,9 +82,17 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
+
+function handleLogout() {
+  authStore.logout()
+  router.push('/login')
+}
 
 const navItems = [
   { to: '/',           icon: 'dashboard',       label: 'Dashboard' },
