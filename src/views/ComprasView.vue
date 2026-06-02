@@ -23,19 +23,19 @@
     </div>
 
     <!-- Pestañas + botón de acción -->
-    <div class="mt-6 flex items-center justify-between border-b" style="border-color:rgba(255,255,255,0.08)">
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-2 border-b" style="border-color:rgba(255,255,255,0.08)">
       <div class="flex gap-1">
         <button
           v-for="tab in tabs"
           :key="tab.key"
-          class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors"
+          class="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors sm:gap-2 sm:px-4"
           :class="activeTab === tab.key
             ? 'border-b-2 border-success text-success'
             : 'text-slate-500 hover:text-slate-300'"
           @click="activeTab = tab.key"
         >
           <span class="material-symbols-outlined text-[16px]">{{ tab.icon }}</span>
-          {{ tab.label }}
+          <span class="hidden sm:inline">{{ tab.label }}</span>
           <span class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
             :style="activeTab === tab.key
               ? 'background:rgba(16,185,129,0.2);color:#10B981'
@@ -47,21 +47,21 @@
       <div class="pb-2">
         <button
           v-if="activeTab === 'normales'"
-          class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
           style="background:#10B981"
           @click="showNormalModal = true"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
-          Nueva compra
+          <span class="hidden sm:inline">Nueva compra</span>
         </button>
         <button
           v-else
-          class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
           style="background:#10B981"
           @click="openCreateTasaCero"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
-          Nueva tasa cero
+          <span class="hidden sm:inline">Nueva tasa cero</span>
         </button>
       </div>
     </div>
@@ -99,8 +99,8 @@
           <p class="mt-1 text-sm text-slate-500">Registra tu primera compra para ver el movimiento aquí.</p>
         </div>
 
-        <div v-else class="fintech-card overflow-hidden">
-          <table class="w-full text-sm">
+        <div v-else class="fintech-card overflow-x-auto">
+          <table class="w-full min-w-[560px] text-sm">
             <thead>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
                 <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Descripción</th>
@@ -257,43 +257,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineComponent } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useComprasStore }  from '../stores/compras'
 import { useTarjetasStore } from '../stores/tarjetas'
 import { formatCurrency }   from '../utils/currency'
 import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
 import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
-
-// ── Inline confirm-delete mini-component ─────────────────────────
-const ConfirmDeleteModal = defineComponent({
-  props: { nombre: String, error: String, deleting: Boolean },
-  emits: ['confirm', 'cancel'],
-  template: `
-    <Teleport to="body">
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0" style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)" @click="$emit('cancel')" />
-        <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)">
-          <div class="flex items-start gap-4">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style="background:var(--color-danger-bg)">
-              <span class="material-symbols-outlined text-danger">warning</span>
-            </div>
-            <div>
-              <h3 class="font-semibold text-white">Eliminar registro</h3>
-              <p class="mt-1 text-sm text-slate-400">¿Eliminar <strong class="text-white">{{ nombre }}</strong>? Esta acción no se puede deshacer.</p>
-              <p v-if="error" class="mt-2 text-xs text-danger">{{ error }}</p>
-            </div>
-          </div>
-          <div class="mt-5 flex gap-3">
-            <button class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="$emit('cancel')">Cancelar</button>
-            <button class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#DC2626" :disabled="deleting" @click="$emit('confirm')">
-              {{ deleting ? 'Eliminando…' : 'Eliminar' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-  `,
-})
+import ConfirmDeleteModal      from '../components/ConfirmDeleteModal.vue'
 
 // ── Stores ────────────────────────────────────────────────────────
 const comprasStore  = useComprasStore()

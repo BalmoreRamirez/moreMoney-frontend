@@ -30,18 +30,18 @@
     </div>
 
     <!-- Legend -->
-    <div class="mt-4 flex items-center gap-5">
+    <div class="mt-4 flex flex-wrap items-center gap-3 sm:gap-5">
       <div class="flex items-center gap-2 text-xs text-slate-400">
-        <span class="h-2.5 w-2.5 rounded-full" style="background:#3B82F6" />
-        Día de corte
+        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full" style="background:#3B82F6" />
+        Corte
       </div>
       <div class="flex items-center gap-2 text-xs text-slate-400">
-        <span class="h-2.5 w-2.5 rounded-full" style="background:#10B981" />
-        Día de pago (con pendientes)
+        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full" style="background:#10B981" />
+        Pago (pendiente)
       </div>
       <div class="flex items-center gap-2 text-xs text-slate-400">
-        <span class="h-2.5 w-2.5 rounded-full" style="background:#374151" />
-        Día de pago (al día)
+        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full" style="background:#374151" />
+        Pago (al día)
       </div>
     </div>
 
@@ -55,12 +55,14 @@
       <!-- Days of week header -->
       <div class="grid grid-cols-7 border-b" style="border-color:rgba(255,255,255,0.06)">
         <div
-          v-for="day in DAYS"
+          v-for="(day, i) in DAYS"
           :key="day"
-          class="py-3 text-center text-xs font-semibold uppercase tracking-wider"
+          class="py-2 text-center text-[10px] font-semibold uppercase tracking-wider sm:py-3 sm:text-xs"
           style="color:#64748B"
         >
-          {{ day }}
+          <!-- Inicial en móvil, abreviatura completa en sm+ -->
+          <span class="sm:hidden">{{ DAYS_SHORT[i] }}</span>
+          <span class="hidden sm:inline">{{ day }}</span>
         </div>
       </div>
 
@@ -75,7 +77,7 @@
           <div
             v-for="(day, di) in week"
             :key="di"
-            class="relative min-h-[100px] p-2"
+            class="relative min-h-[60px] p-1 sm:min-h-[100px] sm:p-2"
             :class="[
               di < 6 ? 'border-r' : '',
               day && isToday(day) ? 'today-cell' : '',
@@ -86,23 +88,23 @@
             <!-- Day number -->
             <span
               v-if="day"
-              class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium"
+              class="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium sm:h-6 sm:w-6 sm:text-xs"
               :class="isToday(day) ? 'text-white font-bold' : 'text-slate-400'"
               :style="isToday(day) ? 'background:#10B981' : ''"
             >{{ day }}</span>
 
-            <!-- Events -->
+            <!-- Events: solo puntos de color en móvil, etiquetas en sm+ -->
             <div v-if="day" class="mt-1 flex flex-col gap-1">
               <!-- Corte events -->
               <div
                 v-for="ev in corteEvents(day)"
                 :key="'corte-' + ev.tarjeta_id"
-                class="flex items-center gap-1 rounded-md px-1.5 py-0.5"
+                class="flex items-center gap-1 rounded-md px-1 py-0.5 sm:px-1.5"
                 style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2)"
                 :title="`Corte: ${ev.tarjeta_nombre} (${ev.banco})`"
               >
                 <span class="h-1.5 w-1.5 flex-shrink-0 rounded-full" style="background:#3B82F6" />
-                <span class="truncate text-[10px]" style="color:#93C5FD">{{ ev.tarjeta_nombre }}</span>
+                <span class="hidden truncate text-[10px] sm:block" style="color:#93C5FD">{{ ev.tarjeta_nombre }}</span>
               </div>
 
               <!-- Pago events -->
@@ -110,7 +112,7 @@
                 v-for="ev in pagoEvents(day)"
                 :key="'pago-' + ev.tarjeta_id"
                 type="button"
-                class="flex w-full items-center gap-1 rounded-md px-1.5 py-0.5 text-left transition-opacity hover:opacity-80"
+                class="flex w-full items-center gap-1 rounded-md px-1 py-0.5 text-left transition-opacity hover:opacity-80 sm:px-1.5"
                 :style="ev.tiene_pendientes
                   ? 'background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25)'
                   : 'background:rgba(55,65,81,0.4);border:1px solid rgba(255,255,255,0.06)'"
@@ -122,12 +124,12 @@
                   :style="ev.tiene_pendientes ? 'background:#10B981' : 'background:#374151'"
                 />
                 <span
-                  class="truncate text-[10px]"
+                  class="hidden truncate text-[10px] sm:block"
                   :style="ev.tiene_pendientes ? 'color:#6EE7B7' : 'color:#6B7280'"
                 >{{ ev.tarjeta_nombre }}</span>
                 <span
                   v-if="ev.tiene_pendientes"
-                  class="ml-auto flex-shrink-0 text-[9px] font-bold"
+                  class="ml-auto hidden flex-shrink-0 text-[9px] font-bold sm:block"
                   style="color:#10B981"
                 >{{ ev.pendientes_count }}</span>
               </button>
@@ -161,8 +163,9 @@ import PagoDetalleModal from '../components/PagoDetalleModal.vue'
 
 const store = useCalendarioStore()
 
-const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const DAYS   = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+const MONTHS     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+const DAYS       = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+const DAYS_SHORT = ['L','M','X','J','V','S','D']
 
 const showModal   = ref(false)
 const selectedPago = ref(null)

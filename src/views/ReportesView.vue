@@ -34,9 +34,9 @@
 
     <template v-else>
       <!-- Gran total del mes -->
-      <div class="mt-6 fintech-card p-8 text-center" style="background:linear-gradient(135deg,rgba(16,185,129,0.08) 0%,rgba(10,25,47,0) 100%);border-color:rgba(16,185,129,0.2)">
+      <div class="mt-6 fintech-card p-6 text-center sm:p-8" style="background:linear-gradient(135deg,rgba(16,185,129,0.08) 0%,rgba(10,25,47,0) 100%);border-color:rgba(16,185,129,0.2)">
         <p class="text-sm font-medium uppercase tracking-widest text-slate-500">Total a pagar en {{ MONTHS[store.month - 1] }}</p>
-        <p class="mt-3 font-mono font-bold leading-none" style="font-size:3.5rem;color:#10B981">
+        <p class="mt-3 break-all font-mono font-bold leading-none sm:break-normal" style="font-size:clamp(2rem, 8vw, 3.5rem);color:#10B981">
           {{ formatCurrency(store.grand_total) }}
         </p>
         <p v-if="store.resumen.length" class="mt-3 text-sm text-slate-500">
@@ -108,14 +108,14 @@
                 </span>
               </div>
               <!-- Desglose de cuotas -->
-              <div v-if="r.cuotas_detalle.length" class="mt-2 space-y-1 pl-6">
+              <div v-if="r.cuotas_detalle.length" class="mt-2 space-y-1 pl-4 sm:pl-6">
                 <div
                   v-for="(cd, i) in r.cuotas_detalle"
                   :key="i"
-                  class="flex items-center justify-between text-xs text-slate-500"
+                  class="flex items-start justify-between gap-2 text-xs text-slate-500"
                 >
-                  <span>{{ cd.nombre_compra }} <span class="text-slate-600">cuota {{ cd.numero_cuota }}/{{ cd.total_cuotas }}</span></span>
-                  <span class="font-mono" style="color:#93C5FD">{{ formatCurrency(cd.monto_cuota) }}</span>
+                  <span class="min-w-0 truncate">{{ cd.nombre_compra }} <span class="text-slate-600">cuota {{ cd.numero_cuota }}/{{ cd.total_cuotas }}</span></span>
+                  <span class="flex-shrink-0 font-mono" style="color:#93C5FD">{{ formatCurrency(cd.monto_cuota) }}</span>
                 </div>
               </div>
             </div>

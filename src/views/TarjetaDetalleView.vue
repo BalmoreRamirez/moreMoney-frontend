@@ -17,10 +17,10 @@
 
     <template v-else-if="data">
       <!-- Encabezado de la tarjeta -->
-      <div class="flex flex-wrap items-start gap-6">
+      <div class="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:gap-6">
         <!-- Plástico grande -->
         <div
-          class="relative flex h-52 w-full max-w-xs flex-col justify-between overflow-hidden rounded-2xl p-5 shadow-card"
+          class="relative flex h-48 w-full flex-col justify-between overflow-hidden rounded-2xl p-5 shadow-card sm:h-52 sm:max-w-xs"
           :style="cardStyle"
         >
           <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full opacity-10" style="background:white" />
@@ -49,17 +49,17 @@
         </div>
 
         <!-- Gráfico donut -->
-        <div class="fintech-card flex flex-1 flex-col items-center justify-center p-6">
+        <div class="fintech-card flex w-full flex-col items-center justify-center p-6 lg:flex-1">
           <DonutChart
             :limite="data.saldos.limite_credito"
             :gastado="data.saldos.saldo_gastado"
             :disponible="data.saldos.saldo_disponible"
-            :size="200"
+            :size="180"
           />
         </div>
 
         <!-- Info adicional -->
-        <div class="fintech-card flex-1 space-y-4 p-5">
+        <div class="fintech-card w-full space-y-4 p-5 lg:flex-1">
           <h3 class="text-sm font-semibold text-slate-300">Información</h3>
           <div class="grid grid-cols-2 gap-3">
             <div class="rounded-xl p-3" style="background: var(--color-surface-mid)">
@@ -109,8 +109,8 @@
           <div v-if="!data.compras_normales.length" class="py-10 text-center text-sm text-slate-500">
             Sin compras normales registradas.
           </div>
-          <div v-else class="fintech-card overflow-hidden">
-            <table class="w-full text-sm">
+          <div v-else class="fintech-card overflow-x-auto">
+            <table class="w-full min-w-[420px] text-sm">
               <thead>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.06)">
                   <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Nombre</th>
