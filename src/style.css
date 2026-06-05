@@ -146,4 +146,13 @@ body {
   .fintech-input::placeholder {
     color: var(--color-text-muted);
   }
+
+  /* Opciones de select nativo */
+  .fintech-input option {
+    background: #0D2240;
+    color: #E2E8F0;
+  }
+  .fintech-input option:disabled {
+    color: #64748B;
+  }
 }
