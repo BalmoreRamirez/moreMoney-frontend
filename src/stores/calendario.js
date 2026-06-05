@@ -46,11 +46,11 @@ export const useCalendarioStore = defineStore('calendario', {
       }
     },
 
-    async confirmarPago(tarjeta_id) {
+    async confirmarPago(tarjeta_id, cuenta_id) {
       this.confirming = true
       try {
         const { data } = await api.post('/calendario/pago/confirmar', {
-          tarjeta_id, year: this.year, month: this.month,
+          tarjeta_id, year: this.year, month: this.month, cuenta_id,
         })
         return data
       } finally {

@@ -44,6 +44,31 @@ const router = createRouter({
           name: 'reportes',
           component: () => import('../views/ReportesView.vue'),
         },
+        {
+          path: 'cuentas',
+          name: 'cuentas',
+          component: () => import('../views/CuentasView.vue'),
+        },
+        {
+          path: 'cuentas/:id',
+          name: 'cuenta-detalle',
+          component: () => import('../views/CuentaDetalleView.vue'),
+        },
+        {
+          path: 'ingresos',
+          name: 'ingresos',
+          component: () => import('../views/IngresosView.vue'),
+        },
+        {
+          path: 'prestamos',
+          name: 'prestamos',
+          component: () => import('../views/PrestamosView.vue'),
+        },
+        {
+          path: 'prestamos/:id',
+          name: 'prestamo-detalle',
+          component: () => import('../views/PrestamoDetalleView.vue'),
+        },
       ],
     },
     {

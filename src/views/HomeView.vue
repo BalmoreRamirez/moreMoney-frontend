@@ -8,9 +8,8 @@
       <span class="text-xs text-slate-600 pt-1">{{ MONTHS[mesActual - 1] }} {{ anioActual }}</span>
     </div>
 
-    <!-- KPI cards -->
+    <!-- ── KPI: Tarjetas ──────────────────────────────────────────────────── -->
     <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <!-- Disponible total -->
       <div class="fintech-card p-5">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px]" style="color:#10B981">account_balance_wallet</span>
@@ -20,7 +19,6 @@
         <p class="mt-1 text-xs text-slate-600">de {{ formatCurrency(totalLimite) }} en límite</p>
       </div>
 
-      <!-- Gastado total -->
       <div class="fintech-card p-5">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px]" :style="{ color: colorGastado }">trending_up</span>
@@ -30,7 +28,6 @@
         <p class="mt-1 text-xs text-slate-600">{{ pctGastado }}% del límite global</p>
       </div>
 
-      <!-- A pagar este mes -->
       <div class="fintech-card p-5">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px]" style="color:#F59E0B">calendar_month</span>
@@ -40,7 +37,6 @@
         <p class="mt-1 text-xs text-slate-600">{{ MONTHS[mesActual - 1] }} {{ anioActual }}</p>
       </div>
 
-      <!-- Tarjetas activas -->
       <div class="fintech-card p-5">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px]" style="color:#93C5FD">credit_card</span>
@@ -62,7 +58,49 @@
       </div>
     </div>
 
-    <!-- Tarjetas individuales -->
+    <!-- ── KPI: Cuentas, Capital en calle, Flujo del mes ─────────────────── -->
+    <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <!-- Saldo en cuentas -->
+      <div class="fintech-card p-5" style="background:linear-gradient(135deg,rgba(16,185,129,0.06) 0%,rgba(10,25,47,0) 100%);border-color:rgba(16,185,129,0.15)">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]" style="color:#10B981">savings</span>
+          <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Saldo en cuentas</p>
+        </div>
+        <p class="mt-3 font-mono text-2xl font-bold" :style="{ color: saldoCuentas >= 0 ? '#10B981' : '#DC2626' }">
+          {{ cuentasStore.stats ? formatCurrency(cuentasStore.stats.saldo_total_cuentas) : '—' }}
+        </p>
+        <p class="mt-1 text-xs text-slate-600">saldo disponible consolidado</p>
+      </div>
+
+      <!-- Capital en calle -->
+      <div class="fintech-card p-5" style="background:linear-gradient(135deg,rgba(251,191,36,0.06) 0%,rgba(10,25,47,0) 100%);border-color:rgba(251,191,36,0.15)">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]" style="color:#FBBF24">handshake</span>
+          <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Capital en calle</p>
+        </div>
+        <p class="mt-3 font-mono text-2xl font-bold" style="color:#FBBF24">
+          {{ cuentasStore.stats ? formatCurrency(cuentasStore.stats.capital_en_calle) : '—' }}
+        </p>
+        <p class="mt-1 text-xs text-slate-600">en préstamos activos</p>
+      </div>
+
+      <!-- Flujo del mes -->
+      <div class="fintech-card p-5" :style="flujoStyle">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]" :style="{ color: flujoColor }">swap_vert</span>
+          <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Flujo {{ MONTHS[mesActual - 1] }}</p>
+        </div>
+        <p class="mt-3 font-mono text-2xl font-bold" :style="{ color: flujoColor }">
+          {{ cuentasStore.stats ? formatCurrency(cuentasStore.stats.flujo_mes.neto) : '—' }}
+        </p>
+        <p v-if="cuentasStore.stats" class="mt-1 text-xs text-slate-600">
+          +{{ formatCurrency(cuentasStore.stats.flujo_mes.ingresos) }} / -{{ formatCurrency(cuentasStore.stats.flujo_mes.egresos) }}
+        </p>
+        <p v-else class="mt-1 text-xs text-slate-600">ingresos − egresos del mes</p>
+      </div>
+    </div>
+
+    <!-- ── Tarjetas individuales ────────────────────────────────────────── -->
     <div class="mt-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">Mis tarjetas</h2>
 
@@ -84,7 +122,6 @@
           class="fintech-card block p-5 transition-all hover:border-white/20 hover:-translate-y-0.5"
           style="text-decoration:none"
         >
-          <!-- Cabecera -->
           <div class="flex items-start justify-between">
             <div>
               <p class="font-semibold text-slate-100">{{ t.nombre }}</p>
@@ -100,7 +137,6 @@
             >{{ pctTarjeta(t) }}%</span>
           </div>
 
-          <!-- Saldos -->
           <div class="mt-4 flex items-end justify-between">
             <div>
               <p class="text-[10px] text-slate-600">Disponible</p>
@@ -112,7 +148,6 @@
             </div>
           </div>
 
-          <!-- Mini barra -->
           <div class="mt-3 progress-bar-track" style="height:4px">
             <div
               class="progress-bar-fill"
@@ -129,7 +164,7 @@
       </div>
     </div>
 
-    <!-- Desglose del mes -->
+    <!-- ── Desglose del mes ─────────────────────────────────────────────── -->
     <div v-if="reportesStore.resumen.length" class="mt-8">
       <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">Pagos de {{ MONTHS[mesActual - 1] }}</h2>
       <div class="fintech-card overflow-hidden">
@@ -160,13 +195,15 @@
 import { computed, onMounted } from 'vue'
 import { useTarjetasStore } from '../stores/tarjetas'
 import { useReportesStore } from '../stores/reportes'
-import { formatCurrency } from '../utils/currency'
+import { useCuentasStore }  from '../stores/cuentas'
+import { formatCurrency }   from '../utils/currency'
 
 const tarjetasStore = useTarjetasStore()
 const reportesStore = useReportesStore()
+const cuentasStore  = useCuentasStore()
 
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const now = new Date()
+const now        = new Date()
 const mesActual  = now.getMonth() + 1
 const anioActual = now.getFullYear()
 
@@ -175,6 +212,7 @@ onMounted(async () => {
   reportesStore.month = mesActual
   reportesStore.year  = anioActual
   await reportesStore.fetchMensual()
+  await cuentasStore.fetchStats(anioActual, mesActual)
 })
 
 const totalLimite     = computed(() => tarjetasStore.tarjetas.reduce((s, t) => s + parseFloat(t.limite_credito), 0))
@@ -192,4 +230,13 @@ function pctTarjeta(t) {
   if (!t.limite_credito) return 0
   return Math.min(100, Math.round((t.saldo_gastado / t.limite_credito) * 100))
 }
+
+// Widgets de cuentas
+const saldoCuentas = computed(() => cuentasStore.stats?.saldo_total_cuentas ?? 0)
+const flujoNeto    = computed(() => cuentasStore.stats?.flujo_mes?.neto ?? 0)
+const flujoColor   = computed(() => flujoNeto.value >= 0 ? '#10B981' : '#DC2626')
+const flujoStyle   = computed(() => flujoNeto.value >= 0
+  ? 'background:linear-gradient(135deg,rgba(16,185,129,0.06) 0%,rgba(10,25,47,0) 100%);border-color:rgba(16,185,129,0.15)'
+  : 'background:linear-gradient(135deg,rgba(220,38,38,0.06) 0%,rgba(10,25,47,0) 100%);border-color:rgba(220,38,38,0.15)',
+)
 </script>

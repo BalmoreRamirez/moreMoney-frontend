@@ -82,12 +82,32 @@
               <span class="font-mono text-2xl font-bold text-success">{{ formatCurrency(store.detalle.total) }}</span>
             </div>
 
+            <!-- Selector de cuenta (obligatorio cuando hay algo que pagar) -->
+            <div v-if="store.detalle.total > 0">
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                ¿Desde qué cuenta pagas?
+              </label>
+              <select
+                v-model.number="cuentaId"
+                class="fintech-input w-full"
+                :class="!cuentaId && intentoConfirmar ? 'border-danger' : ''"
+              >
+                <option :value="null" disabled>Selecciona una cuenta</option>
+                <option v-for="c in cuentas" :key="c.id" :value="c.id">
+                  {{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }} ({{ c.tipo }})
+                </option>
+              </select>
+              <p v-if="!cuentaId && intentoConfirmar" class="mt-1 text-xs text-danger">
+                Debes seleccionar una cuenta para confirmar el pago.
+              </p>
+            </div>
+
             <!-- Error -->
             <div v-if="errorMsg" class="rounded-lg px-4 py-3 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid rgba(220,38,38,0.2)">
               {{ errorMsg }}
             </div>
 
-            <!-- No pendientes warning -->
+            <!-- No pendientes -->
             <div v-if="store.detalle.total === 0" class="rounded-lg px-4 py-3 text-sm text-slate-400" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
               No hay importes pendientes para este mes.
             </div>
@@ -115,26 +135,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useCalendarioStore } from '../stores/calendario'
-import { useTarjetasStore } from '../stores/tarjetas'
-import { formatCurrency } from '../utils/currency'
+import { useTarjetasStore }   from '../stores/tarjetas'
+import { useCuentasStore }    from '../stores/cuentas'
+import { formatCurrency }     from '../utils/currency'
 
 const props = defineProps({
-  modelValue:     Boolean,
-  tarjetaId:      { type: Number, default: null },
-  tarjetaNombre:  { type: String, default: '' },
-  banco:          { type: String, default: '' },
+  modelValue:    Boolean,
+  tarjetaId:     { type: Number, default: null },
+  tarjetaNombre: { type: String, default: '' },
+  banco:         { type: String, default: '' },
 })
 const emit = defineEmits(['update:modelValue', 'confirmed'])
 
 const store         = useCalendarioStore()
 const tarjetasStore = useTarjetasStore()
-const errorMsg      = ref('')
+const cuentasStore  = useCuentasStore()
+
+const cuentas         = computed(() => cuentasStore.cuentas)
+const cuentaId        = ref(null)
+const errorMsg        = ref('')
+const intentoConfirmar = ref(false)
 
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 const tituloMes = computed(() => `Pago de ${MONTHS[store.month - 1]} ${store.year}`)
+
+// Reset state when modal opens
+watch(() => props.modelValue, async (open) => {
+  if (open) {
+    cuentaId.value        = null
+    errorMsg.value        = ''
+    intentoConfirmar.value = false
+    if (!cuentasStore.cuentas.length) await cuentasStore.fetchCuentas()
+  }
+})
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -143,14 +179,18 @@ function formatDate(dateStr) {
 }
 
 function close() {
-  errorMsg.value = ''
+  errorMsg.value        = ''
+  intentoConfirmar.value = false
   emit('update:modelValue', false)
 }
 
 async function confirmar() {
+  intentoConfirmar.value = true
+  if (store.detalle?.total > 0 && !cuentaId.value) return
+
   errorMsg.value = ''
   try {
-    await store.confirmarPago(props.tarjetaId)
+    await store.confirmarPago(props.tarjetaId, cuentaId.value)
     await Promise.all([store.fetchCalendario(), tarjetasStore.fetchTarjetas()])
     emit('confirmed')
     close()

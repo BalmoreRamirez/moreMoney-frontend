@@ -114,11 +114,14 @@ function handleLogout() {
 }
 
 const navItems = [
-  { to: '/',           icon: 'dashboard',       label: 'Dashboard' },
-  { to: '/tarjetas',   icon: 'credit_card',      label: 'Tarjetas' },
-  { to: '/compras',    icon: 'shopping_bag',     label: 'Compras' },
-  { to: '/calendario', icon: 'calendar_month',   label: 'Calendario' },
-  { to: '/reportes',   icon: 'bar_chart',        label: 'Reportes' },
+  { to: '/',           icon: 'dashboard',              label: 'Dashboard' },
+  { to: '/tarjetas',   icon: 'credit_card',             label: 'Tarjetas' },
+  { to: '/compras',    icon: 'shopping_bag',            label: 'Compras' },
+  { to: '/calendario', icon: 'calendar_month',          label: 'Calendario' },
+  { to: '/reportes',   icon: 'bar_chart',               label: 'Reportes' },
+  { to: '/cuentas',    icon: 'account_balance_wallet',  label: 'Cuentas' },
+  { to: '/ingresos',   icon: 'payments',                label: 'Ingresos' },
+  { to: '/prestamos',  icon: 'handshake',               label: 'Préstamos' },
 ]
 
 function isActive(to) {
