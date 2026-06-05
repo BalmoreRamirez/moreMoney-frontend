@@ -121,6 +121,7 @@ const navItems = [
   { to: '/reportes',   icon: 'bar_chart',               label: 'Reportes' },
   { to: '/cuentas',    icon: 'account_balance_wallet',  label: 'Cuentas' },
   { to: '/ingresos',   icon: 'payments',                label: 'Ingresos' },
+  { to: '/egresos',    icon: 'money_off',               label: 'Egresos' },
   { to: '/prestamos',  icon: 'handshake',               label: 'Préstamos' },
 ]
 

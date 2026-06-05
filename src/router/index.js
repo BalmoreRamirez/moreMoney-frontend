@@ -60,6 +60,11 @@ const router = createRouter({
           component: () => import('../views/IngresosView.vue'),
         },
         {
+          path: 'egresos',
+          name: 'egresos',
+          component: () => import('../views/EgresosView.vue'),
+        },
+        {
           path: 'prestamos',
           name: 'prestamos',
           component: () => import('../views/PrestamosView.vue'),
