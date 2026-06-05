@@ -32,7 +32,7 @@
             <label class="mb-1.5 block text-xs text-slate-400">Cuenta de ingreso</label>
             <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
-              <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.tipo }})</option>
+              <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
             </select>
           </div>
 
@@ -60,6 +60,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
+import { formatCurrency }  from '../utils/currency'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },

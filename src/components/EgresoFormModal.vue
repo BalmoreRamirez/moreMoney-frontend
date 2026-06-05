@@ -59,7 +59,7 @@
               <select v-model.number="form.cuenta_id" class="fintech-input" required>
                 <option :value="null" disabled>Selecciona una cuenta</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
-                  {{ c.nombre }} ({{ c.tipo }})
+                  {{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}
                 </option>
               </select>
             </div>
@@ -92,6 +92,7 @@
 import { ref, computed, watch } from 'vue'
 import { useEgresosStore }  from '../stores/egresos'
 import { useCuentasStore }  from '../stores/cuentas'
+import { formatCurrency }   from '../utils/currency'
 
 const props = defineProps({
   modelValue: Boolean,

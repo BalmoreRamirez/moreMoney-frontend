@@ -44,7 +44,7 @@
             <label class="mb-1.5 block text-xs text-slate-400">Cuenta de origen (de donde sale el dinero)</label>
             <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
-              <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.tipo }})</option>
+              <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
             </select>
           </div>
 
