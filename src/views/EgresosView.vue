@@ -43,66 +43,69 @@
       <button class="mt-3 text-xs hover:underline" style="color:#DC2626" @click="showForm = true">Registrar egreso →</button>
     </div>
 
-    <!-- Tabla -->
-    <div v-else class="fintech-card mt-6 overflow-hidden">
-      <table class="w-full text-sm">
-        <thead>
-          <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
-            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Fecha</th>
-            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Descripción</th>
-            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Cuenta</th>
-            <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Monto</th>
-            <th class="px-5 py-3" />
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="grupo in egresosAgrupados" :key="grupo.fecha">
-            <!-- Fila de grupo por fecha -->
-            <tr style="background:rgba(220,38,38,0.05);border-bottom:1px solid rgba(220,38,38,0.12)">
-              <td class="px-5 py-2 font-mono text-xs font-semibold text-slate-300">{{ formatDate(grupo.fecha) }}</td>
-              <td class="px-5 py-2 text-xs text-slate-500" colspan="2">{{ grupo.egresos.length }} egreso{{ grupo.egresos.length !== 1 ? 's' : '' }}</td>
-              <td class="px-5 py-2 text-right font-mono text-xs font-semibold" style="color:#DC2626">{{ formatCurrency(grupo.total) }}</td>
-              <td class="px-5 py-2" />
-            </tr>
-            <!-- Filas de egresos del grupo -->
-            <tr
+    <!-- Accordion -->
+    <div v-else class="mt-6 flex flex-col gap-2">
+      <div
+        v-for="grupo in egresosAgrupados"
+        :key="grupo.fecha"
+        class="overflow-hidden rounded-xl"
+        style="border:1px solid rgba(255,255,255,0.07);background:#0D2240"
+      >
+        <!-- Cabecera del accordion -->
+        <button
+          class="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03]"
+          @click="toggleGrupo(grupo.fecha)"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="material-symbols-outlined text-[18px] transition-transform duration-200"
+              style="color:#DC2626"
+              :style="{ transform: abiertos.has(grupo.fecha) ? 'rotate(90deg)' : 'rotate(0deg)' }"
+            >chevron_right</span>
+            <span class="font-mono text-sm font-semibold text-slate-200">{{ formatDate(grupo.fecha) }}</span>
+            <span class="rounded-full px-2 py-0.5 text-xs text-slate-500" style="background:rgba(255,255,255,0.05)">
+              {{ grupo.egresos.length }} egreso{{ grupo.egresos.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+          <span class="font-mono text-sm font-bold" style="color:#DC2626">{{ formatCurrency(grupo.total) }}</span>
+        </button>
+
+        <!-- Cuerpo colapsable -->
+        <Transition name="accordion">
+          <div v-if="abiertos.has(grupo.fecha)" style="border-top:1px solid rgba(255,255,255,0.05)">
+            <div
               v-for="e in grupo.egresos"
               :key="e.id"
+              class="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/[0.02]"
               style="border-bottom:1px solid rgba(255,255,255,0.04)"
-              class="hover:bg-white/[0.02] transition-colors"
             >
-              <td class="px-5 py-3 font-mono text-xs text-slate-500 pl-8">—</td>
-              <td class="px-5 py-3 text-slate-200">{{ e.descripcion }}</td>
-              <td class="px-5 py-3">
-                <span class="rounded-md px-2 py-0.5 text-xs" style="background:rgba(255,255,255,0.06);color:#94A3B8">
+              <div class="flex-1 min-w-0">
+                <p class="truncate text-sm text-slate-200">{{ e.descripcion }}</p>
+                <span class="mt-0.5 inline-block rounded-md px-2 py-0.5 text-xs" style="background:rgba(255,255,255,0.06);color:#94A3B8">
                   {{ e.cuenta?.nombre || '—' }}
                 </span>
-              </td>
-              <td class="px-5 py-3 text-right font-mono font-semibold" style="color:#DC2626">
-                {{ formatCurrency(e.monto) }}
-              </td>
-              <td class="px-5 py-3">
-                <div class="flex items-center justify-end gap-2">
-                  <button
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-slate-300"
-                    title="Editar"
-                    @click="editarEgreso(e)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">edit</span>
-                  </button>
-                  <button
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400"
-                    title="Eliminar"
-                    @click="confirmarEliminar(e)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </table>
+              </div>
+              <span class="font-mono text-sm font-semibold shrink-0" style="color:#DC2626">{{ formatCurrency(e.monto) }}</span>
+              <div class="flex items-center gap-1 shrink-0">
+                <button
+                  class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-slate-300"
+                  title="Editar"
+                  @click="editarEgreso(e)"
+                >
+                  <span class="material-symbols-outlined text-[16px]">edit</span>
+                </button>
+                <button
+                  class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400"
+                  title="Eliminar"
+                  @click="confirmarEliminar(e)"
+                >
+                  <span class="material-symbols-outlined text-[16px]">delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- Modal form -->
@@ -137,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useEgresosStore } from '../stores/egresos'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
@@ -187,6 +190,20 @@ const egresosAgrupados = computed(() => {
     }))
 })
 
+const abiertos = ref(new Set())
+
+watch(egresosAgrupados, (grupos) => {
+  if (grupos.length && !abiertos.value.size) {
+    abiertos.value = new Set([grupos[0].fecha])
+  }
+}, { immediate: true })
+
+function toggleGrupo(fecha) {
+  const next = new Set(abiertos.value)
+  next.has(fecha) ? next.delete(fecha) : next.add(fecha)
+  abiertos.value = next
+}
+
 function formatDate(d) {
   if (!d) return ''
   const [y, m, dd] = d.split('-')
@@ -216,4 +233,14 @@ async function eliminar() {
 <style scoped>
 .modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
 .modal-enter-from, .modal-leave-to       { opacity: 0; }
+
+.accordion-enter-active, .accordion-leave-active {
+  transition: opacity 0.2s ease, max-height 0.25s ease;
+  max-height: 800px;
+  overflow: hidden;
+}
+.accordion-enter-from, .accordion-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
 </style>
