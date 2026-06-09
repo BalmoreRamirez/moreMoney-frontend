@@ -56,41 +56,51 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="e in egresosFiltrados"
-            :key="e.id"
-            style="border-bottom:1px solid rgba(255,255,255,0.04)"
-            class="hover:bg-white/[0.02] transition-colors"
-          >
-            <td class="px-5 py-3 font-mono text-xs text-slate-400">{{ formatDate(e.fecha) }}</td>
-            <td class="px-5 py-3 text-slate-200">{{ e.descripcion }}</td>
-            <td class="px-5 py-3">
-              <span class="rounded-md px-2 py-0.5 text-xs" style="background:rgba(255,255,255,0.06);color:#94A3B8">
-                {{ e.cuenta?.nombre || '—' }}
-              </span>
-            </td>
-            <td class="px-5 py-3 text-right font-mono font-semibold" style="color:#DC2626">
-              {{ formatCurrency(e.monto) }}
-            </td>
-            <td class="px-5 py-3">
-              <div class="flex items-center justify-end gap-2">
-                <button
-                  class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-slate-300"
-                  title="Editar"
-                  @click="editarEgreso(e)"
-                >
-                  <span class="material-symbols-outlined text-[16px]">edit</span>
-                </button>
-                <button
-                  class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400"
-                  title="Eliminar"
-                  @click="confirmarEliminar(e)"
-                >
-                  <span class="material-symbols-outlined text-[16px]">delete</span>
-                </button>
-              </div>
-            </td>
-          </tr>
+          <template v-for="grupo in egresosAgrupados" :key="grupo.fecha">
+            <!-- Fila de grupo por fecha -->
+            <tr style="background:rgba(220,38,38,0.05);border-bottom:1px solid rgba(220,38,38,0.12)">
+              <td class="px-5 py-2 font-mono text-xs font-semibold text-slate-300">{{ formatDate(grupo.fecha) }}</td>
+              <td class="px-5 py-2 text-xs text-slate-500" colspan="2">{{ grupo.egresos.length }} egreso{{ grupo.egresos.length !== 1 ? 's' : '' }}</td>
+              <td class="px-5 py-2 text-right font-mono text-xs font-semibold" style="color:#DC2626">{{ formatCurrency(grupo.total) }}</td>
+              <td class="px-5 py-2" />
+            </tr>
+            <!-- Filas de egresos del grupo -->
+            <tr
+              v-for="e in grupo.egresos"
+              :key="e.id"
+              style="border-bottom:1px solid rgba(255,255,255,0.04)"
+              class="hover:bg-white/[0.02] transition-colors"
+            >
+              <td class="px-5 py-3 font-mono text-xs text-slate-500 pl-8">—</td>
+              <td class="px-5 py-3 text-slate-200">{{ e.descripcion }}</td>
+              <td class="px-5 py-3">
+                <span class="rounded-md px-2 py-0.5 text-xs" style="background:rgba(255,255,255,0.06);color:#94A3B8">
+                  {{ e.cuenta?.nombre || '—' }}
+                </span>
+              </td>
+              <td class="px-5 py-3 text-right font-mono font-semibold" style="color:#DC2626">
+                {{ formatCurrency(e.monto) }}
+              </td>
+              <td class="px-5 py-3">
+                <div class="flex items-center justify-end gap-2">
+                  <button
+                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-slate-300"
+                    title="Editar"
+                    @click="editarEgreso(e)"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">edit</span>
+                  </button>
+                  <button
+                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400"
+                    title="Eliminar"
+                    @click="confirmarEliminar(e)"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -160,6 +170,22 @@ const egresosFiltrados = computed(() => {
 const totalPeriodo = computed(() =>
   egresosFiltrados.value.reduce((s, e) => s + parseFloat(e.monto), 0)
 )
+
+const egresosAgrupados = computed(() => {
+  const map = new Map()
+  for (const e of egresosFiltrados.value) {
+    const fecha = e.fecha?.split('T')[0] ?? ''
+    if (!map.has(fecha)) map.set(fecha, [])
+    map.get(fecha).push(e)
+  }
+  return [...map.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([fecha, egresos]) => ({
+      fecha,
+      egresos,
+      total: egresos.reduce((s, e) => s + parseFloat(e.monto), 0),
+    }))
+})
 
 function formatDate(d) {
   if (!d) return ''
