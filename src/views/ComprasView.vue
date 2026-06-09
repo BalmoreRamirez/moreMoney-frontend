@@ -99,46 +99,61 @@
           <p class="mt-1 text-sm text-slate-500">Registra tu primera compra para ver el movimiento aquí.</p>
         </div>
 
-        <div v-else class="fintech-card overflow-x-auto">
-          <table class="w-full min-w-[560px] text-sm">
-            <thead>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
-                <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Descripción</th>
-                <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Tarjeta</th>
-                <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Fecha</th>
-                <th class="px-4 py-3 text-right text-[10px] font-semibold uppercase tracking-wider text-slate-500">Monto</th>
-                <th class="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-500">Estado</th>
-                <th class="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="c in comprasStore.normales"
-                :key="c.id"
-                style="border-bottom:1px solid rgba(255,255,255,0.04)"
-              >
-                <td class="px-4 py-3 font-medium text-slate-200">{{ c.nombre }}</td>
-                <td class="px-4 py-3 text-slate-400">
-                  <span class="text-xs">{{ c.tarjeta?.nombre }}</span>
-                  <span class="ml-1 text-[10px] text-slate-600">{{ c.tarjeta?.banco }}</span>
-                </td>
-                <td class="px-4 py-3 text-slate-400">{{ formatDate(c.fecha_compra) }}</td>
-                <td class="px-4 py-3 text-right font-mono font-semibold text-slate-200">{{ formatCurrency(c.monto) }}</td>
-                <td class="px-4 py-3 text-center">
-                  <span :class="c.estado === 'pagada' ? 'badge-success' : 'badge-alert'">{{ c.estado }}</span>
-                </td>
-                <td class="px-4 py-3 text-right">
+        <div v-else class="flex flex-col gap-2">
+          <div
+            v-for="grupo in normalesAgrupados"
+            :key="grupo.fecha"
+            class="overflow-hidden rounded-xl"
+            style="border:1px solid rgba(255,255,255,0.07);background:#0D2240"
+          >
+            <!-- Cabecera -->
+            <button
+              class="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03]"
+              @click="toggleNormalGrupo(grupo.fecha)"
+            >
+              <div class="flex items-center gap-3">
+                <span
+                  class="material-symbols-outlined text-[18px] transition-transform duration-200"
+                  style="color:#10B981"
+                  :style="{ transform: abiertosNormales.has(grupo.fecha) ? 'rotate(90deg)' : 'rotate(0deg)' }"
+                >chevron_right</span>
+                <span class="font-mono text-sm font-semibold text-slate-200">{{ formatDate(grupo.fecha) }}</span>
+                <span class="rounded-full px-2 py-0.5 text-xs text-slate-500" style="background:rgba(255,255,255,0.05)">
+                  {{ grupo.compras.length }} compra{{ grupo.compras.length !== 1 ? 's' : '' }}
+                </span>
+              </div>
+              <span class="font-mono text-sm font-bold text-slate-200">{{ formatCurrency(grupo.total) }}</span>
+            </button>
+
+            <!-- Cuerpo colapsable -->
+            <Transition name="accordion">
+              <div v-if="abiertosNormales.has(grupo.fecha)" style="border-top:1px solid rgba(255,255,255,0.05)">
+                <div
+                  v-for="c in grupo.compras"
+                  :key="c.id"
+                  class="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/[0.02]"
+                  style="border-bottom:1px solid rgba(255,255,255,0.04)"
+                >
+                  <div class="flex-1 min-w-0">
+                    <p class="truncate text-sm font-medium text-slate-200">{{ c.nombre }}</p>
+                    <span class="mt-0.5 text-xs text-slate-500">
+                      {{ c.tarjeta?.nombre }}
+                      <span class="text-slate-600">{{ c.tarjeta?.banco }}</span>
+                    </span>
+                  </div>
+                  <span :class="c.estado === 'pagada' ? 'badge-success' : 'badge-alert'" class="shrink-0">{{ c.estado }}</span>
+                  <span class="font-mono text-sm font-semibold text-slate-200 shrink-0">{{ formatCurrency(c.monto) }}</span>
                   <button
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-                    @click="confirmDeleteNormal(c)"
+                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
                     title="Eliminar"
+                    @click="confirmDeleteNormal(c)"
                   >
                     <span class="material-symbols-outlined text-[16px]">delete</span>
                   </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </Transition>
+          </div>
         </div>
       </div>
 
@@ -257,7 +272,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useComprasStore }  from '../stores/compras'
 import { useTarjetasStore } from '../stores/tarjetas'
 import { formatCurrency }   from '../utils/currency'
@@ -268,6 +283,37 @@ import ConfirmDeleteModal      from '../components/ConfirmDeleteModal.vue'
 // ── Stores ────────────────────────────────────────────────────────
 const comprasStore  = useComprasStore()
 const tarjetasStore = useTarjetasStore()
+
+// ── Accordion compras normales ────────────────────────────────────
+const normalesAgrupados = computed(() => {
+  const map = new Map()
+  for (const c of comprasStore.normales) {
+    const fecha = c.fecha_compra?.split('T')[0] ?? ''
+    if (!map.has(fecha)) map.set(fecha, [])
+    map.get(fecha).push(c)
+  }
+  return [...map.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([fecha, compras]) => ({
+      fecha,
+      compras,
+      total: compras.reduce((s, c) => s + parseFloat(c.monto), 0),
+    }))
+})
+
+const abiertosNormales = ref(new Set())
+
+watch(normalesAgrupados, (grupos) => {
+  if (grupos.length && !abiertosNormales.value.size) {
+    abiertosNormales.value = new Set([grupos[0].fecha])
+  }
+}, { immediate: true })
+
+function toggleNormalGrupo(fecha) {
+  const next = new Set(abiertosNormales.value)
+  next.has(fecha) ? next.delete(fecha) : next.add(fecha)
+  abiertosNormales.value = next
+}
 
 const activeTab     = ref('normales')
 const filtroTarjeta = ref('')
@@ -393,3 +439,15 @@ function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 </script>
+
+<style scoped>
+.accordion-enter-active, .accordion-leave-active {
+  transition: opacity 0.2s ease, max-height 0.25s ease;
+  max-height: 800px;
+  overflow: hidden;
+}
+.accordion-enter-from, .accordion-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+</style>
