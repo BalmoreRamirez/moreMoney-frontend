@@ -6,14 +6,25 @@
         <h1 class="text-2xl font-bold text-slate-100">Cuentas</h1>
         <p class="mt-1 text-sm text-slate-400">Control de tus billeteras y flujo de dinero.</p>
       </div>
-      <button
-        class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-        style="background:#10B981"
-        @click="openCreate"
-      >
-        <span class="material-symbols-outlined text-[18px]">add</span>
-        <span class="hidden sm:inline">Nueva cuenta</span>
-      </button>
+      <div class="flex gap-2">
+        <button
+          v-if="store.cuentas.length >= 2"
+          class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+          style="background:#A78BFA"
+          @click="showTransferModal = true"
+        >
+          <span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+          <span class="hidden sm:inline">Mover fondos</span>
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+          style="background:#10B981"
+          @click="openCreate"
+        >
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span class="hidden sm:inline">Nueva cuenta</span>
+        </button>
+      </div>
     </div>
 
     <!-- Saldo total consolidado -->
@@ -113,6 +124,9 @@
       @saved="onSaved"
     />
 
+    <!-- Transferencia entre cuentas -->
+    <TransferenciaModal v-model="showTransferModal" />
+
     <!-- Confirm delete -->
     <ConfirmDeleteModal
       v-if="deleteTarget"
@@ -130,8 +144,9 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency } from '../utils/currency'
-import CuentaFormModal   from '../components/CuentaFormModal.vue'
-import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
+import CuentaFormModal     from '../components/CuentaFormModal.vue'
+import ConfirmDeleteModal   from '../components/ConfirmDeleteModal.vue'
+import TransferenciaModal   from '../components/TransferenciaModal.vue'
 
 const store  = useCuentasStore()
 const router = useRouter()
@@ -152,6 +167,7 @@ function iconoColor(tipo) {
 }
 
 // Modal crear/editar
+const showTransferModal = ref(false)
 const showModal  = ref(false)
 const editTarget = ref(null)
 function openCreate() { editTarget.value = null; showModal.value = true }

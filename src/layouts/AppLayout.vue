@@ -123,6 +123,7 @@ const navItems = [
   { to: '/ingresos',   icon: 'payments',                label: 'Ingresos' },
   { to: '/egresos',    icon: 'money_off',               label: 'Egresos' },
   { to: '/prestamos',  icon: 'handshake',               label: 'Préstamos' },
+  { to: '/creditos',   icon: 'credit_score',            label: 'Créditos' },
 ]
 
 function isActive(to) {

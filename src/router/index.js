@@ -74,6 +74,16 @@ const router = createRouter({
           name: 'prestamo-detalle',
           component: () => import('../views/PrestamoDetalleView.vue'),
         },
+        {
+          path: 'creditos',
+          name: 'creditos',
+          component: () => import('../views/CreditosView.vue'),
+        },
+        {
+          path: 'creditos/:id',
+          name: 'credito-detalle',
+          component: () => import('../views/CreditoDetalleView.vue'),
+        },
       ],
     },
     {

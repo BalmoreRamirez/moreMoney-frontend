@@ -49,5 +49,11 @@ export const useCuentasStore = defineStore('cuentas', () => {
     }
   }
 
-  return { cuentas, saldo_total, stats, loading, error, fetchCuentas, createCuenta, updateCuenta, deleteCuenta, fetchStats }
+  async function transferir(payload) {
+    const { data } = await api.post('/cuentas/transferir', payload)
+    await fetchCuentas()
+    return data
+  }
+
+  return { cuentas, saldo_total, stats, loading, error, fetchCuentas, createCuenta, updateCuenta, deleteCuenta, fetchStats, transferir }
 })
