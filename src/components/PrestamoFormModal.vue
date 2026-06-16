@@ -10,7 +10,9 @@
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
         style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)"
       >
-        <h2 class="text-base font-semibold text-white">Nuevo préstamo</h2>
+        <h2 class="text-base font-semibold text-white">
+          {{ editData ? 'Editar préstamo' : 'Nuevo préstamo' }}
+        </h2>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
@@ -64,7 +66,7 @@
               Cancelar
             </button>
             <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
-              {{ saving ? 'Guardando…' : 'Registrar préstamo' }}
+              {{ saving ? 'Guardando…' : editData ? 'Guardar cambios' : 'Registrar préstamo' }}
             </button>
           </div>
         </form>
@@ -80,19 +82,19 @@ import { formatCurrency } from '../utils/currency'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
+  editData:   { type: Object,  default: null },
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
 const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
 
-const today = new Date().toISOString().split('T')[0]
 const form = ref({
   deudor_nombre:   '',
   deudor_contacto: '',
   capital:         '',
   tasa_display:    '',
-  fecha_inicio:    today,
+  fecha_inicio:    new Date().toISOString().split('T')[0],
   cuenta_id:       '',
 })
 const saving   = ref(false)
@@ -102,7 +104,18 @@ watch(() => props.modelValue, (open) => {
   if (!open) return
   errorMsg.value = ''
   saving.value   = false
-  form.value     = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: new Date().toISOString().split('T')[0], cuenta_id: '' }
+  if (props.editData) {
+    form.value = {
+      deudor_nombre:   props.editData.deudor_nombre,
+      deudor_contacto: props.editData.deudor_contacto || '',
+      capital:         parseFloat(props.editData.capital),
+      tasa_display:    parseFloat((parseFloat(props.editData.tasa_interes_mensual) * 100).toFixed(4)),
+      fecha_inicio:    props.editData.fecha_inicio,
+      cuenta_id:       props.editData.cuenta_id,
+    }
+  } else {
+    form.value = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: new Date().toISOString().split('T')[0], cuenta_id: '' }
+  }
 })
 
 function close() { emit('update:modelValue', false) }

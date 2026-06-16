@@ -40,6 +40,12 @@ export const usePrestamosStore = defineStore('prestamos', () => {
     return data
   }
 
+  async function updatePrestamo(id, payload) {
+    const { data } = await api.put(`/prestamos/${id}`, payload)
+    await fetchPrestamos()
+    return data
+  }
+
   async function deletePrestamo(id) {
     await api.delete(`/prestamos/${id}`)
     await fetchPrestamos()
@@ -59,7 +65,7 @@ export const usePrestamosStore = defineStore('prestamos', () => {
 
   return {
     prestamos, prestamo, loading, error,
-    fetchPrestamos, fetchPrestamo, createPrestamo, deletePrestamo,
+    fetchPrestamos, fetchPrestamo, createPrestamo, updatePrestamo, deletePrestamo,
     registrarAbono, marcarPagado,
   }
 })

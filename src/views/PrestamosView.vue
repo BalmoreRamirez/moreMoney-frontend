@@ -81,14 +81,22 @@
             >
               {{ p.estado === 'activo' ? 'Activo' : 'Pagado' }}
             </span>
-            <button
-              v-if="p.estado === 'activo' && !p.pagos?.length"
-              class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-              title="Eliminar"
-              @click="confirmDelete(p)"
-            >
-              <span class="material-symbols-outlined text-[16px]">delete</span>
-            </button>
+            <template v-if="p.estado === 'activo' && !p.pagos?.length">
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+                title="Editar"
+                @click="openEdit(p)"
+              >
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                title="Eliminar"
+                @click="confirmDelete(p)"
+              >
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </template>
           </div>
         </div>
 
@@ -136,7 +144,7 @@
     </div>
 
     <!-- Modales -->
-    <PrestamoFormModal v-model="showFormModal" @saved="onCrear" />
+    <PrestamoFormModal v-model="showFormModal" :edit-data="editTarget2" @saved="onSaved" />
 
     <ConfirmDeleteModal
       v-if="deleteTarget"
@@ -150,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePrestamosStore } from '../stores/prestamos'
 import { useCuentasStore }   from '../stores/cuentas'
@@ -192,11 +200,24 @@ function progresoLabel(p) {
   return `${progresoPct(p)}% (${formatCurrency(p.total_pagado)} / ${formatCurrency(p.total_deuda)})`
 }
 
-// Crear
+// Crear / Editar
 const showFormModal = ref(false)
-async function onCrear(payload) {
-  try { await store.createPrestamo(payload) }
-  catch (e) { console.error(e) }
+const editTarget2   = ref(null)
+
+function openEdit(p) {
+  editTarget2.value  = p
+  showFormModal.value = true
+}
+
+watch(showFormModal, (open) => {
+  if (!open) editTarget2.value = null
+})
+
+async function onSaved(payload) {
+  try {
+    if (editTarget2.value) await store.updatePrestamo(editTarget2.value.id, payload)
+    else                   await store.createPrestamo(payload)
+  } catch (e) { console.error(e) }
 }
 
 // Eliminar
