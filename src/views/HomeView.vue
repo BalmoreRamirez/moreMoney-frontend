@@ -370,12 +370,14 @@ const now        = new Date()
 const mesActual  = now.getMonth() + 1
 const anioActual = now.getFullYear()
 
-onMounted(async () => {
-  await tarjetasStore.fetchTarjetas()
+onMounted(() => {
   reportesStore.month = mesActual
   reportesStore.year  = anioActual
-  await reportesStore.fetchMensual()
-  await cuentasStore.fetchStats(anioActual, mesActual)
+  Promise.all([
+    tarjetasStore.fetchTarjetas(),
+    reportesStore.fetchMensual(),
+    cuentasStore.fetchStats(anioActual, mesActual),
+  ])
 })
 
 // ── Crédito (tarjetas) ───────────────────────────────────────────────────────

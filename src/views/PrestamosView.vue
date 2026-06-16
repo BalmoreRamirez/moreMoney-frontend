@@ -178,10 +178,7 @@ const FILTROS = [
 
 const filtro = ref('')
 
-onMounted(async () => {
-  await cuentasStore.fetchCuentas()
-  await store.fetchPrestamos()
-})
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos()]))
 
 function setFiltro(val) {
   filtro.value = val

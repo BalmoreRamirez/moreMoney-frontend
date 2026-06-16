@@ -160,10 +160,7 @@ const cuentasStore = useCuentasStore()
 const route        = useRoute()
 const router       = useRouter()
 
-onMounted(async () => {
-  await cuentasStore.fetchCuentas()
-  await store.fetchCredito(route.params.id)
-})
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchCredito(route.params.id)]))
 
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 

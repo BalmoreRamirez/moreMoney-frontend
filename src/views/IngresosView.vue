@@ -341,11 +341,7 @@ function toggleInvGrupo(fecha) {
   abiertosI.value = next
 }
 
-onMounted(async () => {
-  await cuentasStore.fetchCuentas()
-  await store.fetchSueldos()
-  await store.fetchInversiones()
-})
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchSueldos(), store.fetchInversiones()]))
 
 watch(activeTab, (tab) => {
   if (tab === 'sueldos')     store.fetchSueldos()

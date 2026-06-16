@@ -396,8 +396,10 @@ async function doDeleteNormal() {
   deleting.value = true
   try {
     await comprasStore.deleteNormal(deleteNormalTarget.value.id)
-    await comprasStore.fetchNormales(filtroTarjeta.value ? { tarjeta_id: filtroTarjeta.value } : {})
-    await tarjetasStore.fetchTarjetas()
+    await Promise.all([
+      comprasStore.fetchNormales(filtroTarjeta.value ? { tarjeta_id: filtroTarjeta.value } : {}),
+      tarjetasStore.fetchTarjetas(),
+    ])
     deleteNormalTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'
@@ -410,8 +412,10 @@ async function doDeleteTasaCero() {
   deleting.value = true
   try {
     await comprasStore.deleteTasaCero(deleteTasaCeroTarget.value.id)
-    await comprasStore.fetchTasaCero(filtroTarjeta.value ? { tarjeta_id: filtroTarjeta.value } : {})
-    await tarjetasStore.fetchTarjetas()
+    await Promise.all([
+      comprasStore.fetchTasaCero(filtroTarjeta.value ? { tarjeta_id: filtroTarjeta.value } : {}),
+      tarjetasStore.fetchTarjetas(),
+    ])
     deleteTasaCeroTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'
