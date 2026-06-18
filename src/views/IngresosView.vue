@@ -227,7 +227,7 @@
                     v-if="inv.estado === 'en_curso'"
                     class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
                     style="background:rgba(16,185,129,0.15);color:#10B981"
-                    @click="openCobrar(inv)"
+                    @click="openCobrarInv(inv)"
                   >
                     <span class="material-symbols-outlined text-[14px]">payments</span>
                     Cobrar
@@ -269,9 +269,9 @@
     />
 
     <CobrarInversionModal
-      v-model="showCobrarModal"
-      :inversion="cobrarTarget"
-      @saved="onCobrar"
+      v-model="showCobrarInvModal"
+      :inversion="cobrarInvTarget"
+      @saved="onCobrarInv"
     />
 
     <ConfirmDeleteModal
@@ -424,15 +424,15 @@ async function onInversionSaved(payload) {
 }
 
 // ─── COBRAR INVERSIÓN ────────────────────────────────────────────────────────
-const showCobrarModal = ref(false)
-const cobrarTarget    = ref(null)
+const showCobrarInvModal = ref(false)
+const cobrarInvTarget    = ref(null)
 
-function openCobrar(inv) { cobrarTarget.value = inv; showCobrarModal.value = true }
+function openCobrarInv(inv) { cobrarInvTarget.value = inv; showCobrarInvModal.value = true }
 
-async function onCobrar(payload) {
-  if (!cobrarTarget.value) return
+async function onCobrarInv(payload) {
+  if (!cobrarInvTarget.value) return
   try {
-    await store.registrarCobro(cobrarTarget.value.id, payload)
+    await store.registrarCobro(cobrarInvTarget.value.id, payload)
   } catch (e) {
     console.error(e)
   }
