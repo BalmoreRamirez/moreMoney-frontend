@@ -171,14 +171,14 @@ const cuentasStore = useCuentasStore()
 const router       = useRouter()
 
 const FILTROS = [
-  { value: '',       label: 'Todos' },
   { value: 'activo', label: 'Activos' },
   { value: 'pagado', label: 'Pagados' },
+  { value: '',       label: 'Todos'   },
 ]
 
-const filtro = ref('')
+const filtro = ref('activo')
 
-onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos()]))
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos({ estado: 'activo' })]))
 
 function setFiltro(val) {
   filtro.value = val

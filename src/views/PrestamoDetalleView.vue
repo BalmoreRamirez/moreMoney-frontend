@@ -45,14 +45,6 @@
             <span class="material-symbols-outlined text-[18px]">payments</span>
             <span class="hidden sm:inline">Registrar abono</span>
           </button>
-          <button
-            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-            style="background:#3B82F6"
-            @click="confirmPagar = true"
-          >
-            <span class="material-symbols-outlined text-[18px]">check_circle</span>
-            <span class="hidden sm:inline">Marcar como pagado</span>
-          </button>
         </div>
       </div>
 
@@ -142,51 +134,6 @@
       @saved="onAbono"
     />
 
-    <!-- Confirm marcar pagado -->
-    <Teleport to="body">
-      <div v-if="confirmPagar" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div
-          class="absolute inset-0"
-          style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)"
-          @click="confirmPagar = false"
-        />
-        <div
-          class="relative w-full max-w-sm rounded-2xl p-6 shadow-card"
-          style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)"
-        >
-          <div class="flex items-start gap-4">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style="background:rgba(59,130,246,0.15)">
-              <span class="material-symbols-outlined text-[20px]" style="color:#3B82F6">check_circle</span>
-            </div>
-            <div>
-              <h3 class="font-semibold text-white">Marcar como pagado</h3>
-              <p class="mt-1 text-sm text-slate-400">
-                ¿Confirmar que el préstamo de
-                <strong class="text-white">{{ store.prestamo?.deudor_nombre }}</strong>
-                ha sido liquidado completamente?
-              </p>
-              <p v-if="store.prestamo?.ganancia > 0" class="mt-2 text-xs" style="color:#10B981">
-                Se registrará una ganancia de {{ formatCurrency(store.prestamo.ganancia) }}.
-              </p>
-              <p v-if="pagarError" class="mt-2 text-xs text-danger">{{ pagarError }}</p>
-            </div>
-          </div>
-          <div class="mt-5 flex gap-3">
-            <button class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="confirmPagar = false">
-              Cancelar
-            </button>
-            <button
-              :disabled="pagando"
-              class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-              style="background:#3B82F6"
-              @click="doPagar"
-            >
-              {{ pagando ? 'Procesando…' : 'Confirmar pago' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
   </section>
 </template>
 
@@ -213,32 +160,8 @@ const progresoPct = computed(() => {
 
 // Abono
 const showAbonoModal = ref(false)
-const abonoError     = ref('')
 
 async function onAbono(payload) {
-  abonoError.value = ''
-  try {
-    await store.registrarAbono(route.params.id, payload)
-  } catch (e) {
-    abonoError.value = e.response?.data?.error || 'Error al registrar abono'
-  }
-}
-
-// Marcar pagado
-const confirmPagar = ref(false)
-const pagarError   = ref('')
-const pagando      = ref(false)
-
-async function doPagar() {
-  pagando.value  = true
-  pagarError.value = ''
-  try {
-    await store.marcarPagado(route.params.id)
-    confirmPagar.value = false
-  } catch (e) {
-    pagarError.value = e.response?.data?.error || 'Error al marcar como pagado'
-  } finally {
-    pagando.value = false
-  }
+  await store.registrarAbono(route.params.id, payload)
 }
 </script>
