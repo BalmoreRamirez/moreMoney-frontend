@@ -29,6 +29,22 @@
           </div>
 
           <div>
+            <label class="mb-1.5 block text-xs text-slate-400">
+              Precio de venta esperado ($)
+              <span class="ml-1 text-slate-600">(opcional)</span>
+            </label>
+            <input
+              v-model.number="form.precio_esperado"
+              type="number" min="0.01" step="0.01" placeholder="Ej. 200.00"
+              class="fintech-input w-full"
+            />
+            <p v-if="gananciaEsperada !== null" class="mt-1.5 text-xs" :style="gananciaEsperada >= 0 ? 'color:#10B981' : 'color:#DC2626'">
+              Ganancia esperada: {{ formatCurrency(gananciaEsperada) }}
+              ({{ gananciaEsperadaPct }}%)
+            </p>
+          </div>
+
+          <div>
             <label class="mb-1.5 block text-xs text-slate-400">Cuenta de egreso (donde sale el dinero)</label>
             <select v-model.number="form.cuenta_egreso_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
@@ -66,15 +82,28 @@ const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
 
 const today    = new Date().toISOString().split('T')[0]
-const form     = ref({ nombre: '', costo_total: '', fecha_compra: today, cuenta_egreso_id: '' })
+const form     = ref({ nombre: '', costo_total: '', precio_esperado: '', fecha_compra: today, cuenta_egreso_id: '' })
 const saving   = ref(false)
 const errorMsg = ref('')
+
+const gananciaEsperada = computed(() => {
+  const costo    = parseFloat(form.value.costo_total)
+  const esperado = parseFloat(form.value.precio_esperado)
+  if (!form.value.precio_esperado || isNaN(costo) || isNaN(esperado)) return null
+  return parseFloat((esperado - costo).toFixed(2))
+})
+
+const gananciaEsperadaPct = computed(() => {
+  const costo = parseFloat(form.value.costo_total)
+  if (!costo || gananciaEsperada.value === null) return 0
+  return parseFloat(((gananciaEsperada.value / costo) * 100).toFixed(1))
+})
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
   errorMsg.value = ''
   saving.value   = false
-  form.value     = { nombre: '', costo_total: '', fecha_compra: new Date().toISOString().split('T')[0], cuenta_egreso_id: '' }
+  form.value     = { nombre: '', costo_total: '', precio_esperado: '', fecha_compra: new Date().toISOString().split('T')[0], cuenta_egreso_id: '' }
 })
 
 function close() { emit('update:modelValue', false) }

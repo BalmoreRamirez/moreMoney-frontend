@@ -195,10 +195,16 @@
                   <div class="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
                     <span>Costo: <span class="font-mono text-slate-400">{{ formatCurrency(inv.costo_total) }}</span></span>
                     <span v-if="inv.precio_venta_total != null">Venta: <span class="font-mono text-slate-400">{{ formatCurrency(inv.precio_venta_total) }}</span></span>
+                    <span v-else-if="inv.ganancia_esperada != null" style="color:#FBBF24">
+                      Esp: <span class="font-mono">+{{ formatCurrency(inv.ganancia_esperada) }}</span>
+                    </span>
                   </div>
                 </div>
                 <span v-if="inv.ganancia != null" class="font-mono text-sm font-semibold shrink-0" :style="{ color: inv.ganancia >= 0 ? '#10B981' : '#DC2626' }">
                   {{ formatCurrency(inv.ganancia) }}
+                </span>
+                <span v-else-if="inv.ganancia_esperada != null" class="font-mono text-sm font-semibold shrink-0" style="color:rgba(251,191,36,0.7)">
+                  +{{ formatCurrency(inv.ganancia_esperada) }}
                 </span>
                 <span
                   class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0"
