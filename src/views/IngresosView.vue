@@ -192,18 +192,30 @@
               >
                 <div class="flex-1 min-w-0">
                   <p class="truncate text-sm font-medium text-slate-200">{{ inv.nombre }}</p>
-                  <div class="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+                  <div class="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
                     <span>Costo: <span class="font-mono text-slate-400">{{ formatCurrency(inv.costo_total) }}</span></span>
-                    <span v-if="inv.precio_venta_total != null">Venta: <span class="font-mono text-slate-400">{{ formatCurrency(inv.precio_venta_total) }}</span></span>
-                    <span v-else-if="inv.ganancia_esperada != null" style="color:#FBBF24">
-                      Esp: <span class="font-mono">+{{ formatCurrency(inv.ganancia_esperada) }}</span>
+                    <span v-if="inv.estado === 'en_curso' && inv.total_cobrado > 0">
+                      Cobrado: <span class="font-mono" style="color:#10B981">{{ formatCurrency(inv.total_cobrado) }}</span>
                     </span>
+                    <span v-if="inv.estado === 'en_curso' && inv.saldo_por_cobrar != null && inv.saldo_por_cobrar > 0">
+                      Falta: <span class="font-mono" style="color:#FBBF24">{{ formatCurrency(inv.saldo_por_cobrar) }}</span>
+                    </span>
+                    <span v-if="inv.estado === 'vendida' && inv.precio_venta_total != null">
+                      Venta total: <span class="font-mono text-slate-400">{{ formatCurrency(inv.precio_venta_total) }}</span>
+                    </span>
+                  </div>
+                  <!-- Barra de progreso para en_curso con cobros -->
+                  <div v-if="inv.estado === 'en_curso' && inv.precio_esperado && inv.total_cobrado > 0" class="mt-1.5 h-1 w-full rounded-full overflow-hidden" style="background:rgba(255,255,255,0.06)">
+                    <div
+                      class="h-full rounded-full"
+                      :style="{ width: Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) + '%', background: '#10B981' }"
+                    />
                   </div>
                 </div>
                 <span v-if="inv.ganancia != null" class="font-mono text-sm font-semibold shrink-0" :style="{ color: inv.ganancia >= 0 ? '#10B981' : '#DC2626' }">
-                  {{ formatCurrency(inv.ganancia) }}
+                  +{{ formatCurrency(inv.ganancia) }}
                 </span>
-                <span v-else-if="inv.ganancia_esperada != null" class="font-mono text-sm font-semibold shrink-0" style="color:rgba(251,191,36,0.7)">
+                <span v-else-if="inv.ganancia_esperada != null" class="font-mono text-sm font-semibold shrink-0" style="color:rgba(251,191,36,0.6)">
                   +{{ formatCurrency(inv.ganancia_esperada) }}
                 </span>
                 <span
@@ -214,14 +226,14 @@
                   <button
                     v-if="inv.estado === 'en_curso'"
                     class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                    style="background:rgba(251,191,36,0.15);color:#FBBF24"
-                    @click="openVender(inv)"
+                    style="background:rgba(16,185,129,0.15);color:#10B981"
+                    @click="openCobrar(inv)"
                   >
-                    <span class="material-symbols-outlined text-[14px]">sell</span>
-                    Vender
+                    <span class="material-symbols-outlined text-[14px]">payments</span>
+                    Cobrar
                   </button>
                   <button
-                    v-if="inv.estado === 'en_curso'"
+                    v-if="inv.estado === 'en_curso' && !inv.cobros?.length"
                     class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
                     title="Eliminar"
                     @click="confirmDeleteInversion(inv)"
@@ -256,10 +268,10 @@
       @saved="onInversionSaved"
     />
 
-    <VenderInversionModal
-      v-model="showVenderModal"
-      :inversion="venderTarget"
-      @saved="onVender"
+    <CobrarInversionModal
+      v-model="showCobrarModal"
+      :inversion="cobrarTarget"
+      @saved="onCobrar"
     />
 
     <ConfirmDeleteModal
@@ -281,7 +293,7 @@ import { formatCurrency } from '../utils/currency'
 import SueldoFormModal    from '../components/SueldoFormModal.vue'
 import CobrarSueldoModal  from '../components/CobrarSueldoModal.vue'
 import InversionFormModal from '../components/InversionFormModal.vue'
-import VenderInversionModal from '../components/VenderInversionModal.vue'
+import CobrarInversionModal from '../components/CobrarInversionModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 
 const store        = useIngresosStore()
@@ -411,16 +423,16 @@ async function onInversionSaved(payload) {
   }
 }
 
-// ─── VENDER INVERSIÓN ────────────────────────────────────────────────────────
-const showVenderModal = ref(false)
-const venderTarget    = ref(null)
+// ─── COBRAR INVERSIÓN ────────────────────────────────────────────────────────
+const showCobrarModal = ref(false)
+const cobrarTarget    = ref(null)
 
-function openVender(inv) { venderTarget.value = inv; showVenderModal.value = true }
+function openCobrar(inv) { cobrarTarget.value = inv; showCobrarModal.value = true }
 
-async function onVender(payload) {
-  if (!venderTarget.value) return
+async function onCobrar(payload) {
+  if (!cobrarTarget.value) return
   try {
-    await store.venderInversion(venderTarget.value.id, payload)
+    await store.registrarCobro(cobrarTarget.value.id, payload)
   } catch (e) {
     console.error(e)
   }

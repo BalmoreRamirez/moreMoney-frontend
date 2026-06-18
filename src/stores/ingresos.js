@@ -67,8 +67,8 @@ export const useIngresosStore = defineStore('ingresos', () => {
     return data
   }
 
-  async function venderInversion(id, payload) {
-    const { data } = await api.post(`/ingresos/inversiones/${id}/vender`, payload)
+  async function registrarCobro(id, payload) {
+    const { data } = await api.post(`/ingresos/inversiones/${id}/cobrar`, payload)
     await fetchInversiones()
     return data
   }
@@ -81,6 +81,6 @@ export const useIngresosStore = defineStore('ingresos', () => {
   return {
     sueldos, inversiones, loading, error,
     fetchSueldos, createSueldo, updateSueldo, deleteSueldo, cobrarSueldo,
-    fetchInversiones, createInversion, venderInversion, deleteInversion,
+    fetchInversiones, createInversion, registrarCobro, deleteInversion,
   }
 })
