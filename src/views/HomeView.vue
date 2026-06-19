@@ -75,6 +75,19 @@
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════
+         SECCIÓN: ANALÍTICAS (flujo en el tiempo)
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="flex items-center gap-3 mb-4">
+      <span class="material-symbols-outlined text-[14px]" style="color:#A78BFA">insights</span>
+      <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Analíticas</span>
+      <div class="flex-1 h-px" style="background:rgba(255,255,255,0.06)" />
+    </div>
+
+    <div class="mb-8">
+      <AnalyticsPanel />
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
          SECCIÓN: TARJETAS DE CRÉDITO (deuda / límites)
     ═══════════════════════════════════════════════════════════════════════ -->
     <div class="flex items-center gap-3 mb-4">
@@ -360,6 +373,7 @@ import { useCuentasStore }  from '../stores/cuentas'
 import { formatCurrency }   from '../utils/currency'
 import DonutChart           from '../components/DonutChart.vue'
 import FlowBars             from '../components/FlowBars.vue'
+import AnalyticsPanel       from '../components/AnalyticsPanel.vue'
 
 const tarjetasStore = useTarjetasStore()
 const reportesStore = useReportesStore()
