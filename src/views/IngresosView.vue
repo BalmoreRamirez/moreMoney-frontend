@@ -9,10 +9,10 @@
       <button
         class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
         style="background:#10B981"
-        @click="activeTab === 'sueldos' ? openCreateSueldo() : openCreateInversion()"
+        @click="onTabCreate"
       >
         <span class="material-symbols-outlined text-[18px]">add</span>
-        <span class="hidden sm:inline">{{ activeTab === 'sueldos' ? 'Nuevo sueldo' : 'Nueva inversión' }}</span>
+        <span class="hidden sm:inline">{{ tabCreateLabel }}</span>
       </button>
     </div>
 
@@ -129,7 +129,7 @@
     </template>
 
     <!-- ════════════════════════════════════════ INVERSIONES ══════════════════════════════════════ -->
-    <template v-else>
+    <template v-else-if="activeTab === 'inversiones'">
       <!-- Filtro estado -->
       <div class="mt-6 flex flex-wrap gap-2">
         <button
@@ -249,6 +249,63 @@
       </div>
     </template>
 
+    <!-- ════════════════════════════════════════ OTROS INGRESOS ═══════════════════════════════════════ -->
+    <template v-else-if="activeTab === 'otros'">
+      <div v-if="!store.otros.length" class="mt-10 fintech-card flex flex-col items-center py-14 text-center">
+        <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">add_circle</span>
+        <p class="mt-3 font-semibold text-slate-300">Sin ingresos registrados</p>
+        <p class="mt-1 text-sm text-slate-500">Registra cualquier ingreso puntual: ventas, comisiones, regalos, etc.</p>
+        <button class="mt-5 rounded-xl px-5 py-2.5 text-sm font-semibold text-white" style="background:#10B981" @click="openCreateOtro">
+          Nuevo ingreso
+        </button>
+      </div>
+
+      <div v-else class="mt-6 fintech-card overflow-x-auto">
+        <table class="min-w-[520px] w-full text-sm">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fecha</th>
+              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Descripción</th>
+              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Cuenta</th>
+              <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Monto</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in store.otros"
+              :key="item.id"
+              class="transition-colors hover:bg-white/[0.02]"
+              style="border-bottom:1px solid rgba(255,255,255,0.04)"
+            >
+              <td class="px-4 py-3 text-slate-400 whitespace-nowrap">{{ item.fecha }}</td>
+              <td class="px-4 py-3 text-slate-200">{{ item.descripcion }}</td>
+              <td class="px-4 py-3 text-slate-400">{{ item.cuenta?.nombre ?? '—' }}</td>
+              <td class="px-4 py-3 text-right font-mono font-semibold" style="color:#10B981">{{ formatCurrency(item.monto) }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1">
+                  <button
+                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+                    title="Editar"
+                    @click="openEditOtro(item)"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">edit</span>
+                  </button>
+                  <button
+                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                    title="Eliminar"
+                    @click="confirmDeleteOtro(item)"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
     <!-- ═══ MODALES ═══════════════════════════════════════════════════════════ -->
 
     <SueldoFormModal
@@ -274,6 +331,12 @@
       @saved="onCobrarInv"
     />
 
+    <IngresoFormModal
+      v-model="showOtroModal"
+      :ingreso="editOtro"
+      @saved="onOtroSaved"
+    />
+
     <ConfirmDeleteModal
       v-if="deleteTarget"
       :nombre="deleteTarget.nombre"
@@ -294,14 +357,16 @@ import SueldoFormModal    from '../components/SueldoFormModal.vue'
 import CobrarSueldoModal  from '../components/CobrarSueldoModal.vue'
 import InversionFormModal from '../components/InversionFormModal.vue'
 import CobrarInversionModal from '../components/CobrarInversionModal.vue'
+import IngresoFormModal     from '../components/IngresoFormModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 
 const store        = useIngresosStore()
 const cuentasStore = useCuentasStore()
 
 const TABS = [
-  { key: 'sueldos',    label: 'Sueldos',     icon: 'payments' },
+  { key: 'sueldos',     label: 'Sueldos',     icon: 'payments' },
   { key: 'inversiones', label: 'Inversiones', icon: 'trending_up' },
+  { key: 'otros',       label: 'Otros',       icon: 'add_circle' },
 ]
 
 const FILTROS_ESTADO = [
@@ -359,12 +424,25 @@ function toggleInvGrupo(fecha) {
   abiertosI.value = next
 }
 
-onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchSueldos(), store.fetchInversiones()]))
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchSueldos(), store.fetchInversiones(), store.fetchOtros()]))
 
 watch(activeTab, (tab) => {
   if (tab === 'sueldos')     store.fetchSueldos()
   if (tab === 'inversiones') store.fetchInversiones({ estado: filtroEstado.value || undefined })
+  if (tab === 'otros')       store.fetchOtros()
 })
+
+const tabCreateLabel = computed(() => ({
+  sueldos:     'Nuevo sueldo',
+  inversiones: 'Nueva inversión',
+  otros:       'Nuevo ingreso',
+}[activeTab.value]))
+
+function onTabCreate() {
+  if (activeTab.value === 'sueldos')     openCreateSueldo()
+  if (activeTab.value === 'inversiones') openCreateInversion()
+  if (activeTab.value === 'otros')       openCreateOtro()
+}
 
 function setFiltroEstado(val) {
   filtroEstado.value = val
@@ -444,19 +522,37 @@ const deleteErrorMsg = ref('')
 const deleting       = ref(false)
 const deleteType     = ref('')
 
-function confirmDeleteSueldo(s)  { deleteTarget.value = s;   deleteType.value = 'sueldo';    deleteErrorMsg.value = '' }
+function confirmDeleteSueldo(s)      { deleteTarget.value = s;   deleteType.value = 'sueldo';    deleteErrorMsg.value = '' }
 function confirmDeleteInversion(inv) { deleteTarget.value = inv; deleteType.value = 'inversion'; deleteErrorMsg.value = '' }
+function confirmDeleteOtro(item)     { deleteTarget.value = item; deleteType.value = 'otro';     deleteErrorMsg.value = '' }
 
 async function doDelete() {
   deleting.value = true
   try {
     if (deleteType.value === 'sueldo')    await store.deleteSueldo(deleteTarget.value.id)
     if (deleteType.value === 'inversion') await store.deleteInversion(deleteTarget.value.id)
+    if (deleteType.value === 'otro')      await store.deleteOtro(deleteTarget.value.id)
     deleteTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'
   } finally {
     deleting.value = false
+  }
+}
+
+// ─── OTROS INGRESOS ──────────────────────────────────────────────────────────
+const showOtroModal = ref(false)
+const editOtro      = ref(null)
+
+function openCreateOtro() { editOtro.value = null; showOtroModal.value = true }
+function openEditOtro(item) { editOtro.value = item; showOtroModal.value = true }
+
+async function onOtroSaved(payload) {
+  try {
+    if (editOtro.value) await store.updateOtro(editOtro.value.id, payload)
+    else                await store.createOtro(payload)
+  } catch (e) {
+    console.error(e)
   }
 }
 </script>

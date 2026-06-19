@@ -46,6 +46,40 @@ export const useIngresosStore = defineStore('ingresos', () => {
     return data
   }
 
+  // ─── OTROS INGRESOS (manuales) ───────────────────────────────────────────────
+
+  const otros = ref([])
+
+  async function fetchOtros() {
+    loading.value = true
+    error.value   = null
+    try {
+      const { data } = await api.get('/ingresos/otros')
+      otros.value = data
+    } catch (e) {
+      error.value = e.response?.data?.error || 'Error al cargar ingresos'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createOtro(payload) {
+    const { data } = await api.post('/ingresos/otros', payload)
+    await fetchOtros()
+    return data
+  }
+
+  async function updateOtro(id, payload) {
+    const { data } = await api.put(`/ingresos/otros/${id}`, payload)
+    await fetchOtros()
+    return data
+  }
+
+  async function deleteOtro(id) {
+    await api.delete(`/ingresos/otros/${id}`)
+    await fetchOtros()
+  }
+
   // ─── INVERSIONES ─────────────────────────────────────────────────────────────
 
   async function fetchInversiones(params = {}) {
@@ -79,8 +113,9 @@ export const useIngresosStore = defineStore('ingresos', () => {
   }
 
   return {
-    sueldos, inversiones, loading, error,
+    sueldos, inversiones, otros, loading, error,
     fetchSueldos, createSueldo, updateSueldo, deleteSueldo, cobrarSueldo,
     fetchInversiones, createInversion, registrarCobro, deleteInversion,
+    fetchOtros, createOtro, updateOtro, deleteOtro,
   }
 })
