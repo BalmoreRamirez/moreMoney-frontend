@@ -9,7 +9,8 @@ export const useReportesStore = defineStore('reportes', {
     grand_total: 0,
     loading:     false,
     error:       null,
-    flujo: { serie: [], categorias: [], loading: false, error: null },
+    flujo:          { serie: [], categorias: [], loading: false, error: null },
+    flujoTarjetas:  { serie: [],               loading: false, error: null },
   }),
 
   actions: {
@@ -40,6 +41,19 @@ export const useReportesStore = defineStore('reportes', {
         this.flujo.error = e.message
       } finally {
         this.flujo.loading = false
+      }
+    },
+
+    async fetchFlujoTarjetas(periodo = 'mes') {
+      this.flujoTarjetas.loading = true
+      this.flujoTarjetas.error   = null
+      try {
+        const { data } = await api.get('/reportes/flujo-tarjetas', { params: { periodo } })
+        this.flujoTarjetas.serie = data.serie
+      } catch (e) {
+        this.flujoTarjetas.error = e.message
+      } finally {
+        this.flujoTarjetas.loading = false
       }
     },
 
