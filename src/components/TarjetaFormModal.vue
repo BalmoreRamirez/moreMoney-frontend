@@ -3,15 +3,15 @@
     <Transition name="modal">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="$emit('update:modelValue', false)">
         <!-- Backdrop -->
-        <div class="absolute inset-0" style="background: rgba(7,17,31,0.75); backdrop-filter: blur(6px)" />
+        <div class="absolute inset-0" style="background: rgba(15,23,42,0.40); backdrop-filter: blur(6px)" />
 
         <!-- Panel -->
-        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background: #0D2240; border: 1px solid rgba(255,255,255,0.1)">
+        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background: #FFFFFF; border: 1px solid #E2E8F0">
           <div class="mb-5 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">
+            <h2 class="text-lg font-semibold text-slate-900">
               {{ isEdit ? 'Editar Tarjeta' : 'Nueva Tarjeta' }}
             </h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-white" @click="$emit('update:modelValue', false)">
+            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900" @click="$emit('update:modelValue', false)">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -19,23 +19,23 @@
           <form @submit.prevent="submit" class="space-y-4">
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Nombre de la tarjeta</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Nombre de la tarjeta</label>
               <input v-model.trim="form.nombre" type="text" class="fintech-input" placeholder="Ej: Visa Platino" required />
               <p v-if="errors.nombre" class="mt-1 text-xs text-danger">{{ errors.nombre }}</p>
             </div>
 
             <!-- Banco -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Banco emisor</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Banco emisor</label>
               <input v-model.trim="form.banco" type="text" class="fintech-input" placeholder="Ej: Banco Nacional" required />
               <p v-if="errors.banco" class="mt-1 text-xs text-danger">{{ errors.banco }}</p>
             </div>
 
             <!-- Límite de crédito -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Límite de crédito</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Límite de crédito</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-500">$</span>
                 <input
                   v-model="form.limite_credito"
                   type="number"
@@ -52,7 +52,7 @@
             <!-- Días -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-400">Día de corte</label>
+                <label class="mb-1.5 block text-xs font-medium text-slate-500">Día de corte</label>
                 <input
                   v-model.number="form.dia_corte"
                   type="number"
@@ -65,7 +65,7 @@
                 <p v-if="errors.dia_corte" class="mt-1 text-xs text-danger">{{ errors.dia_corte }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-400">Día de pago</label>
+                <label class="mb-1.5 block text-xs font-medium text-slate-500">Día de pago</label>
                 <input
                   v-model.number="form.dia_pago"
                   type="number"
@@ -86,7 +86,7 @@
 
             <!-- Acciones -->
             <div class="flex gap-3 pt-2">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5" @click="$emit('update:modelValue', false)">
+              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-50" @click="$emit('update:modelValue', false)">
                 Cancelar
               </button>
               <button

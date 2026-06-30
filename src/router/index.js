@@ -40,11 +40,6 @@ const router = createRouter({
           component: () => import('../views/CalendarioView.vue'),
         },
         {
-          path: 'reportes',
-          name: 'reportes',
-          component: () => import('../views/ReportesView.vue'),
-        },
-        {
           path: 'cuentas',
           name: 'cuentas',
           component: () => import('../views/CuentasView.vue'),

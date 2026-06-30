@@ -3,44 +3,42 @@
 @tailwind utilities;
 
 /* ──────────────────────────────────────────
-   Variables semánticas fintech
+   Variables semánticas — tema claro / pastel
    ────────────────────────────────────────── */
 :root {
-  /* Fuentes */
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'Roboto Mono', monospace;
 
-  /* Paleta principal */
-  --color-primary:      #0A192F;
-  --color-primary-mid:  #0D2240;
-  --color-primary-soft: #152D52;
+  /* Fondo y superficies */
+  --color-primary:      #F0F4FA;   /* fondo de página — azul-gris muy suave */
+  --color-primary-mid:  #FFFFFF;   /* cards — blanco puro */
+  --color-primary-soft: #E8EDF5;   /* navy-50 del config — separadores */
 
-  /* Semántica financiera */
-  --color-success:      #10B981;
-  --color-success-bg:   rgba(16, 185, 129, 0.12);
-  --color-alert:        #F59E0B;
-  --color-alert-bg:     rgba(245, 158, 11, 0.12);
-  --color-danger:       #DC2626;
-  --color-danger-bg:    rgba(220, 38, 38, 0.12);
+  /* Semántica financiera (colores con buen contraste sobre blanco) */
+  --color-success:      #059669;   /* esmeralda oscuro — texto */
+  --color-success-bg:   #ECFDF5;   /* esmeralda 50 — fondo pastel */
+  --color-alert:        #D97706;   /* ámbar oscuro — texto */
+  --color-alert-bg:     #FFFBEB;   /* ámbar 50 — fondo pastel */
+  --color-danger:       #DC2626;   /* rojo — texto */
+  --color-danger-bg:    #FFF1F1;   /* rojo 50 — fondo pastel */
 
   /* Superficies */
-  --color-surface:      rgba(255, 255, 255, 0.04);
-  --color-surface-mid:  rgba(255, 255, 255, 0.07);
-  --color-surface-high: rgba(255, 255, 255, 0.11);
-  --color-border:       rgba(255, 255, 255, 0.08);
+  --color-surface:      #FFFFFF;
+  --color-surface-mid:  #F8FAFC;   /* inputs / chips */
+  --color-surface-high: #F1F5F9;   /* hover / selected */
+  --color-border:       #E2E8F0;   /* slate-200 */
+  --color-border-soft:  #EEF2F8;   /* borde muy suave */
 
   /* Texto */
-  --color-text-primary:   #F1F5F9;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted:     #4B5563;
+  --color-text-primary:   #0F172A;  /* slate-900 */
+  --color-text-secondary: #475569;  /* slate-600 */
+  --color-text-muted:     #94A3B8;  /* slate-400 */
 }
 
 /* ──────────────────────────────────────────
    Reset y base
    ────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 html, body, #app {
   margin: 0;
@@ -54,85 +52,65 @@ html, body, #app {
   text-rendering: optimizeLegibility;
 }
 
-/* ──────────────────────────────────────────
-   Fondo degradado fintech global
-   ────────────────────────────────────────── */
 body {
-  background:
-    radial-gradient(ellipse 60% 40% at 70% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 0% 80%, rgba(10, 25, 47, 0.6) 0%, transparent 70%),
-    linear-gradient(160deg, #07111F 0%, #0A192F 50%, #081423 100%);
-  background-attachment: fixed;
+  background: #F0F4FA;
 }
 
 /* ──────────────────────────────────────────
    Material Symbols
    ────────────────────────────────────────── */
 .material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   user-select: none;
 }
 
 /* ──────────────────────────────────────────
-   Clases utilitarias fintech
+   Clases utilitarias
    ────────────────────────────────────────── */
 @layer components {
-  /* Montos monetarios — siempre Roboto Mono */
-  .amount {
-    @apply font-mono tabular-nums tracking-tight;
-  }
-  .amount-lg {
-    @apply font-mono tabular-nums tracking-tight text-2xl font-semibold;
-  }
-  .amount-xl {
-    @apply font-mono tabular-nums tracking-tight text-4xl font-bold;
-  }
+
+  /* Montos monetarios */
+  .amount    { @apply font-mono tabular-nums tracking-tight; }
+  .amount-lg { @apply font-mono tabular-nums tracking-tight text-2xl font-semibold; }
+  .amount-xl { @apply font-mono tabular-nums tracking-tight text-4xl font-bold; }
 
   /* Tarjeta de superficie */
   .fintech-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    @apply rounded-card backdrop-blur-sm shadow-card;
+    @apply rounded-card shadow-sm;
   }
 
-  /* Badge de estado */
+  /* Badges de estado */
   .badge-success {
     background: var(--color-success-bg);
     color: var(--color-success);
+    border: 1px solid #A7F3D0;
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
   .badge-alert {
     background: var(--color-alert-bg);
     color: var(--color-alert);
+    border: 1px solid #FDE68A;
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
   .badge-danger {
     background: var(--color-danger-bg);
     color: var(--color-danger);
+    border: 1px solid #FECACA;
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 
-  /* Barra de progreso de cuotas */
+  /* Barras de progreso */
   .progress-bar-track {
     @apply h-2 w-full overflow-hidden rounded-full;
     background: var(--color-surface-high);
   }
-  .progress-bar-fill {
-    @apply h-full rounded-full transition-all duration-500;
-    background: var(--color-success);
-  }
-  .progress-bar-fill--danger {
-    background: var(--color-danger);
-  }
-  .progress-bar-fill--alert {
-    background: var(--color-alert);
-  }
+  .progress-bar-fill            { @apply h-full rounded-full transition-all duration-500; background: var(--color-success); }
+  .progress-bar-fill--danger    { background: var(--color-danger); }
+  .progress-bar-fill--alert     { background: var(--color-alert); }
 
-  /* Inputs fintech */
+  /* Inputs */
   .fintech-input {
     background: var(--color-surface-mid);
     border: 1px solid var(--color-border);
@@ -141,18 +119,9 @@ body {
   }
   .fintech-input:focus {
     border-color: var(--color-success);
-    box-shadow: 0 0 0 3px var(--color-success-bg);
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
   }
-  .fintech-input::placeholder {
-    color: var(--color-text-muted);
-  }
-
-  /* Opciones de select nativo */
-  .fintech-input option {
-    background: #0D2240;
-    color: #E2E8F0;
-  }
-  .fintech-input option:disabled {
-    color: #64748B;
-  }
+  .fintech-input::placeholder { color: var(--color-text-muted); }
+  .fintech-input option       { background: #FFFFFF; color: #0F172A; }
+  .fintech-input option:disabled { color: #94A3B8; }
 }

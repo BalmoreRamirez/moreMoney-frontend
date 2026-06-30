@@ -3,35 +3,35 @@
     <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         class="absolute inset-0"
-        style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)"
+        style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
         @click="close"
       />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
-        style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)"
+        style="background:#FFFFFF;border:1px solid #E2E8F0"
       >
-        <h2 class="text-base font-semibold text-white">Registrar inversión</h2>
+        <h2 class="text-base font-semibold text-slate-900">Registrar inversión</h2>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Nombre / Descripción</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Nombre / Descripción</label>
             <input v-model="form.nombre" type="text" placeholder="Ej. Pantalones para reventa" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Costo total ($)</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Costo total ($)</label>
             <input v-model.number="form.costo_total" type="number" min="0.01" step="0.01" placeholder="150.00" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Fecha de compra</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Fecha de compra</label>
             <input v-model="form.fecha_compra" type="date" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">
+            <label class="mb-1.5 block text-xs text-slate-500">
               Precio de venta esperado ($)
-              <span class="ml-1 text-slate-600">(opcional)</span>
+              <span class="ml-1 text-slate-500">(opcional)</span>
             </label>
             <input
               v-model.number="form.precio_esperado"
@@ -45,7 +45,7 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Cuenta de egreso (donde sale el dinero)</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Cuenta de egreso (donde sale el dinero)</label>
             <select v-model.number="form.cuenta_egreso_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -55,7 +55,7 @@
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="close">
+            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
               Cancelar
             </button>
             <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">

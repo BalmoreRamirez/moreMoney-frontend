@@ -4,12 +4,12 @@
     <!-- ── Header ──────────────────────────────────────────────────────────── -->
     <div class="flex items-start justify-between mb-7">
       <div>
-        <h1 class="text-2xl font-bold text-slate-100">Dashboard</h1>
+        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
         <p class="mt-0.5 text-sm text-slate-500">Estado financiero global</p>
       </div>
       <span
         class="text-xs text-slate-500 border rounded-lg px-3 py-1.5"
-        style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.07)"
+        style="background:rgba(10,25,47,0.02);border-color:#E2E8F0"
       >
         {{ MONTHS[mesActual - 1] }} {{ anioActual }}
       </span>
@@ -21,7 +21,7 @@
     <div class="flex items-center gap-3 mb-4">
       <span class="material-symbols-outlined text-[14px]" style="color:#10B981">account_balance</span>
       <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Cuentas y flujo</span>
-      <div class="flex-1 h-px" style="background:rgba(255,255,255,0.06)" />
+      <div class="flex-1 h-px" style="background:#E8EDF5" />
     </div>
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 mb-8">
@@ -29,7 +29,7 @@
       <!-- Panel: Saldo en cuentas -->
       <div
         class="fintech-card p-6 flex flex-col justify-between"
-        style="background:linear-gradient(135deg,rgba(16,185,129,0.08) 0%,transparent 100%);border-color:rgba(16,185,129,0.18)"
+        style="background:linear-gradient(135deg,rgba(5,150,105,0.06) 0%,transparent 100%);border-color:#A7F3D0"
       >
         <div>
           <div class="flex items-center gap-2 mb-1">
@@ -45,15 +45,15 @@
           <p class="text-xs text-slate-600 mt-1">dinero real disponible</p>
         </div>
 
-        <div class="mt-6 pt-4 border-t" style="border-color:rgba(255,255,255,0.07)">
+        <div class="mt-6 pt-4 border-t" style="border-color:#E2E8F0">
           <div class="flex items-center gap-1.5 mb-1">
-            <span class="material-symbols-outlined text-[14px]" style="color:#FBBF24">handshake</span>
+            <span class="material-symbols-outlined text-[14px]" style="color:#D97706">handshake</span>
             <p class="text-xs text-slate-500">Capital en préstamos</p>
           </div>
-          <p class="font-mono text-xl font-bold" style="color:#FBBF24">
+          <p class="font-mono text-xl font-bold" style="color:#D97706">
             {{ stats ? formatCurrency(capitalEnCalle) : '—' }}
           </p>
-          <p class="text-[10px] text-slate-700 mt-0.5">pendiente de recuperar</p>
+          <p class="text-[10px] text-slate-600 mt-0.5">pendiente de recuperar</p>
         </div>
       </div>
 
@@ -78,9 +78,9 @@
          SECCIÓN: ANALÍTICAS (flujo en el tiempo)
     ═══════════════════════════════════════════════════════════════════════ -->
     <div class="flex items-center gap-3 mb-4">
-      <span class="material-symbols-outlined text-[14px]" style="color:#A78BFA">insights</span>
+      <span class="material-symbols-outlined text-[14px]" style="color:#6366F1">insights</span>
       <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Analíticas</span>
-      <div class="flex-1 h-px" style="background:rgba(255,255,255,0.06)" />
+      <div class="flex-1 h-px" style="background:#E8EDF5" />
     </div>
 
     <div class="mb-8">
@@ -91,9 +91,9 @@
          SECCIÓN: TARJETAS DE CRÉDITO (deuda / límites)
     ═══════════════════════════════════════════════════════════════════════ -->
     <div class="flex items-center gap-3 mb-4">
-      <span class="material-symbols-outlined text-[14px]" style="color:#93C5FD">credit_card</span>
+      <span class="material-symbols-outlined text-[14px]" style="color:#2D5991">credit_card</span>
       <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Tarjetas de crédito</span>
-      <div class="flex-1 h-px" style="background:rgba(255,255,255,0.06)" />
+      <div class="flex-1 h-px" style="background:#E8EDF5" />
     </div>
 
     <!-- KPIs de tarjetas + Donut -->
@@ -102,7 +102,7 @@
       <!-- Donut: uso global de crédito -->
       <div class="fintech-card p-6 flex flex-col items-center">
         <div class="flex items-center gap-2 mb-4 self-start">
-          <span class="material-symbols-outlined text-[16px]" style="color:#93C5FD">donut_large</span>
+          <span class="material-symbols-outlined text-[16px]" style="color:#2D5991">donut_large</span>
           <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Uso global de crédito</p>
         </div>
         <DonutChart
@@ -129,10 +129,10 @@
 
         <div class="fintech-card p-4">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[15px]" style="color:#93C5FD">credit_score</span>
+            <span class="material-symbols-outlined text-[15px]" style="color:#2D5991">credit_score</span>
             <p class="text-[10px] font-medium uppercase tracking-wider text-slate-500">Crédito libre</p>
           </div>
-          <p class="font-mono text-xl font-bold mt-2.5" style="color:#93C5FD">
+          <p class="font-mono text-xl font-bold mt-2.5" style="color:#2D5991">
             {{ formatCurrency(totalDisponible) }}
           </p>
           <p class="text-[10px] text-slate-600 mt-0.5">de {{ formatCurrency(totalLimite) }} en límite</p>
@@ -168,23 +168,23 @@
           v-else-if="!tarjetasStore.tarjetas.length"
           class="flex flex-col items-center py-6 text-center"
         >
-          <span class="material-symbols-outlined text-3xl mb-2" style="color:rgba(147,197,253,0.2)">credit_card_off</span>
+          <span class="material-symbols-outlined text-3xl mb-2" style="color:rgba(45,89,145,0.12)">credit_card_off</span>
           <p class="text-xs text-slate-500">Sin tarjetas registradas</p>
-          <router-link to="/tarjetas" class="mt-2 text-xs" style="color:#93C5FD">Agregar →</router-link>
+          <router-link to="/tarjetas" class="mt-2 text-xs" style="color:#2D5991">Agregar →</router-link>
         </div>
 
         <div v-else class="space-y-5">
           <div v-for="t in tarjetasStore.tarjetas" :key="t.id">
             <div class="flex items-center justify-between text-xs mb-1.5">
               <div class="flex items-center gap-2 min-w-0">
-                <span class="font-medium text-slate-200 truncate">{{ t.nombre }}</span>
-                <span class="text-slate-600 shrink-0">{{ t.banco }}</span>
+                <span class="font-medium text-slate-700 truncate">{{ t.nombre }}</span>
+                <span class="text-slate-500 shrink-0">{{ t.banco }}</span>
               </div>
               <div class="flex items-center gap-3 shrink-0 ml-2">
-                <span class="text-slate-600">{{ formatCurrency(t.saldo_disponible) }} libre</span>
+                <span class="text-slate-500">{{ formatCurrency(t.saldo_disponible) }} libre</span>
                 <span
                   class="font-mono font-bold min-w-[34px] text-right"
-                  :style="pctTarjeta(t) >= 90 ? 'color:#DC2626' : pctTarjeta(t) >= 70 ? 'color:#F59E0B' : 'color:#93C5FD'"
+                  :style="pctTarjeta(t) >= 90 ? 'color:#DC2626' : pctTarjeta(t) >= 70 ? 'color:#F59E0B' : 'color:#2D5991'"
                 >{{ pctTarjeta(t) }}%</span>
               </div>
             </div>
@@ -195,12 +195,12 @@
                 style="transition:width 0.7s ease"
                 :style="{
                   width: pctTarjeta(t) + '%',
-                  background: pctTarjeta(t) >= 90 ? '#DC2626' : pctTarjeta(t) >= 70 ? '#F59E0B' : '#93C5FD',
+                  background: pctTarjeta(t) >= 90 ? '#DC2626' : pctTarjeta(t) >= 70 ? '#F59E0B' : '#2D5991',
                 }"
               />
             </div>
 
-            <div class="flex justify-between text-[10px] text-slate-700 mt-1">
+            <div class="flex justify-between text-[10px] text-slate-600 mt-1">
               <span>{{ formatCurrency(t.saldo_gastado) }} cargado</span>
               <span>límite {{ formatCurrency(t.limite_credito) }}</span>
             </div>
@@ -208,12 +208,12 @@
         </div>
 
         <!-- Barra global -->
-        <div v-if="totalLimite > 0" class="mt-6 pt-4 border-t" style="border-color:rgba(255,255,255,0.06)">
+        <div v-if="totalLimite > 0" class="mt-6 pt-4 border-t" style="border-color:#E8EDF5">
           <div class="flex justify-between text-xs mb-2">
             <span class="text-slate-500">Uso global</span>
             <span
               class="font-mono font-bold"
-              :style="pctGastado >= 90 ? 'color:#DC2626' : pctGastado >= 70 ? 'color:#F59E0B' : 'color:#93C5FD'"
+              :style="pctGastado >= 90 ? 'color:#DC2626' : pctGastado >= 70 ? 'color:#F59E0B' : 'color:#2D5991'"
             >{{ pctGastado }}%</span>
           </div>
           <div class="progress-bar-track" style="height:5px">
@@ -222,7 +222,7 @@
               style="transition:width 0.7s ease"
               :style="{
                 width: pctGastado + '%',
-                background: pctGastado >= 90 ? '#DC2626' : pctGastado >= 70 ? '#F59E0B' : '#93C5FD',
+                background: pctGastado >= 90 ? '#DC2626' : pctGastado >= 70 ? '#F59E0B' : '#2D5991',
               }"
             />
           </div>
@@ -239,14 +239,14 @@
           v-if="!reportesStore.resumen.length"
           class="flex flex-col items-center py-6 text-center"
         >
-          <span class="material-symbols-outlined text-3xl mb-2" style="color:rgba(245,158,11,0.2)">receipt_long</span>
+          <span class="material-symbols-outlined text-3xl mb-2" style="color:rgba(217,119,6,0.10)">receipt_long</span>
           <p class="text-xs text-slate-500">Sin pagos este mes</p>
         </div>
 
         <div v-else class="space-y-4">
           <div v-for="r in reportesStore.resumen" :key="r.tarjeta_id">
             <div class="flex items-center justify-between text-xs mb-1.5">
-              <span class="text-slate-300 font-medium truncate mr-2">{{ r.nombre }}</span>
+              <span class="text-slate-600 font-medium truncate mr-2">{{ r.nombre }}</span>
               <span
                 class="font-mono font-bold shrink-0"
                 :style="r.total > 0 ? 'color:#F59E0B' : 'color:#10B981'"
@@ -262,13 +262,13 @@
                 }"
               />
             </div>
-            <p class="text-[10px] text-slate-700 mt-1">
+            <p class="text-[10px] text-slate-600 mt-1">
               {{ r.normales_count }} normal{{ r.normales_count !== 1 ? 'es' : '' }}
               · {{ r.cuotas_detalle.length }} cuota{{ r.cuotas_detalle.length !== 1 ? 's' : '' }} tasa cero
             </p>
           </div>
 
-          <div class="pt-4 mt-2 border-t flex items-center justify-between" style="border-color:rgba(255,255,255,0.07)">
+          <div class="pt-4 mt-2 border-t flex items-center justify-between" style="border-color:#E2E8F0">
             <span class="text-xs text-slate-500">Total a pagar</span>
             <span class="font-mono text-2xl font-bold" style="color:#F59E0B">
               {{ formatCurrency(reportesStore.grand_total) }}
@@ -276,90 +276,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- ── Mis tarjetas (detalle individual) ────────────────────────────────── -->
-    <div class="flex items-center gap-3 mb-4">
-      <span class="material-symbols-outlined text-[14px]" style="color:#93C5FD">style</span>
-      <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Mis tarjetas</span>
-      <div class="flex-1 h-px" style="background:rgba(255,255,255,0.06)" />
-    </div>
-
-    <div v-if="tarjetasStore.loading" class="flex justify-center py-10">
-      <div class="h-7 w-7 animate-spin rounded-full border-2 border-t-transparent" style="border-color:#93C5FD;border-top-color:transparent" />
-    </div>
-
-    <div
-      v-else-if="!tarjetasStore.tarjetas.length"
-      class="fintech-card flex flex-col items-center py-12 text-center"
-    >
-      <span class="material-symbols-outlined text-5xl" style="color:rgba(147,197,253,0.2)">credit_card_off</span>
-      <p class="mt-3 text-sm text-slate-400">No hay tarjetas registradas.</p>
-      <router-link to="/tarjetas" class="mt-3 text-xs hover:underline" style="color:#93C5FD">
-        Agregar tarjeta →
-      </router-link>
-    </div>
-
-    <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      <router-link
-        v-for="t in tarjetasStore.tarjetas"
-        :key="t.id"
-        :to="`/tarjetas/${t.id}`"
-        class="fintech-card block p-5 transition-all hover:border-white/20 hover:-translate-y-0.5"
-        style="text-decoration:none"
-      >
-        <!-- Card header -->
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="font-semibold text-slate-100">{{ t.nombre }}</p>
-            <p class="text-xs text-slate-500">{{ t.banco }}</p>
-          </div>
-          <span
-            class="rounded-lg px-2 py-1 text-[10px] font-bold"
-            :style="pctTarjeta(t) >= 90
-              ? 'background:rgba(220,38,38,0.15);color:#DC2626'
-              : pctTarjeta(t) >= 70
-              ? 'background:rgba(245,158,11,0.15);color:#F59E0B'
-              : 'background:rgba(147,197,253,0.1);color:#93C5FD'"
-          >{{ pctTarjeta(t) }}% usado</span>
-        </div>
-
-        <!-- Montos de crédito -->
-        <div class="mt-4 flex items-end justify-between">
-          <div>
-            <p class="text-[10px] text-slate-600">Crédito libre</p>
-            <p class="font-mono text-lg font-bold" style="color:#93C5FD">
-              {{ formatCurrency(t.saldo_disponible) }}
-            </p>
-          </div>
-          <div class="text-right">
-            <p class="text-[10px] text-slate-600">Cargado</p>
-            <p
-              class="font-mono text-sm font-semibold"
-              :style="pctTarjeta(t) >= 90 ? 'color:#DC2626' : pctTarjeta(t) >= 70 ? 'color:#F59E0B' : 'color:#94A3B8'"
-            >{{ formatCurrency(t.saldo_gastado) }}</p>
-          </div>
-        </div>
-
-        <!-- Barra de crédito -->
-        <div class="mt-3 progress-bar-track" style="height:4px">
-          <div
-            class="h-full rounded-full"
-            style="transition:width 0.7s ease"
-            :style="{
-              width: pctTarjeta(t) + '%',
-              background: pctTarjeta(t) >= 90 ? '#DC2626' : pctTarjeta(t) >= 70 ? '#F59E0B' : '#93C5FD',
-            }"
-          />
-        </div>
-
-        <!-- Fechas y límite -->
-        <div class="mt-2 flex justify-between text-[10px] text-slate-600">
-          <span>Corte: día {{ t.dia_corte }}</span>
-          <span>Límite {{ formatCurrency(t.limite_credito) }}</span>
-          <span>Pago: día {{ t.dia_pago }}</span>
-        </div>
-      </router-link>
     </div>
 
   </section>
@@ -403,7 +319,7 @@ const pctGastado      = computed(() => totalLimite.value ? Math.round((totalGast
 const colorGastado = computed(() => {
   if (pctGastado.value >= 90) return '#DC2626'
   if (pctGastado.value >= 70) return '#F59E0B'
-  return '#4B5563'
+  return '#94A3B8'
 })
 
 function pctTarjeta(t) {

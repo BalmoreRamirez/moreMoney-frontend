@@ -57,14 +57,5 @@ export const useReportesStore = defineStore('reportes', {
       }
     },
 
-    prevMonth() {
-      if (this.month === 1) { this.month = 12; this.year-- }
-      else this.month--
-    },
-
-    nextMonth() {
-      if (this.month === 12) { this.month = 1; this.year++ }
-      else this.month++
-    },
   },
 })

@@ -3,8 +3,8 @@
     <!-- Encabezado -->
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-100">Compras</h1>
-        <p class="mt-1 text-sm text-slate-400">Gestión de gastos normales y compras a tasa cero.</p>
+        <h1 class="text-2xl font-bold text-slate-800">Compras</h1>
+        <p class="mt-1 text-sm text-slate-500">Gestión de gastos normales y compras a tasa cero.</p>
       </div>
 
       <!-- Filtro por tarjeta -->
@@ -23,7 +23,7 @@
     </div>
 
     <!-- Pestañas + botón de acción -->
-    <div class="mt-6 flex flex-wrap items-center justify-between gap-2 border-b" style="border-color:rgba(255,255,255,0.08)">
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-2 border-b" style="border-color:#E2E8F0">
       <div class="flex gap-1">
         <button
           v-for="tab in tabs"
@@ -31,7 +31,7 @@
           class="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors sm:gap-2 sm:px-4"
           :class="activeTab === tab.key
             ? 'border-b-2 border-success text-success'
-            : 'text-slate-500 hover:text-slate-300'"
+            : 'text-slate-500 hover:text-slate-700'"
           @click="activeTab = tab.key"
         >
           <span class="material-symbols-outlined text-[16px]">{{ tab.icon }}</span>
@@ -39,7 +39,7 @@
           <span class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
             :style="activeTab === tab.key
               ? 'background:rgba(16,185,129,0.2);color:#10B981'
-              : 'background:rgba(255,255,255,0.06);color:#64748B'"
+              : 'background:rgba(10,25,47,0.04);color:#94A3B8'"
           >{{ tab.key === 'normales' ? comprasStore.normales.length : comprasStore.tasaCero.length }}</span>
         </button>
       </div>
@@ -67,25 +67,20 @@
     </div>
 
     <!-- Filtro de estado (sólo en pestaña tasa cero) -->
-    <div v-if="activeTab === 'tasa_cero'" class="mt-4 flex items-center gap-1 rounded-xl p-1 w-fit" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
+    <div v-if="activeTab === 'tasa_cero'" class="mt-4 flex items-center gap-1 rounded-xl p-1 w-fit" style="background:rgba(10,25,47,0.03);border:1px solid #E2E8F0">
       <button
         v-for="opt in estadoOpts"
         :key="opt.value"
         class="rounded-lg px-4 py-1.5 text-xs font-semibold transition-colors"
         :style="filtroEstado === opt.value
           ? 'background:rgba(16,185,129,0.18);color:#10B981'
-          : 'color:#64748B'"
+          : 'color:#94A3B8'"
         @click="setFiltroEstado(opt.value)"
       >{{ opt.label }}</button>
     </div>
 
-    <!-- Cargando -->
-    <div v-if="comprasStore.loading" class="mt-10 flex justify-center">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-success border-t-transparent" />
-    </div>
-
     <!-- Error -->
-    <div v-else-if="comprasStore.error" class="mt-4 rounded-xl px-5 py-4 text-sm"
+    <div v-if="comprasStore.error" class="mt-4 rounded-xl px-5 py-4 text-sm"
       style="background:var(--color-danger-bg);color:var(--color-danger)">
       {{ comprasStore.error }}
     </div>
@@ -93,75 +88,63 @@
     <template v-else>
       <!-- ── TAB: Compras Normales ── -->
       <div v-if="activeTab === 'normales'" class="mt-4">
-        <div v-if="!comprasStore.normales.length" class="fintech-card flex flex-col items-center py-14 text-center">
-          <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">receipt_long</span>
-          <p class="mt-3 font-semibold text-slate-300">Sin compras normales</p>
-          <p class="mt-1 text-sm text-slate-500">Registra tu primera compra para ver el movimiento aquí.</p>
-        </div>
+        <AppDataTable
+          :data="comprasStore.normales"
+          :loading="comprasStore.loading"
+          empty-text="Sin compras normales"
+          empty-icon="receipt_long"
+        >
+          <!-- Fecha -->
+          <Column field="fecha_compra" header="Fecha" sortable style="min-width:110px">
+            <template #body="{ data: c }">
+              <span class="text-sm text-slate-600">{{ formatDate(c.fecha_compra) }}</span>
+            </template>
+          </Column>
 
-        <div v-else class="flex flex-col gap-2">
-          <div
-            v-for="grupo in normalesAgrupados"
-            :key="grupo.fecha"
-            class="overflow-hidden rounded-xl"
-            style="border:1px solid rgba(255,255,255,0.07);background:#0D2240"
-          >
-            <!-- Cabecera -->
-            <button
-              class="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03]"
-              @click="toggleNormalGrupo(grupo.fecha)"
-            >
-              <div class="flex items-center gap-3">
-                <span
-                  class="material-symbols-outlined text-[18px] transition-transform duration-200"
-                  style="color:#10B981"
-                  :style="{ transform: abiertosNormales.has(grupo.fecha) ? 'rotate(90deg)' : 'rotate(0deg)' }"
-                >chevron_right</span>
-                <span class="font-mono text-sm font-semibold text-slate-200">{{ formatDate(grupo.fecha) }}</span>
-                <span class="rounded-full px-2 py-0.5 text-xs text-slate-500" style="background:rgba(255,255,255,0.05)">
-                  {{ grupo.compras.length }} compra{{ grupo.compras.length !== 1 ? 's' : '' }}
-                </span>
-              </div>
-              <span class="font-mono text-sm font-bold text-slate-200">{{ formatCurrency(grupo.total) }}</span>
-            </button>
+          <!-- Nombre + tarjeta -->
+          <Column field="nombre" header="Compra" sortable style="min-width:200px">
+            <template #body="{ data: c }">
+              <p class="text-sm font-medium text-slate-700 truncate">{{ c.nombre }}</p>
+              <span class="text-[11px] text-slate-500">{{ c.tarjeta?.nombre }} · {{ c.tarjeta?.banco }}</span>
+            </template>
+          </Column>
 
-            <!-- Cuerpo colapsable -->
-            <Transition name="accordion">
-              <div v-if="abiertosNormales.has(grupo.fecha)" style="border-top:1px solid rgba(255,255,255,0.05)">
-                <div
-                  v-for="c in grupo.compras"
-                  :key="c.id"
-                  class="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/[0.02]"
-                  style="border-bottom:1px solid rgba(255,255,255,0.04)"
+          <!-- Estado -->
+          <Column field="estado" header="Estado" sortable style="min-width:100px">
+            <template #body="{ data: c }">
+              <span :class="c.estado === 'pagada' ? 'badge-success' : 'badge-alert'">{{ c.estado }}</span>
+            </template>
+          </Column>
+
+          <!-- Monto -->
+          <Column field="monto" header="Monto" sortable style="min-width:120px">
+            <template #body="{ data: c }">
+              <span class="font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(c.monto) }}</span>
+            </template>
+          </Column>
+
+          <!-- Acciones -->
+          <Column header="" style="min-width:70px;width:70px">
+            <template #body="{ data: c }">
+              <div class="flex items-center justify-end">
+                <button
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                  title="Eliminar"
+                  @click="confirmDeleteNormal(c)"
                 >
-                  <div class="flex-1 min-w-0">
-                    <p class="truncate text-sm font-medium text-slate-200">{{ c.nombre }}</p>
-                    <span class="mt-0.5 text-xs text-slate-500">
-                      {{ c.tarjeta?.nombre }}
-                      <span class="text-slate-600">{{ c.tarjeta?.banco }}</span>
-                    </span>
-                  </div>
-                  <span :class="c.estado === 'pagada' ? 'badge-success' : 'badge-alert'" class="shrink-0">{{ c.estado }}</span>
-                  <span class="font-mono text-sm font-semibold text-slate-200 shrink-0">{{ formatCurrency(c.monto) }}</span>
-                  <button
-                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-                    title="Eliminar"
-                    @click="confirmDeleteNormal(c)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                </div>
+                  <span class="material-symbols-outlined text-[16px]">delete</span>
+                </button>
               </div>
-            </Transition>
-          </div>
-        </div>
+            </template>
+          </Column>
+        </AppDataTable>
       </div>
 
       <!-- ── TAB: Tasa Cero ── -->
       <div v-if="activeTab === 'tasa_cero'" class="mt-4 space-y-4">
         <div v-if="!comprasStore.tasaCero.length" class="fintech-card flex flex-col items-center py-14 text-center">
           <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">payments</span>
-          <p class="mt-3 font-semibold text-slate-300">Sin compras a tasa cero</p>
+          <p class="mt-3 font-semibold text-slate-600">Sin compras a tasa cero</p>
           <p class="mt-1 text-sm text-slate-500">Registra una compra con cuotas para verla aquí.</p>
         </div>
 
@@ -174,7 +157,7 @@
             <!-- Info principal -->
             <div class="flex-1">
               <div class="flex items-center gap-2">
-                <p class="font-semibold text-slate-200">{{ c.nombre }}</p>
+                <p class="font-semibold text-slate-700">{{ c.nombre }}</p>
                 <span :class="c.estado === 'activa' ? 'badge-success' : 'badge-alert'">{{ c.estado }}</span>
               </div>
               <p class="mt-0.5 text-xs text-slate-500">
@@ -185,22 +168,20 @@
             <!-- Monto y acciones -->
             <div class="flex items-center gap-2">
               <div class="text-right mr-1">
-                <p class="font-mono text-lg font-bold text-white">{{ formatCurrency(c.monto_total) }}</p>
+                <p class="font-mono text-lg font-bold text-slate-900">{{ formatCurrency(c.monto_total) }}</p>
                 <p class="text-xs text-slate-500">{{ formatCurrency(cuotaMonto(c)) }}/mes</p>
               </div>
-              <!-- Botón editar -->
               <button
-                class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+                class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
                 title="Editar"
                 @click="openEditTasaCero(c)"
               >
                 <span class="material-symbols-outlined text-[18px]">edit</span>
               </button>
-              <!-- Botón eliminar — deshabilitado si tiene cuotas pagadas -->
               <button
                 class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
                 :class="tieneCuotasPagadas(c)
-                  ? 'cursor-not-allowed text-slate-700'
+                  ? 'cursor-not-allowed text-slate-400'
                   : 'text-slate-500 hover:bg-red-500/10 hover:text-danger'"
                 :title="tieneCuotasPagadas(c) ? 'No se puede eliminar: ya tiene cuotas pagadas' : 'Eliminar'"
                 :disabled="tieneCuotasPagadas(c)"
@@ -214,8 +195,8 @@
           <!-- Barra de progreso de cuotas -->
           <div class="mt-4">
             <div class="mb-1.5 flex items-center justify-between text-xs">
-              <span class="text-slate-400">Progreso de cuotas</span>
-              <span class="font-mono text-slate-300">
+              <span class="text-slate-500">Progreso de cuotas</span>
+              <span class="font-mono text-slate-600">
                 {{ cuotasBlocks(c) }}
                 <span class="ml-1 text-slate-500">{{ cuotasPagadas(c) }}/{{ c.total_cuotas }}</span>
               </span>
@@ -276,44 +257,13 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useComprasStore }  from '../stores/compras'
 import { useTarjetasStore } from '../stores/tarjetas'
 import { formatCurrency }   from '../utils/currency'
+import AppDataTable            from '../components/AppDataTable.vue'
 import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
 import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
 import ConfirmDeleteModal      from '../components/ConfirmDeleteModal.vue'
 
-// ── Stores ────────────────────────────────────────────────────────
 const comprasStore  = useComprasStore()
 const tarjetasStore = useTarjetasStore()
-
-// ── Accordion compras normales ────────────────────────────────────
-const normalesAgrupados = computed(() => {
-  const map = new Map()
-  for (const c of comprasStore.normales) {
-    const fecha = c.fecha_compra?.split('T')[0] ?? ''
-    if (!map.has(fecha)) map.set(fecha, [])
-    map.get(fecha).push(c)
-  }
-  return [...map.entries()]
-    .sort(([a], [b]) => b.localeCompare(a))
-    .map(([fecha, compras]) => ({
-      fecha,
-      compras,
-      total: compras.reduce((s, c) => s + parseFloat(c.monto), 0),
-    }))
-})
-
-const abiertosNormales = ref(new Set())
-
-watch(normalesAgrupados, (grupos) => {
-  if (grupos.length && !abiertosNormales.value.size) {
-    abiertosNormales.value = new Set([grupos[0].fecha])
-  }
-}, { immediate: true })
-
-function toggleNormalGrupo(fecha) {
-  const next = new Set(abiertosNormales.value)
-  next.has(fecha) ? next.delete(fecha) : next.add(fecha)
-  abiertosNormales.value = next
-}
 
 const activeTab     = ref('normales')
 const filtroTarjeta = ref('')
@@ -351,10 +301,9 @@ function setFiltroEstado(val) {
   comprasStore.fetchTasaCero(tcParams)
 }
 
-// ── Modales creación / edición ────────────────────────────────────
-const showNormalModal      = ref(false)
-const showTasaCeroModal    = ref(false)
-const editTasaCeroTarget   = ref(null)
+const showNormalModal    = ref(false)
+const showTasaCeroModal  = ref(false)
+const editTasaCeroTarget = ref(null)
 
 function openCreateTasaCero() { editTasaCeroTarget.value = null; showTasaCeroModal.value = true }
 function openEditTasaCero(c)  { editTasaCeroTarget.value = c;    showTasaCeroModal.value = true }
@@ -383,7 +332,6 @@ async function onSaveTasaCero(payload) {
   }
 }
 
-// ── Eliminación ───────────────────────────────────────────────────
 const deleteNormalTarget   = ref(null)
 const deleteTasaCeroTarget = ref(null)
 const deleteErrorMsg       = ref('')
@@ -424,34 +372,21 @@ async function doDeleteTasaCero() {
   }
 }
 
-// ── Helpers tasa cero ─────────────────────────────────────────────
 function cuotasPagadas(c)     { return c.cuotas?.filter(q => q.estado === 'pagada').length ?? 0 }
 function tieneCuotasPagadas(c){ return cuotasPagadas(c) > 0 }
 function cuotasPct(c)         { return c.total_cuotas ? Math.round((cuotasPagadas(c) / c.total_cuotas) * 100) : 0 }
 function cuotaMonto(c)        { return c.total_cuotas ? parseFloat(c.monto_total) / c.total_cuotas : 0 }
 
 function cuotasBlocks(c) {
-  const paid = cuotasPagadas(c)
+  const paid  = cuotasPagadas(c)
   const total = c.total_cuotas ?? 0
-  const BLOCKS = 10
+  const BLOCKS  = 10
   const filled = Math.round((paid / total) * BLOCKS)
   return '[' + '█'.repeat(filled) + '░'.repeat(BLOCKS - filled) + ']'
 }
 
 function formatDate(d) {
-  if (!d) return '-'
+  if (!d) return '—'
   return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 </script>
-
-<style scoped>
-.accordion-enter-active, .accordion-leave-active {
-  transition: opacity 0.2s ease, max-height 0.25s ease;
-  max-height: 800px;
-  overflow: hidden;
-}
-.accordion-enter-from, .accordion-leave-to {
-  opacity: 0;
-  max-height: 0;
-}
-</style>

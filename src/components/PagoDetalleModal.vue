@@ -2,16 +2,16 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
-        <div class="absolute inset-0" style="background:rgba(7,17,31,0.82);backdrop-filter:blur(6px)" />
+        <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="relative w-full max-w-lg rounded-2xl shadow-card" style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)">
+        <div class="relative w-full max-w-lg rounded-2xl shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
           <!-- Header -->
           <div class="flex items-start justify-between p-6 pb-4">
             <div>
-              <h2 class="text-lg font-semibold text-white">{{ tituloMes }}</h2>
-              <p class="mt-0.5 text-sm text-slate-400">{{ tarjetaNombre }} — {{ banco }}</p>
+              <h2 class="text-lg font-semibold text-slate-900">{{ tituloMes }}</h2>
+              <p class="mt-0.5 text-sm text-slate-600">{{ tarjetaNombre }} — {{ banco }}</p>
             </div>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white" @click="close">
+            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -26,65 +26,65 @@
 
             <!-- Compras normales -->
             <div>
-              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Compras normales pendientes</p>
-              <div v-if="store.detalle.compras_normales.length === 0" class="rounded-xl px-4 py-3 text-sm text-slate-500" style="background:rgba(255,255,255,0.03)">
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">Compras normales pendientes</p>
+              <div v-if="store.detalle.compras_normales.length === 0" class="rounded-xl px-4 py-3 text-sm text-slate-600" style="background:rgba(10,25,47,0.04)">
                 Sin compras normales pendientes
               </div>
-              <div v-else class="rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.06)">
+              <div v-else class="rounded-xl overflow-hidden" style="border:1px solid #E8EDF5">
                 <div
                   v-for="c in store.detalle.compras_normales"
                   :key="c.id"
                   class="flex items-center justify-between px-4 py-2.5 text-sm"
-                  style="border-bottom:1px solid rgba(255,255,255,0.05)"
+                  style="border-bottom:1px solid #E8EDF5"
                 >
                   <div>
-                    <p class="text-slate-200">{{ c.nombre }}</p>
-                    <p class="text-xs text-slate-500">{{ formatDate(c.fecha_compra) }}</p>
+                    <p class="text-slate-700">{{ c.nombre }}</p>
+                    <p class="text-xs text-slate-600">{{ formatDate(c.fecha_compra) }}</p>
                   </div>
-                  <span class="font-mono font-semibold text-slate-200">{{ formatCurrency(c.monto) }}</span>
+                  <span class="font-mono font-semibold text-slate-700">{{ formatCurrency(c.monto) }}</span>
                 </div>
-                <div class="flex items-center justify-between px-4 py-2.5" style="background:rgba(255,255,255,0.03)">
-                  <span class="text-xs text-slate-400">Subtotal normales</span>
-                  <span class="font-mono text-sm font-semibold text-slate-200">{{ formatCurrency(store.detalle.total_normales) }}</span>
+                <div class="flex items-center justify-between px-4 py-2.5" style="background:rgba(10,25,47,0.04)">
+                  <span class="text-xs text-slate-500">Subtotal normales</span>
+                  <span class="font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(store.detalle.total_normales) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Cuotas tasa cero -->
             <div>
-              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Cuotas tasa cero del mes</p>
-              <div v-if="store.detalle.cuotas.length === 0" class="rounded-xl px-4 py-3 text-sm text-slate-500" style="background:rgba(255,255,255,0.03)">
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">Cuotas tasa cero del mes</p>
+              <div v-if="store.detalle.cuotas.length === 0" class="rounded-xl px-4 py-3 text-sm text-slate-600" style="background:rgba(10,25,47,0.04)">
                 Sin cuotas en este mes
               </div>
-              <div v-else class="rounded-xl overflow-hidden" style="border:1px solid rgba(255,255,255,0.06)">
+              <div v-else class="rounded-xl overflow-hidden" style="border:1px solid #E8EDF5">
                 <div
                   v-for="cuota in store.detalle.cuotas"
                   :key="cuota.id"
                   class="flex items-center justify-between px-4 py-2.5 text-sm"
-                  style="border-bottom:1px solid rgba(255,255,255,0.05)"
+                  style="border-bottom:1px solid #E8EDF5"
                 >
                   <div>
-                    <p class="text-slate-200">{{ cuota.compra_tasa_cero.nombre }}</p>
-                    <p class="text-xs text-slate-500">Cuota {{ cuota.numero_cuota }}/{{ cuota.compra_tasa_cero.total_cuotas }} · {{ formatDate(cuota.fecha_estimada_pago) }}</p>
+                    <p class="text-slate-700">{{ cuota.compra_tasa_cero.nombre }}</p>
+                    <p class="text-xs text-slate-600">Cuota {{ cuota.numero_cuota }}/{{ cuota.compra_tasa_cero.total_cuotas }} · {{ formatDate(cuota.fecha_estimada_pago) }}</p>
                   </div>
-                  <span class="font-mono font-semibold text-slate-200">{{ formatCurrency(cuota.monto_cuota) }}</span>
+                  <span class="font-mono font-semibold text-slate-700">{{ formatCurrency(cuota.monto_cuota) }}</span>
                 </div>
-                <div class="flex items-center justify-between px-4 py-2.5" style="background:rgba(255,255,255,0.03)">
-                  <span class="text-xs text-slate-400">Subtotal cuotas</span>
-                  <span class="font-mono text-sm font-semibold text-slate-200">{{ formatCurrency(store.detalle.total_cuotas) }}</span>
+                <div class="flex items-center justify-between px-4 py-2.5" style="background:rgba(10,25,47,0.04)">
+                  <span class="text-xs text-slate-500">Subtotal cuotas</span>
+                  <span class="font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(store.detalle.total_cuotas) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Total -->
             <div class="flex items-center justify-between rounded-xl px-5 py-4" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
-              <span class="font-semibold text-slate-300">Total a pagar</span>
+              <span class="font-semibold text-slate-700">Total a pagar</span>
               <span class="font-mono text-2xl font-bold text-success">{{ formatCurrency(store.detalle.total) }}</span>
             </div>
 
             <!-- Selector de cuenta (obligatorio cuando hay algo que pagar) -->
             <div v-if="store.detalle.total > 0">
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">
                 ¿Desde qué cuenta pagas?
               </label>
               <select
@@ -108,13 +108,13 @@
             </div>
 
             <!-- No pendientes -->
-            <div v-if="store.detalle.total === 0" class="rounded-lg px-4 py-3 text-sm text-slate-400" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+            <div v-if="store.detalle.total === 0" class="rounded-lg px-4 py-3 text-sm text-slate-500" style="background:rgba(10,25,47,0.04);border:1px solid #E2E8F0">
               No hay importes pendientes para este mes.
             </div>
 
             <!-- Actions -->
             <div class="flex gap-3 pt-1">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="close">
+              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
                 Cancelar
               </button>
               <button

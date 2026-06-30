@@ -1,11 +1,11 @@
 <template>
   <div
     class="flex min-h-screen items-center justify-center"
-    style="background: linear-gradient(135deg, #0A192F 0%, #081423 100%)"
+    style="background: linear-gradient(135deg, #F0F4FA 0%, #E8EDF5 100%)"
   >
     <div
       class="w-full max-w-sm rounded-2xl p-8"
-      style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px)"
+      style="background: #FFFFFF; border: 1px solid #E2E8F0; backdrop-filter: blur(12px)"
     >
       <!-- Logo -->
       <div class="mb-8 flex flex-col items-center gap-3">
@@ -15,27 +15,27 @@
         >
           <span class="material-symbols-outlined text-[28px]" style="color: #10B981">account_balance</span>
         </div>
-        <h1 class="text-xl font-bold tracking-tight text-white">moreMoney</h1>
-        <p class="text-xs" style="color: #4B5563">Control financiero inteligente</p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">moreMoney</h1>
+        <p class="text-xs" style="color: #94A3B8">Control financiero inteligente</p>
       </div>
 
       <!-- Form -->
       <form @submit.prevent="handleLogin" class="flex flex-col gap-4">
         <!-- Usuario -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-medium" style="color: #94A3B8">Usuario</label>
+          <label class="text-xs font-medium" style="color: #64748B">Usuario</label>
           <div class="relative">
             <span
               class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px]"
-              style="color: #4B5563"
+              style="color: #94A3B8"
             >person</span>
             <input
               v-model="form.usuario"
               type="text"
               autocomplete="username"
               placeholder="Tu usuario"
-              class="w-full rounded-lg py-2.5 pl-9 pr-4 text-sm text-white outline-none transition-all"
-              style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10)"
+              class="w-full rounded-lg py-2.5 pl-9 pr-4 text-sm text-slate-900 outline-none transition-all"
+              style="background: rgba(10,25,47,0.03); border: 1px solid #E2E8F0"
               :style="inputFocusStyle"
               @focus="focusedField = 'usuario'"
               @blur="focusedField = null"
@@ -45,19 +45,19 @@
 
         <!-- Contraseña -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-medium" style="color: #94A3B8">Contraseña</label>
+          <label class="text-xs font-medium" style="color: #64748B">Contraseña</label>
           <div class="relative">
             <span
               class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px]"
-              style="color: #4B5563"
+              style="color: #94A3B8"
             >lock</span>
             <input
               v-model="form.contrasena"
               :type="showPassword ? 'text' : 'password'"
               autocomplete="current-password"
               placeholder="Tu contraseña"
-              class="w-full rounded-lg py-2.5 pl-9 pr-10 text-sm text-white outline-none transition-all"
-              style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10)"
+              class="w-full rounded-lg py-2.5 pl-9 pr-10 text-sm text-slate-900 outline-none transition-all"
+              style="background: rgba(10,25,47,0.03); border: 1px solid #E2E8F0"
               :style="inputFocusStyle"
               @focus="focusedField = 'contrasena'"
               @blur="focusedField = null"
@@ -67,7 +67,7 @@
               class="absolute right-3 top-1/2 -translate-y-1/2"
               @click="showPassword = !showPassword"
             >
-              <span class="material-symbols-outlined text-[18px]" style="color: #4B5563">
+              <span class="material-symbols-outlined text-[18px]" style="color: #94A3B8">
                 {{ showPassword ? 'visibility_off' : 'visibility' }}
               </span>
             </button>
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Error -->
-        <p v-if="errorMsg" class="rounded-lg px-3 py-2 text-xs" style="background: rgba(220,38,38,0.12); color: #F87171; border: 1px solid rgba(220,38,38,0.2)">
+        <p v-if="errorMsg" class="rounded-lg px-3 py-2 text-xs" style="background: rgba(220,38,38,0.08); color: #F87171; border: 1px solid rgba(220,38,38,0.2)">
           {{ errorMsg }}
         </p>
 

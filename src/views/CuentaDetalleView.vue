@@ -1,7 +1,7 @@
 <template>
   <section>
     <!-- Back -->
-    <button class="mb-5 flex items-center gap-1 text-sm text-slate-400 transition-colors hover:text-slate-200" @click="router.back()">
+    <button class="mb-5 flex items-center gap-1 text-sm text-slate-400 transition-colors hover:text-slate-900" @click="router.back()">
       <span class="material-symbols-outlined text-[18px]">arrow_back</span>
       Volver a cuentas
     </button>
@@ -19,7 +19,7 @@
             <span class="material-symbols-outlined text-[28px]" :style="{ color: iconoColor(cuenta.tipo) }">{{ iconoTipo(cuenta.tipo) }}</span>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-slate-100">{{ cuenta.nombre }}</h1>
+            <h1 class="text-2xl font-bold text-slate-800">{{ cuenta.nombre }}</h1>
             <p class="text-sm capitalize text-slate-500">{{ cuenta.tipo }}</p>
           </div>
         </div>
@@ -57,12 +57,12 @@
         <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Libro de movimientos</h2>
         <div class="flex flex-wrap items-center gap-2">
           <!-- Filtro tipo -->
-          <div class="flex gap-1 rounded-xl p-1" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
+          <div class="flex gap-1 rounded-xl p-1" style="background:rgba(10,25,47,0.03);border:1px solid #E2E8F0">
             <button
               v-for="opt in tipoOpts"
               :key="opt.value"
               class="rounded-lg px-3 py-1 text-xs font-semibold transition-colors"
-              :style="filtroTipo === opt.value ? 'background:rgba(16,185,129,0.18);color:#10B981' : 'color:#64748B'"
+              :style="filtroTipo === opt.value ? 'background:rgba(5,150,105,0.12);color:#10B981' : 'color:#64748B'"
               @click="setFiltroTipo(opt.value)"
             >{{ opt.label }}</button>
           </div>
@@ -81,7 +81,7 @@
       <div v-else-if="txStore.transacciones.length" class="mt-4 fintech-card overflow-x-auto">
         <table class="w-full min-w-[480px] text-sm">
           <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+            <tr style="border-bottom:1px solid #E8EDF5">
               <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Fecha</th>
               <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Descripción</th>
               <th class="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-500">Tipo</th>
@@ -93,12 +93,12 @@
             <tr
               v-for="tx in txStore.transacciones"
               :key="tx.id"
-              style="border-bottom:1px solid rgba(255,255,255,0.04)"
+              style="border-bottom:1px solid #E8EDF5"
             >
-              <td class="px-4 py-3 text-slate-400 tabular-nums">{{ formatDate(tx.fecha) }}</td>
-              <td class="px-4 py-3 text-slate-200">
+              <td class="px-4 py-3 text-slate-600 tabular-nums">{{ formatDate(tx.fecha) }}</td>
+              <td class="px-4 py-3 text-slate-700">
                 {{ tx.descripcion }}
-                <span v-if="tx.referencia_tipo && tx.referencia_tipo !== 'manual'" class="ml-1 text-[10px] text-slate-600">
+                <span v-if="tx.referencia_tipo && tx.referencia_tipo !== 'manual'" class="ml-1 text-[10px] text-slate-500">
                   ({{ labelReferencia(tx.referencia_tipo) }})
                 </span>
               </td>
@@ -126,13 +126,13 @@
       <!-- Vacío -->
       <div v-else class="mt-4 fintech-card flex flex-col items-center py-12 text-center">
         <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">receipt_long</span>
-        <p class="mt-3 text-sm text-slate-400">Sin movimientos registrados.</p>
+        <p class="mt-3 text-sm text-slate-600">Sin movimientos registrados.</p>
       </div>
 
       <!-- Paginación -->
       <div v-if="txStore.totalPages > 1" class="mt-4 flex items-center justify-center gap-2">
         <button
-          class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors disabled:opacity-30 hover:bg-white/10"
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors disabled:opacity-30 hover:bg-slate-100"
           :disabled="txStore.page === 1"
           @click="cambiarPagina(txStore.page - 1)"
         >
@@ -140,7 +140,7 @@
         </button>
         <span class="text-xs text-slate-500">{{ txStore.page }} / {{ txStore.totalPages }}</span>
         <button
-          class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors disabled:opacity-30 hover:bg-white/10"
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors disabled:opacity-30 hover:bg-slate-100"
           :disabled="txStore.page === txStore.totalPages"
           @click="cambiarPagina(txStore.page + 1)"
         >
@@ -153,9 +153,9 @@
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showMovModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div class="absolute inset-0" style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)" @click="showMovModal = false" />
-          <div class="relative w-full max-w-sm rounded-2xl p-6" style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)">
-            <h3 class="mb-4 font-semibold text-white">Registrar movimiento</h3>
+          <div class="absolute inset-0" style="background:rgba(7,17,31,0.4);backdrop-filter:blur(6px)" @click="showMovModal = false" />
+          <div class="relative w-full max-w-sm rounded-2xl p-6" style="background:#FFFFFF;border:1px solid #E2E8F0">
+            <h3 class="mb-4 font-semibold text-slate-900">Registrar movimiento</h3>
             <form class="space-y-4" @submit.prevent="guardarMovimiento">
               <div>
                 <label class="mb-1.5 block text-xs font-medium text-slate-400">Tipo</label>
@@ -178,7 +178,7 @@
               </div>
               <p v-if="movError" class="text-xs text-danger">{{ movError }}</p>
               <div class="flex gap-3 pt-1">
-                <button type="button" class="flex-1 rounded-xl py-2.5 text-sm text-slate-400 hover:bg-white/5" @click="showMovModal = false">Cancelar</button>
+                <button type="button" class="flex-1 rounded-xl py-2.5 text-sm text-slate-400 hover:bg-slate-50" @click="showMovModal = false">Cancelar</button>
                 <button type="submit" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981" :disabled="savingMov">
                   {{ savingMov ? 'Guardando…' : 'Guardar' }}
                 </button>
@@ -255,8 +255,8 @@ const REFERENCIA_LABELS = {
 function labelReferencia(tipo) { return REFERENCIA_LABELS[tipo] ?? tipo }
 
 function iconoTipo(tipo)  { return { banco: 'account_balance', efectivo: 'payments', digital: 'phone_iphone' }[tipo] ?? 'wallet' }
-function iconoBg(tipo)    { return { banco: 'background:rgba(59,130,246,0.12)', efectivo: 'background:rgba(16,185,129,0.12)', digital: 'background:rgba(167,139,250,0.12)' }[tipo] ?? '' }
-function iconoColor(tipo) { return { banco: '#93C5FD', efectivo: '#10B981', digital: '#A78BFA' }[tipo] ?? '#94A3B8' }
+function iconoBg(tipo)    { return { banco: 'background:rgba(45,89,145,0.10)', efectivo: 'background:rgba(5,150,105,0.10)', digital: 'background:rgba(99,102,241,0.10)' }[tipo] ?? '' }
+function iconoColor(tipo) { return { banco: '#2D5991', efectivo: '#10B981', digital: '#6366F1' }[tipo] ?? '#94A3B8' }
 
 // Modal movimiento manual
 const showMovModal = ref(false)

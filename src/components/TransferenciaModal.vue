@@ -3,23 +3,23 @@
     <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         class="absolute inset-0"
-        style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)"
+        style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
         @click="close"
       />
       <div
         class="relative w-full max-w-sm rounded-2xl p-6 shadow-card"
-        style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)"
+        style="background:#FFFFFF;border:1px solid #E2E8F0"
       >
         <div class="flex items-center gap-3 mb-5">
           <div class="flex h-9 w-9 items-center justify-center rounded-xl" style="background:rgba(167,139,250,0.12)">
             <span class="material-symbols-outlined text-[20px]" style="color:#A78BFA">swap_horiz</span>
           </div>
-          <h2 class="text-base font-semibold text-white">Mover fondos</h2>
+          <h2 class="text-base font-semibold text-slate-900">Mover fondos</h2>
         </div>
 
         <form class="flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Cuenta origen</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Cuenta origen</label>
             <select v-model.number="form.origen_id" required class="fintech-input w-full" @change="onOrigenChange">
               <option value="" disabled>Selecciona cuenta</option>
               <option
@@ -35,11 +35,11 @@
 
           <!-- Flecha visual -->
           <div class="flex items-center justify-center">
-            <span class="material-symbols-outlined text-slate-600">arrow_downward</span>
+            <span class="material-symbols-outlined text-slate-500">arrow_downward</span>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Cuenta destino</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Cuenta destino</label>
             <select v-model.number="form.destino_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona cuenta</option>
               <option
@@ -54,7 +54,7 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Monto ($)</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Monto ($)</label>
             <input
               v-model.number="form.monto"
               type="number"
@@ -64,13 +64,13 @@
               required
               class="fintech-input w-full"
             />
-            <p v-if="saldoOrigen !== null" class="mt-1 text-[10px] text-slate-600">
+            <p v-if="saldoOrigen !== null" class="mt-1 text-[10px] text-slate-500">
               Disponible: <span class="font-mono" style="color:#A78BFA">{{ formatCurrency(saldoOrigen) }}</span>
             </p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Descripción (opcional)</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Descripción (opcional)</label>
             <input
               v-model="form.descripcion"
               type="text"
@@ -80,7 +80,7 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Fecha</label>
+            <label class="mb-1.5 block text-xs text-slate-500">Fecha</label>
             <input v-model="form.fecha" type="date" required class="fintech-input w-full" />
           </div>
 
@@ -89,7 +89,7 @@
           <div class="flex gap-3 pt-2">
             <button
               type="button"
-              class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5"
+              class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50"
               @click="close"
             >
               Cancelar

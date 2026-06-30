@@ -2,13 +2,13 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
-        <div class="absolute inset-0" style="background:rgba(7,17,31,0.82);backdrop-filter:blur(6px)" />
+        <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="relative w-full max-w-md rounded-2xl shadow-card" style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)">
+        <div class="relative w-full max-w-md rounded-2xl shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
           <!-- Header -->
           <div class="flex items-center justify-between p-6 pb-4">
-            <h2 class="text-lg font-semibold text-white">{{ egreso ? 'Editar egreso' : 'Nuevo egreso' }}</h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white" @click="close">
+            <h2 class="text-lg font-semibold text-slate-900">{{ egreso ? 'Editar egreso' : 'Nuevo egreso' }}</h2>
+            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -18,7 +18,7 @@
 
             <!-- Descripción -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Descripción</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Descripción</label>
               <input
                 v-model="form.descripcion"
                 type="text"
@@ -30,7 +30,7 @@
 
             <!-- Monto -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Monto</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Monto</label>
               <input
                 v-model.number="form.monto"
                 type="number"
@@ -44,7 +44,7 @@
 
             <!-- Fecha -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Fecha</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Fecha</label>
               <input
                 v-model="form.fecha"
                 type="date"
@@ -55,7 +55,7 @@
 
             <!-- Cuenta -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Cuenta</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Cuenta</label>
               <select v-model.number="form.cuenta_id" class="fintech-input" required>
                 <option :value="null" disabled>Selecciona una cuenta</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
@@ -69,7 +69,7 @@
 
             <!-- Actions -->
             <div class="flex gap-3 pt-1">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="close">
+              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
                 Cancelar
               </button>
               <button

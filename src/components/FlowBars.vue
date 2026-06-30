@@ -10,7 +10,7 @@
       <div class="flex justify-between text-xs mb-2">
         <div class="flex items-center gap-1.5">
           <span class="h-2 w-2 rounded-full shrink-0" style="background:#10B981" />
-          <span class="text-slate-400">Ingresos</span>
+          <span class="text-slate-600">Ingresos</span>
         </div>
         <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(ingresos) }}</span>
       </div>
@@ -28,7 +28,7 @@
       <div class="flex justify-between text-xs mb-2">
         <div class="flex items-center gap-1.5">
           <span class="h-2 w-2 rounded-full shrink-0" style="background:#DC2626" />
-          <span class="text-slate-400">Egresos</span>
+          <span class="text-slate-600">Egresos</span>
         </div>
         <span class="font-mono font-semibold" style="color:#DC2626">{{ formatCurrency(egresos) }}</span>
       </div>
@@ -42,14 +42,14 @@
     </div>
 
     <!-- Neto -->
-    <div class="border-t pt-4" style="border-color:rgba(255,255,255,0.06)">
+    <div class="border-t pt-4" style="border-color:#E2E8F0">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-1.5">
           <span
             class="material-symbols-outlined text-[16px]"
             :style="{ color: netoColor }"
           >{{ neto >= 0 ? 'trending_up' : 'trending_down' }}</span>
-          <span class="text-xs text-slate-400">Neto del mes</span>
+          <span class="text-xs text-slate-600">Neto del mes</span>
         </div>
         <span class="font-mono text-xl font-bold" :style="{ color: netoColor }">
           {{ neto >= 0 ? '+' : '' }}{{ formatCurrency(neto) }}

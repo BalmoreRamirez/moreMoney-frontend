@@ -2,23 +2,23 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0" style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)" @click="$emit('update:modelValue', false)" />
+        <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" @click="$emit('update:modelValue', false)" />
 
-        <div class="relative w-full max-w-md rounded-2xl p-6" style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)">
-          <h2 class="mb-5 text-base font-semibold text-white">
+        <div class="relative w-full max-w-md rounded-2xl p-6" style="background:#FFFFFF;border:1px solid #E2E8F0">
+          <h2 class="mb-5 text-base font-semibold text-slate-900">
             {{ editData ? 'Editar cuenta' : 'Nueva cuenta' }}
           </h2>
 
           <form class="space-y-4" @submit.prevent="submit">
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Nombre</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Nombre</label>
               <input v-model="form.nombre" class="fintech-input" placeholder="Ej: BHD León, Efectivo casa" required />
             </div>
 
             <!-- Tipo -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Tipo</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Tipo</label>
               <select v-model="form.tipo" class="fintech-input" required>
                 <option value="">Seleccionar tipo</option>
                 <option value="banco">Banco</option>
@@ -29,7 +29,7 @@
 
             <!-- Saldo inicial (solo al crear) -->
             <div v-if="!editData">
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Saldo inicial</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Saldo inicial</label>
               <input
                 v-model.number="form.saldo_inicial"
                 type="number"
@@ -38,13 +38,13 @@
                 class="fintech-input"
                 placeholder="0.00"
               />
-              <p class="mt-1 text-[10px] text-slate-600">El saldo actual se calculará sumando los movimientos sobre este valor.</p>
+              <p class="mt-1 text-[10px] text-slate-500">El saldo actual se calculará sumando los movimientos sobre este valor.</p>
             </div>
 
             <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
             <div class="flex gap-3 pt-2">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="$emit('update:modelValue', false)">
+              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="$emit('update:modelValue', false)">
                 Cancelar
               </button>
               <button type="submit" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981" :disabled="saving">

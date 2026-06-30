@@ -5,7 +5,7 @@
       <circle
         :cx="center" :cy="center" :r="radius"
         fill="none"
-        stroke="rgba(255,255,255,0.06)"
+        stroke="#E8EDF5"
         :stroke-width="thickness"
       />
 
@@ -41,7 +41,7 @@
         text-anchor="middle"
         font-family="Roboto Mono, monospace"
         font-size="11"
-        fill="#64748B"
+        fill="#94A3B8"
       >Disponible</text>
       <text
         :x="center" :y="center + 14"
@@ -58,20 +58,20 @@
       <div class="flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full" style="background:#10B981" />
-          <span class="text-slate-400">Disponible</span>
+          <span class="text-slate-600">Disponible</span>
         </div>
         <span class="font-mono font-semibold text-success">{{ formatCurrency(disponible) }}</span>
       </div>
       <div class="flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full" :style="{ background: gastadoColor }" />
-          <span class="text-slate-400">Gastado</span>
+          <span class="text-slate-600">Gastado</span>
         </div>
         <span class="font-mono font-semibold" :style="{ color: gastadoColor }">{{ formatCurrency(gastado) }}</span>
       </div>
-      <div class="mt-1 flex items-center justify-between border-t pt-2 text-xs" style="border-color:rgba(255,255,255,0.08)">
-        <span class="text-slate-400">Límite total</span>
-        <span class="font-mono text-slate-300">{{ formatCurrency(limite) }}</span>
+      <div class="mt-1 flex items-center justify-between border-t pt-2 text-xs" style="border-color:#E2E8F0">
+        <span class="text-slate-600">Límite total</span>
+        <span class="font-mono text-slate-700">{{ formatCurrency(limite) }}</span>
       </div>
     </div>
   </div>
@@ -109,7 +109,7 @@ const gastadoDeg = computed(() => -90 + (disponiblePct.value / 100) * 360)
 const gastadoColor = computed(() => {
   if (gastadoPct.value >= 90) return '#DC2626'
   if (gastadoPct.value >= 70) return '#F59E0B'
-  return '#4B5563'
+  return '#94A3B8'
 })
 const disponibleColor = computed(() => {
   if (disponiblePct.value <= 10) return '#DC2626'

@@ -2,14 +2,14 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
-        <div class="absolute inset-0" style="background:rgba(7,17,31,0.78);backdrop-filter:blur(6px)" />
+        <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)">
+        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
           <div class="mb-5 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">
+            <h2 class="text-lg font-semibold text-slate-900">
               {{ isEdit ? 'Editar compra tasa cero' : 'Nueva compra tasa cero' }}
             </h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white" @click="close">
+            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -23,7 +23,7 @@
           <form @submit.prevent="submit" class="space-y-4">
             <!-- Tarjeta -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Tarjeta</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Tarjeta</label>
               <select v-model="form.tarjeta_id" class="fintech-input" :disabled="isEdit && hasPaidCuotas" required>
                 <option value="" disabled>Selecciona una tarjeta…</option>
                 <option v-for="t in tarjetas" :key="t.id" :value="t.id">
@@ -35,7 +35,7 @@
 
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Descripción del producto</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Descripción del producto</label>
               <input v-model.trim="form.nombre" type="text" class="fintech-input" placeholder="Ej: Laptop Dell" required />
               <p v-if="errors.nombre" class="mt-1 text-xs text-danger">{{ errors.nombre }}</p>
             </div>
@@ -43,9 +43,9 @@
             <!-- Monto total + cuotas -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-400">Monto total</label>
+                <label class="mb-1.5 block text-xs font-medium text-slate-500">Monto total</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-400">$</span>
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-500">$</span>
                   <input
                     v-model="form.monto_total" type="number" step="0.01" min="0.01"
                     class="fintech-input pl-7 font-mono"
@@ -57,7 +57,7 @@
                 <p v-if="errors.monto_total" class="mt-1 text-xs text-danger">{{ errors.monto_total }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-400">N° de cuotas</label>
+                <label class="mb-1.5 block text-xs font-medium text-slate-500">N° de cuotas</label>
                 <input
                   v-model.number="form.total_cuotas" type="number" min="1" max="60"
                   class="fintech-input"
@@ -71,13 +71,13 @@
 
             <!-- Preview cuota mensual -->
             <div v-if="cuotaMensual" class="flex items-center justify-between rounded-xl px-4 py-3" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
-              <span class="text-xs text-slate-400">Cuota mensual estimada</span>
+              <span class="text-xs text-slate-500">Cuota mensual estimada</span>
               <span class="font-mono text-lg font-bold text-success">{{ cuotaMensual }}</span>
             </div>
 
             <!-- Fecha -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-400">Fecha de compra</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Fecha de compra</label>
               <input
                 v-model="form.fecha_compra" type="date"
                 class="fintech-input"
@@ -93,7 +93,7 @@
             </div>
 
             <div class="flex gap-3 pt-2">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="close">Cancelar</button>
+              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">Cancelar</button>
               <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
                 {{ saving
                   ? (isEdit ? 'Guardando…' : 'Generando cuotas…')

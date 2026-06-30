@@ -3,7 +3,7 @@
     <!-- Encabezado -->
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-100">Ingresos</h1>
+        <h1 class="text-2xl font-bold text-slate-800">Ingresos</h1>
         <p class="mt-1 text-sm text-slate-400">Sueldos e inversiones registradas.</p>
       </div>
       <button
@@ -17,12 +17,12 @@
     </div>
 
     <!-- Tabs -->
-    <div class="mt-6 flex gap-1 rounded-xl p-1" style="background:rgba(255,255,255,0.04);width:fit-content">
+    <div class="mt-6 flex gap-1 rounded-xl p-1" style="background:rgba(10,25,47,0.03);width:fit-content">
       <button
         v-for="tab in TABS"
         :key="tab.key"
         class="rounded-lg px-4 py-2 text-sm font-medium transition-all"
-        :class="activeTab === tab.key ? 'bg-success text-white shadow' : 'text-slate-400 hover:text-slate-200'"
+        :class="activeTab === tab.key ? 'bg-success text-white shadow' : 'text-slate-600 hover:text-slate-900'"
         @click="activeTab = tab.key"
       >
         <span class="material-symbols-outlined align-middle text-[16px] mr-1">{{ tab.icon }}</span>
@@ -30,105 +30,95 @@
       </button>
     </div>
 
-    <!-- Loading -->
-    <div v-if="store.loading" class="mt-10 flex justify-center">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-success border-t-transparent" />
-    </div>
-
     <!-- Error -->
-    <div v-else-if="store.error" class="mt-4 rounded-xl px-5 py-4 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger)">
+    <div v-if="store.error" class="mt-4 rounded-xl px-5 py-4 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger)">
       {{ store.error }}
     </div>
 
-    <!-- ════════════════════════════════════════ SUELDOS ═══════════════════════════════════════ -->
+    <!-- ════ SUELDOS ════ -->
     <template v-else-if="activeTab === 'sueldos'">
-      <!-- Estado vacío -->
-      <div v-if="!store.sueldos.length" class="mt-10 fintech-card flex flex-col items-center py-14 text-center">
-        <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">payments</span>
-        <p class="mt-3 font-semibold text-slate-300">Sin sueldos registrados</p>
-        <p class="mt-1 text-sm text-slate-500">Registra tu salario para llevar el control mensual de cobros.</p>
-        <button class="mt-5 rounded-xl px-5 py-2.5 text-sm font-semibold text-white" style="background:#10B981" @click="openCreateSueldo">
-          Agregar sueldo
-        </button>
-      </div>
-
-      <!-- Accordion de sueldos -->
-      <div v-else class="mt-6 flex flex-col gap-2">
-        <div
-          v-for="s in store.sueldos"
-          :key="s.id"
-          class="overflow-hidden rounded-xl"
-          style="border:1px solid rgba(255,255,255,0.07);background:#0D2240"
-        >
-          <!-- Cabecera -->
-          <button
-            class="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03]"
-            @click="toggleSueldo(s.id)"
-          >
-            <div class="flex items-center gap-3">
-              <span
-                class="material-symbols-outlined text-[18px] transition-transform duration-200"
-                style="color:#10B981"
-                :style="{ transform: abiertosS.has(s.id) ? 'rotate(90deg)' : 'rotate(0deg)' }"
-              >chevron_right</span>
-              <span class="text-sm font-semibold text-slate-200">{{ s.nombre }}</span>
+      <AppDataTable
+        class="mt-6"
+        :data="store.sueldos"
+        :loading="store.loading"
+        empty-text="Sin sueldos registrados"
+        empty-icon="payments"
+      >
+        <!-- Nombre + estado -->
+        <Column field="nombre" header="Nombre" sortable style="min-width:200px">
+          <template #body="{ data: s }">
+            <div class="flex items-center gap-2">
+              <p class="font-semibold text-slate-800">{{ s.nombre }}</p>
               <span
                 class="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                :style="s.activo ? 'background:rgba(16,185,129,0.15);color:#10B981' : 'background:rgba(100,116,139,0.15);color:#64748B'"
+                :style="s.activo ? 'background:rgba(5,150,105,0.12);color:#10B981' : 'background:rgba(100,116,139,0.12);color:#64748B'"
               >{{ s.activo ? 'Activo' : 'Inactivo' }}</span>
             </div>
-            <span class="font-mono text-sm font-bold" style="color:#10B981">{{ formatCurrency(s.monto) }}</span>
-          </button>
+          </template>
+        </Column>
 
-          <!-- Cuerpo -->
-          <Transition name="accordion">
-            <div v-if="abiertosS.has(s.id)" class="px-5 pb-4 pt-3" style="border-top:1px solid rgba(255,255,255,0.05)">
-              <div class="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-                <div>
-                  <p class="text-[11px] uppercase tracking-wider text-slate-500">Cuenta</p>
-                  <p class="mt-0.5 text-slate-300">{{ s.cuenta?.nombre ?? '—' }}</p>
-                </div>
-                <div>
-                  <p class="text-[11px] uppercase tracking-wider text-slate-500">Día de cobro</p>
-                  <p class="mt-0.5 text-slate-300">Día {{ s.dia_cobro }}</p>
-                </div>
-                <div>
-                  <p class="text-[11px] uppercase tracking-wider text-slate-500">Último cobro</p>
-                  <p class="mt-0.5 text-slate-300">{{ ultimoCobro(s) }}</p>
-                </div>
-              </div>
-              <div class="mt-4 flex items-center gap-2">
-                <button
-                  v-if="s.activo"
-                  class="flex h-7 items-center gap-1 rounded-lg px-2.5 text-[11px] font-medium transition-colors hover:opacity-80"
-                  style="background:rgba(16,185,129,0.15);color:#10B981"
-                  @click="openCobrar(s)"
-                >
-                  <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                  Cobrar
-                </button>
-                <button
-                  class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
-                  title="Editar"
-                  @click="openEditSueldo(s)"
-                >
-                  <span class="material-symbols-outlined text-[16px]">edit</span>
-                </button>
-                <button
-                  class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-                  title="Eliminar"
-                  @click="confirmDeleteSueldo(s)"
-                >
-                  <span class="material-symbols-outlined text-[16px]">delete</span>
-                </button>
-              </div>
+        <!-- Cuenta -->
+        <Column field="cuenta.nombre" header="Cuenta" sortable style="min-width:140px">
+          <template #body="{ data: s }">
+            <span class="text-sm text-slate-600">{{ s.cuenta?.nombre ?? '—' }}</span>
+          </template>
+        </Column>
+
+        <!-- Día de cobro -->
+        <Column field="dia_cobro" header="Día cobro" sortable style="min-width:110px">
+          <template #body="{ data: s }">
+            <span class="text-sm text-slate-600">Día {{ s.dia_cobro }}</span>
+          </template>
+        </Column>
+
+        <!-- Último cobro -->
+        <Column header="Último cobro" style="min-width:120px">
+          <template #body="{ data: s }">
+            <span class="text-sm text-slate-600">{{ ultimoCobro(s) }}</span>
+          </template>
+        </Column>
+
+        <!-- Monto -->
+        <Column field="monto" header="Monto/mes" sortable style="min-width:120px">
+          <template #body="{ data: s }">
+            <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(s.monto) }}</span>
+          </template>
+        </Column>
+
+        <!-- Acciones -->
+        <Column header="" style="min-width:120px;width:120px">
+          <template #body="{ data: s }">
+            <div class="flex items-center justify-end gap-1">
+              <button
+                v-if="s.activo"
+                class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
+                style="background:rgba(5,150,105,0.12);color:#10B981"
+                @click="openCobrar(s)"
+              >
+                <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                Cobrar
+              </button>
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                title="Editar"
+                @click="openEditSueldo(s)"
+              >
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                title="Eliminar"
+                @click="confirmDeleteSueldo(s)"
+              >
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
             </div>
-          </Transition>
-        </div>
-      </div>
+          </template>
+        </Column>
+      </AppDataTable>
     </template>
 
-    <!-- ════════════════════════════════════════ INVERSIONES ══════════════════════════════════════ -->
+    <!-- ════ INVERSIONES ════ -->
     <template v-else-if="activeTab === 'inversiones'">
       <!-- Filtro estado -->
       <div class="mt-6 flex flex-wrap gap-2">
@@ -136,178 +126,173 @@
           v-for="f in FILTROS_ESTADO"
           :key="f.value"
           class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
-          :class="filtroEstado === f.value ? 'text-white' : 'text-slate-400 hover:text-slate-200'"
-          :style="filtroEstado === f.value ? 'background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3)' : 'background:rgba(255,255,255,0.04);border:1px solid transparent'"
+          :class="filtroEstado === f.value ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'"
+          :style="filtroEstado === f.value ? 'background:rgba(5,150,105,0.12);border:1px solid rgba(5,150,105,0.3)' : 'background:rgba(10,25,47,0.03);border:1px solid transparent'"
           @click="setFiltroEstado(f.value)"
-        >
-          {{ f.label }}
-        </button>
+        >{{ f.label }}</button>
       </div>
 
-      <!-- Estado vacío -->
-      <div v-if="!store.inversiones.length" class="mt-8 fintech-card flex flex-col items-center py-14 text-center">
-        <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">trending_up</span>
-        <p class="mt-3 font-semibold text-slate-300">Sin inversiones registradas</p>
-        <p class="mt-1 text-sm text-slate-500">Registra compras para reventa y lleva el control de tu ganancia.</p>
-        <button class="mt-5 rounded-xl px-5 py-2.5 text-sm font-semibold text-white" style="background:#10B981" @click="openCreateInversion">
-          Nueva inversión
-        </button>
-      </div>
-
-      <!-- Accordion de inversiones agrupadas por fecha -->
-      <div v-else class="mt-4 flex flex-col gap-2">
-        <div
-          v-for="grupo in inversionesAgrupadas"
-          :key="grupo.fecha"
-          class="overflow-hidden rounded-xl"
-          style="border:1px solid rgba(255,255,255,0.07);background:#0D2240"
-        >
-          <!-- Cabecera -->
-          <button
-            class="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-white/[0.03]"
-            @click="toggleInvGrupo(grupo.fecha)"
-          >
-            <div class="flex items-center gap-3">
-              <span
-                class="material-symbols-outlined text-[18px] transition-transform duration-200"
-                style="color:#10B981"
-                :style="{ transform: abiertosI.has(grupo.fecha) ? 'rotate(90deg)' : 'rotate(0deg)' }"
-              >chevron_right</span>
-              <span class="font-mono text-sm font-semibold text-slate-200">{{ grupo.fecha }}</span>
-              <span class="rounded-full px-2 py-0.5 text-xs text-slate-500" style="background:rgba(255,255,255,0.05)">
-                {{ grupo.inversiones.length }} inversión{{ grupo.inversiones.length !== 1 ? 'es' : '' }}
-              </span>
+      <AppDataTable
+        class="mt-4"
+        :data="store.inversiones"
+        :loading="store.loading"
+        empty-text="Sin inversiones registradas"
+        empty-icon="trending_up"
+      >
+        <!-- Nombre + estado -->
+        <Column field="nombre" header="Inversión" sortable style="min-width:200px">
+          <template #body="{ data: inv }">
+            <div class="min-w-0">
+              <p class="font-semibold text-slate-800 truncate">{{ inv.nombre }}</p>
+              <div v-if="inv.fecha_compra" class="text-[11px] text-slate-500">{{ formatDate(inv.fecha_compra) }}</div>
             </div>
-            <span class="font-mono text-sm font-bold text-slate-200">{{ formatCurrency(grupo.totalCosto) }}</span>
-          </button>
+          </template>
+        </Column>
 
-          <!-- Cuerpo -->
-          <Transition name="accordion">
-            <div v-if="abiertosI.has(grupo.fecha)" style="border-top:1px solid rgba(255,255,255,0.05)">
-              <div
-                v-for="inv in grupo.inversiones"
-                :key="inv.id"
-                class="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/[0.02]"
-                style="border-bottom:1px solid rgba(255,255,255,0.04)"
-              >
-                <div class="flex-1 min-w-0">
-                  <p class="truncate text-sm font-medium text-slate-200">{{ inv.nombre }}</p>
-                  <div class="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
-                    <span>Costo: <span class="font-mono text-slate-400">{{ formatCurrency(inv.costo_total) }}</span></span>
-                    <span v-if="inv.estado === 'en_curso' && inv.total_cobrado > 0">
-                      Cobrado: <span class="font-mono" style="color:#10B981">{{ formatCurrency(inv.total_cobrado) }}</span>
-                    </span>
-                    <span v-if="inv.estado === 'en_curso' && inv.saldo_por_cobrar != null && inv.saldo_por_cobrar > 0">
-                      Falta: <span class="font-mono" style="color:#FBBF24">{{ formatCurrency(inv.saldo_por_cobrar) }}</span>
-                    </span>
-                    <span v-if="inv.estado === 'vendida' && inv.precio_venta_total != null">
-                      Venta total: <span class="font-mono text-slate-400">{{ formatCurrency(inv.precio_venta_total) }}</span>
-                    </span>
-                  </div>
-                  <!-- Barra de progreso para en_curso con cobros -->
-                  <div v-if="inv.estado === 'en_curso' && inv.precio_esperado && inv.total_cobrado > 0" class="mt-1.5 h-1 w-full rounded-full overflow-hidden" style="background:rgba(255,255,255,0.06)">
-                    <div
-                      class="h-full rounded-full"
-                      :style="{ width: Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) + '%', background: '#10B981' }"
-                    />
-                  </div>
-                </div>
-                <span v-if="inv.ganancia != null" class="font-mono text-sm font-semibold shrink-0" :style="{ color: inv.ganancia >= 0 ? '#10B981' : '#DC2626' }">
-                  +{{ formatCurrency(inv.ganancia) }}
-                </span>
-                <span v-else-if="inv.ganancia_esperada != null" class="font-mono text-sm font-semibold shrink-0" style="color:rgba(251,191,36,0.6)">
-                  +{{ formatCurrency(inv.ganancia_esperada) }}
-                </span>
-                <span
-                  class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0"
-                  :style="inv.estado === 'en_curso' ? 'background:rgba(251,191,36,0.15);color:#FBBF24' : 'background:rgba(16,185,129,0.15);color:#10B981'"
-                >{{ inv.estado === 'en_curso' ? 'En curso' : 'Vendida' }}</span>
-                <div class="flex items-center gap-1 shrink-0">
-                  <button
-                    v-if="inv.estado === 'en_curso'"
-                    class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                    style="background:rgba(16,185,129,0.15);color:#10B981"
-                    @click="openCobrarInv(inv)"
-                  >
-                    <span class="material-symbols-outlined text-[14px]">payments</span>
-                    Cobrar
-                  </button>
-                  <button
-                    v-if="inv.estado === 'en_curso' && !inv.cobros?.length"
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-                    title="Eliminar"
-                    @click="confirmDeleteInversion(inv)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                  <span v-if="inv.estado === 'vendida'" class="text-xs text-slate-600">{{ inv.fecha_venta }}</span>
-                </div>
+        <!-- Estado -->
+        <Column field="estado" header="Estado" sortable style="min-width:100px">
+          <template #body="{ data: inv }">
+            <span
+              class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+              :style="inv.estado === 'en_curso' ? 'background:rgba(217,119,6,0.10);color:#D97706' : 'background:rgba(5,150,105,0.12);color:#10B981'"
+            >{{ inv.estado === 'en_curso' ? 'En curso' : 'Vendida' }}</span>
+          </template>
+        </Column>
+
+        <!-- Costo -->
+        <Column field="costo_total" header="Costo" sortable style="min-width:120px">
+          <template #body="{ data: inv }">
+            <span class="font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(inv.costo_total) }}</span>
+          </template>
+        </Column>
+
+        <!-- Cobrado / Ganancia -->
+        <Column header="Cobrado / Ganancia" style="min-width:150px">
+          <template #body="{ data: inv }">
+            <div class="text-sm">
+              <div v-if="inv.estado === 'en_curso' && inv.total_cobrado > 0">
+                <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(inv.total_cobrado) }}</span>
+                <span v-if="inv.saldo_por_cobrar > 0" class="ml-1 text-[11px]" style="color:#D97706">falta {{ formatCurrency(inv.saldo_por_cobrar) }}</span>
               </div>
+              <span v-if="inv.ganancia != null" class="font-mono font-semibold" :style="{ color: inv.ganancia >= 0 ? '#10B981' : '#DC2626' }">
+                +{{ formatCurrency(inv.ganancia) }}
+              </span>
+              <span v-else-if="inv.ganancia_esperada != null" class="font-mono font-semibold" style="color:#D97706">
+                ~{{ formatCurrency(inv.ganancia_esperada) }}
+              </span>
+              <span v-else class="text-slate-400 text-[11px]">—</span>
             </div>
-          </Transition>
-        </div>
-      </div>
+          </template>
+        </Column>
+
+        <!-- Progreso (en_curso con cobros) -->
+        <Column header="Progreso" style="min-width:130px">
+          <template #body="{ data: inv }">
+            <template v-if="inv.estado === 'en_curso' && inv.precio_esperado && inv.total_cobrado > 0">
+              <div class="text-[10px] text-slate-500 mb-1">
+                {{ Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) }}%
+              </div>
+              <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:#E8EDF5">
+                <div
+                  class="h-full rounded-full"
+                  :style="{ width: Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) + '%', background: '#10B981' }"
+                />
+              </div>
+            </template>
+            <span v-else class="text-slate-400 text-[11px]">—</span>
+          </template>
+        </Column>
+
+        <!-- Acciones -->
+        <Column header="" style="min-width:110px;width:110px">
+          <template #body="{ data: inv }">
+            <div class="flex items-center justify-end gap-1">
+              <button
+                v-if="inv.estado === 'en_curso'"
+                class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
+                style="background:rgba(5,150,105,0.12);color:#10B981"
+                @click="openCobrarInv(inv)"
+              >
+                <span class="material-symbols-outlined text-[14px]">payments</span>
+                Cobrar
+              </button>
+              <button
+                v-if="inv.estado === 'en_curso' && !inv.cobros?.length"
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                title="Eliminar"
+                @click="confirmDeleteInversion(inv)"
+              >
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+              <span v-if="inv.estado === 'vendida'" class="text-xs text-slate-500">{{ inv.fecha_venta }}</span>
+            </div>
+          </template>
+        </Column>
+      </AppDataTable>
     </template>
 
-    <!-- ════════════════════════════════════════ OTROS INGRESOS ═══════════════════════════════════════ -->
+    <!-- ════ OTROS INGRESOS ════ -->
     <template v-else-if="activeTab === 'otros'">
-      <div v-if="!store.otros.length" class="mt-10 fintech-card flex flex-col items-center py-14 text-center">
-        <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">add_circle</span>
-        <p class="mt-3 font-semibold text-slate-300">Sin ingresos registrados</p>
-        <p class="mt-1 text-sm text-slate-500">Registra cualquier ingreso puntual: ventas, comisiones, regalos, etc.</p>
-        <button class="mt-5 rounded-xl px-5 py-2.5 text-sm font-semibold text-white" style="background:#10B981" @click="openCreateOtro">
-          Nuevo ingreso
-        </button>
-      </div>
+      <AppDataTable
+        class="mt-6"
+        :data="store.otros"
+        :loading="store.loading"
+        empty-text="Sin ingresos registrados"
+        empty-icon="add_circle"
+      >
+        <!-- Fecha -->
+        <Column field="fecha" header="Fecha" sortable style="min-width:110px">
+          <template #body="{ data: item }">
+            <span class="text-sm text-slate-600">{{ item.fecha }}</span>
+          </template>
+        </Column>
 
-      <div v-else class="mt-6 fintech-card overflow-x-auto">
-        <table class="min-w-[520px] w-full text-sm">
-          <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
-              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fecha</th>
-              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Descripción</th>
-              <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Cuenta</th>
-              <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Monto</th>
-              <th class="px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="item in store.otros"
-              :key="item.id"
-              class="transition-colors hover:bg-white/[0.02]"
-              style="border-bottom:1px solid rgba(255,255,255,0.04)"
-            >
-              <td class="px-4 py-3 text-slate-400 whitespace-nowrap">{{ item.fecha }}</td>
-              <td class="px-4 py-3 text-slate-200">{{ item.descripcion }}</td>
-              <td class="px-4 py-3 text-slate-400">{{ item.cuenta?.nombre ?? '—' }}</td>
-              <td class="px-4 py-3 text-right font-mono font-semibold" style="color:#10B981">{{ formatCurrency(item.monto) }}</td>
-              <td class="px-4 py-3">
-                <div class="flex items-center justify-end gap-1">
-                  <button
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
-                    title="Editar"
-                    @click="openEditOtro(item)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">edit</span>
-                  </button>
-                  <button
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-                    title="Eliminar"
-                    @click="confirmDeleteOtro(item)"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <!-- Descripción -->
+        <Column field="descripcion" header="Descripción" sortable style="min-width:200px">
+          <template #body="{ data: item }">
+            <span class="text-sm text-slate-700">{{ item.descripcion }}</span>
+          </template>
+        </Column>
+
+        <!-- Cuenta -->
+        <Column field="cuenta.nombre" header="Cuenta" sortable style="min-width:140px">
+          <template #body="{ data: item }">
+            <span class="text-sm text-slate-600">{{ item.cuenta?.nombre ?? '—' }}</span>
+          </template>
+        </Column>
+
+        <!-- Monto -->
+        <Column field="monto" header="Monto" sortable style="min-width:120px">
+          <template #body="{ data: item }">
+            <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(item.monto) }}</span>
+          </template>
+        </Column>
+
+        <!-- Acciones -->
+        <Column header="" style="min-width:90px;width:90px">
+          <template #body="{ data: item }">
+            <div class="flex items-center justify-end gap-1">
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                title="Editar"
+                @click="openEditOtro(item)"
+              >
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                title="Eliminar"
+                @click="confirmDeleteOtro(item)"
+              >
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          </template>
+        </Column>
+      </AppDataTable>
     </template>
 
-    <!-- ═══ MODALES ═══════════════════════════════════════════════════════════ -->
-
+    <!-- ═══ MODALES ═══ -->
     <SueldoFormModal
       v-model="showSueldoModal"
       :edit-data="editSueldo"
@@ -353,12 +338,13 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useIngresosStore } from '../stores/ingresos'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency } from '../utils/currency'
-import SueldoFormModal    from '../components/SueldoFormModal.vue'
-import CobrarSueldoModal  from '../components/CobrarSueldoModal.vue'
-import InversionFormModal from '../components/InversionFormModal.vue'
+import AppDataTable         from '../components/AppDataTable.vue'
+import SueldoFormModal      from '../components/SueldoFormModal.vue'
+import CobrarSueldoModal    from '../components/CobrarSueldoModal.vue'
+import InversionFormModal   from '../components/InversionFormModal.vue'
 import CobrarInversionModal from '../components/CobrarInversionModal.vue'
 import IngresoFormModal     from '../components/IngresoFormModal.vue'
-import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
+import ConfirmDeleteModal   from '../components/ConfirmDeleteModal.vue'
 
 const store        = useIngresosStore()
 const cuentasStore = useCuentasStore()
@@ -377,52 +363,6 @@ const FILTROS_ESTADO = [
 
 const activeTab    = ref('sueldos')
 const filtroEstado = ref('')
-
-// ── Accordion sueldos ─────────────────────────────────────────────
-const abiertosS = ref(new Set())
-
-watch(() => store.sueldos, (sueldos) => {
-  if (sueldos.length && !abiertosS.value.size) {
-    abiertosS.value = new Set([sueldos[0].id])
-  }
-}, { immediate: true })
-
-function toggleSueldo(id) {
-  const next = new Set(abiertosS.value)
-  next.has(id) ? next.delete(id) : next.add(id)
-  abiertosS.value = next
-}
-
-// ── Accordion inversiones ─────────────────────────────────────────
-const inversionesAgrupadas = computed(() => {
-  const map = new Map()
-  for (const inv of store.inversiones) {
-    const fecha = inv.fecha_compra?.split('T')[0] ?? ''
-    if (!map.has(fecha)) map.set(fecha, [])
-    map.get(fecha).push(inv)
-  }
-  return [...map.entries()]
-    .sort(([a], [b]) => b.localeCompare(a))
-    .map(([fecha, inversiones]) => ({
-      fecha,
-      inversiones,
-      totalCosto: inversiones.reduce((s, i) => s + parseFloat(i.costo_total), 0),
-    }))
-})
-
-const abiertosI = ref(new Set())
-
-watch(inversionesAgrupadas, (grupos) => {
-  if (grupos.length && !abiertosI.value.size) {
-    abiertosI.value = new Set([grupos[0].fecha])
-  }
-}, { immediate: true })
-
-function toggleInvGrupo(fecha) {
-  const next = new Set(abiertosI.value)
-  next.has(fecha) ? next.delete(fecha) : next.add(fecha)
-  abiertosI.value = next
-}
 
 onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchSueldos(), store.fetchInversiones(), store.fetchOtros()]))
 
@@ -455,6 +395,11 @@ function ultimoCobro(sueldo) {
   const cobros = [...sueldo.cobros].sort((a, b) => b.anio - a.anio || b.mes - a.mes)
   const c = cobros[0]
   return `${MESES_CORTOS[c.mes - 1]} ${c.anio}`
+}
+
+function formatDate(d) {
+  if (!d) return '—'
+  return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 // ─── SUELDOS ────────────────────────────────────────────────────────────────
@@ -544,7 +489,7 @@ async function doDelete() {
 const showOtroModal = ref(false)
 const editOtro      = ref(null)
 
-function openCreateOtro() { editOtro.value = null; showOtroModal.value = true }
+function openCreateOtro()   { editOtro.value = null; showOtroModal.value = true }
 function openEditOtro(item) { editOtro.value = item; showOtroModal.value = true }
 
 async function onOtroSaved(payload) {
@@ -556,15 +501,3 @@ async function onOtroSaved(payload) {
   }
 }
 </script>
-
-<style scoped>
-.accordion-enter-active, .accordion-leave-active {
-  transition: opacity 0.2s ease, max-height 0.25s ease;
-  max-height: 800px;
-  overflow: hidden;
-}
-.accordion-enter-from, .accordion-leave-to {
-  opacity: 0;
-  max-height: 0;
-}
-</style>

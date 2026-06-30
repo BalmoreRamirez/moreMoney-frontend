@@ -3,43 +3,43 @@
     <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         class="absolute inset-0"
-        style="background:rgba(7,17,31,0.8);backdrop-filter:blur(6px)"
+        style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
         @click="close"
       />
       <div
         class="relative w-full max-w-lg rounded-2xl p-6 shadow-card overflow-y-auto max-h-[90vh]"
-        style="background:#0D2240;border:1px solid rgba(255,255,255,0.1)"
+        style="background:#FFFFFF;border:1px solid #E2E8F0"
       >
-        <h2 class="text-base font-semibold text-white">Nuevo crédito recibido</h2>
-        <p class="mt-1 text-xs text-slate-400">Préstamo que tú recibiste para cubrir un gasto.</p>
+        <h2 class="text-base font-semibold text-slate-900">Nuevo crédito recibido</h2>
+        <p class="mt-1 text-xs text-slate-600">Préstamo que tú recibiste para cubrir un gasto.</p>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Nombre / descripción</label>
+            <label class="mb-1.5 block text-xs text-slate-600">Nombre / descripción</label>
             <input v-model="form.nombre" type="text" placeholder="Ej. Préstamo para pagar Visa BHD" required class="fintech-input w-full" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-400">Capital recibido ($)</label>
+              <label class="mb-1.5 block text-xs text-slate-600">Capital recibido ($)</label>
               <input v-model.number="form.capital" type="number" min="0.01" step="0.01" placeholder="5000.00" required class="fintech-input w-full" />
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-400">Número de cuotas</label>
+              <label class="mb-1.5 block text-xs text-slate-600">Número de cuotas</label>
               <input v-model.number="form.num_cuotas" type="number" min="1" step="1" placeholder="12" required class="fintech-input w-full" />
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-400">Tipo de interés</label>
+              <label class="mb-1.5 block text-xs text-slate-600">Tipo de interés</label>
               <select v-model="form.tipo_interes" required class="fintech-input w-full">
                 <option value="simple">Interés simple</option>
                 <option value="compuesto">Interés compuesto</option>
               </select>
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-400">Tasa mensual (%)</label>
+              <label class="mb-1.5 block text-xs text-slate-600">Tasa mensual (%)</label>
               <input v-model.number="form.tasa_display" type="number" min="0" max="100" step="0.01" placeholder="3" required class="fintech-input w-full" />
               <p class="mt-1 text-[10px] text-slate-600">Ej: 3 = 3% por mes</p>
             </div>
@@ -47,11 +47,11 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-400">Fecha de inicio</label>
+              <label class="mb-1.5 block text-xs text-slate-600">Fecha de inicio</label>
               <input v-model="form.fecha_inicio" type="date" required class="fintech-input w-full" />
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-400">Cuenta donde entra el dinero</label>
+              <label class="mb-1.5 block text-xs text-slate-600">Cuenta donde entra el dinero</label>
               <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
                 <option value="" disabled>Selecciona</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }}</option>
@@ -61,31 +61,31 @@
 
           <!-- Propósito opcional -->
           <div>
-            <label class="mb-1.5 block text-xs text-slate-400">Propósito (opcional)</label>
+            <label class="mb-1.5 block text-xs text-slate-600">Propósito (opcional)</label>
             <input v-model="form.proposito_tipo" type="text" placeholder="Ej. pago_tarjeta, egreso, compra" class="fintech-input w-full" />
           </div>
 
           <!-- Resumen de amortización -->
-          <div v-if="resumen" class="rounded-xl px-4 py-3 text-xs space-y-1" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
-            <p class="font-semibold text-slate-300 mb-2">Resumen estimado</p>
-            <div class="flex justify-between text-slate-500">
+          <div v-if="resumen" class="rounded-xl px-4 py-3 text-xs space-y-1" style="background:rgba(10,25,47,0.04);border:1px solid #E2E8F0">
+            <p class="font-semibold text-slate-600 mb-2">Resumen estimado</p>
+            <div class="flex justify-between text-slate-600">
               <span>Cuota mensual</span>
-              <span class="font-mono text-slate-300">{{ formatCurrency(resumen.cuota) }}</span>
+              <span class="font-mono text-slate-600">{{ formatCurrency(resumen.cuota) }}</span>
             </div>
-            <div class="flex justify-between text-slate-500">
+            <div class="flex justify-between text-slate-600">
               <span>Total intereses</span>
-              <span class="font-mono" style="color:#FBBF24">{{ formatCurrency(resumen.totalInteres) }}</span>
+              <span class="font-mono" style="color:#D97706">{{ formatCurrency(resumen.totalInteres) }}</span>
             </div>
-            <div class="flex justify-between text-slate-500">
+            <div class="flex justify-between text-slate-600">
               <span>Total a pagar</span>
-              <span class="font-mono text-slate-200 font-semibold">{{ formatCurrency(resumen.totalPagar) }}</span>
+              <span class="font-mono text-slate-700 font-semibold">{{ formatCurrency(resumen.totalPagar) }}</span>
             </div>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5" @click="close">
+            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50" @click="close">
               Cancelar
             </button>
             <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#3B82F6">
