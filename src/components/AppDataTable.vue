@@ -1,5 +1,5 @@
 <template>
-  <div class="fintech-card overflow-hidden">
+  <div class="fintech-card overflow-hidden my-3">
     <DataTable
       :value="data"
       :loading="loading"
@@ -8,21 +8,21 @@
       v-bind="$attrs"
     >
       <template #loading>
-        <div class="flex justify-center py-10">
+        <div class="flex justify-center py-6">
           <div
-            class="h-7 w-7 animate-spin rounded-full border-2"
+            class="h-6 w-6 animate-spin rounded-full border-2"
             style="border-color:#10B981;border-top-color:transparent"
           />
         </div>
       </template>
 
       <template #empty>
-        <div class="flex flex-col items-center py-12 text-center">
+        <div class="flex flex-col items-center py-8 text-center">
           <span
-            class="material-symbols-outlined text-5xl mb-3"
-            style="color:rgba(100,116,139,0.25)"
+            class="material-symbols-outlined text-4xl mb-2"
+            style="color:rgba(100,116,139,0.22)"
           >{{ emptyIcon }}</span>
-          <p class="text-sm text-slate-600">{{ emptyText }}</p>
+          <p class="text-sm text-slate-500">{{ emptyText }}</p>
         </div>
       </template>
 
