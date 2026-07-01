@@ -1,117 +1,104 @@
 <template>
   <div
-    class="group relative cursor-pointer overflow-hidden rounded-2xl shadow-md transition-all duration-200 hover:-translate-y-1.5 hover:shadow-xl select-none"
-    style="aspect-ratio:1.586;width:100%"
+    class="group relative cursor-pointer overflow-hidden rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg select-none"
+    style="height:168px;width:100%"
     :style="cardStyle"
     @click="$emit('click')"
   >
-    <!-- Shine diagonal overlay -->
+    <!-- Shine overlay -->
     <div
       class="pointer-events-none absolute inset-0"
-      style="background:linear-gradient(125deg,rgba(255,255,255,0.13) 0%,rgba(255,255,255,0.04) 40%,rgba(0,0,0,0.10) 100%)"
+      style="background:linear-gradient(120deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.02) 45%,rgba(0,0,0,0.12) 100%)"
     />
-
-    <!-- Circle decoration top-right -->
+    <!-- Single subtle circle top-right -->
     <div
       class="pointer-events-none absolute rounded-full"
-      style="width:55%;height:55%;top:-18%;right:-15%;background:rgba(255,255,255,0.06)"
-    />
-    <!-- Circle decoration bottom-left -->
-    <div
-      class="pointer-events-none absolute rounded-full"
-      style="width:65%;height:65%;bottom:-25%;left:-18%;background:rgba(0,0,0,0.10)"
+      style="width:200px;height:200px;top:-70px;right:-55px;background:rgba(255,255,255,0.05)"
     />
 
-    <!-- All content in absolute layer -->
-    <div class="absolute inset-0 flex flex-col justify-between p-[7%]">
+    <!-- Content -->
+    <div class="absolute inset-0 flex flex-col justify-between p-5">
 
-      <!-- Top row: bank + actions -->
-      <div class="flex items-start justify-between">
+      <!-- Top: bank label + name + actions -->
+      <div class="flex items-start justify-between gap-2">
         <div class="min-w-0">
-          <p class="text-[9px] font-bold uppercase tracking-[0.25em] truncate" style="color:rgba(255,255,255,0.50)">
+          <p class="text-[8px] font-bold uppercase tracking-[0.22em] truncate" style="color:rgba(255,255,255,0.42)">
             {{ tarjeta.banco }}
           </p>
-          <p class="mt-0.5 text-[15px] font-bold text-white leading-tight truncate">
+          <p class="mt-0.5 text-[13px] font-bold text-white leading-snug truncate">
             {{ tarjeta.nombre }}
           </p>
         </div>
 
-        <!-- Action buttons: visible on hover -->
-        <div class="flex gap-1.5 shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <!-- Actions: appear on hover -->
+        <div class="flex shrink-0 gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
           <button
-            class="flex h-7 w-7 items-center justify-center rounded-full transition-colors"
+            class="flex h-6 w-6 items-center justify-center rounded-full"
             style="background:rgba(255,255,255,0.15)"
             title="Editar"
             @click.stop="$emit('edit', tarjeta)"
           >
-            <span class="material-symbols-outlined text-[13px] text-white">edit</span>
+            <span class="material-symbols-outlined text-[11px] text-white">edit</span>
           </button>
           <button
-            class="flex h-7 w-7 items-center justify-center rounded-full transition-colors"
+            class="flex h-6 w-6 items-center justify-center rounded-full"
             style="background:rgba(255,255,255,0.15)"
             title="Eliminar"
             @click.stop="$emit('delete', tarjeta)"
           >
-            <span class="material-symbols-outlined text-[13px] text-white">delete</span>
+            <span class="material-symbols-outlined text-[11px] text-white">delete</span>
           </button>
         </div>
       </div>
 
-      <!-- Middle row: chip + number -->
+      <!-- Middle: chip + dots -->
       <div class="flex items-center gap-3">
-        <!-- EMV chip (gold, with SIM-card grid) -->
+        <!-- EMV chip -->
         <div
-          class="relative rounded overflow-hidden shrink-0"
-          style="width:42px;height:30px;background:linear-gradient(135deg,#f5d060 0%,#c8960c 50%,#f5d060 100%)"
+          class="relative shrink-0 overflow-hidden rounded"
+          style="width:36px;height:26px;background:linear-gradient(135deg,#f5d060 0%,#c8960c 55%,#f5d060 100%)"
         >
-          <!-- Chip grid lines -->
           <div
             class="absolute inset-0"
             style="background-image:
-              repeating-linear-gradient(0deg,transparent,transparent 31%,rgba(0,0,0,0.12) 31%,rgba(0,0,0,0.12) 34%),
-              repeating-linear-gradient(90deg,transparent,transparent 31%,rgba(0,0,0,0.12) 31%,rgba(0,0,0,0.12) 34%)"
-          />
-          <!-- Chip center contact -->
-          <div
-            class="absolute"
-            style="inset:22% 20%;border-radius:2px;background:rgba(180,130,10,0.5)"
+              repeating-linear-gradient(0deg,transparent,transparent 28%,rgba(0,0,0,0.13) 28%,rgba(0,0,0,0.13) 35%),
+              repeating-linear-gradient(90deg,transparent,transparent 28%,rgba(0,0,0,0.13) 28%,rgba(0,0,0,0.13) 35%)"
           />
         </div>
-        <span class="font-mono text-[11px] tracking-[0.20em]" style="color:rgba(255,255,255,0.40)">
+        <span class="font-mono text-[10px] tracking-[0.16em]" style="color:rgba(255,255,255,0.32)">
           •••• •••• •••• ••••
         </span>
       </div>
 
-      <!-- Bottom row: amounts + network + bar -->
+      <!-- Bottom: amounts + usage bar -->
       <div>
-        <!-- Amounts -->
-        <div class="flex items-end justify-between mb-2">
+        <div class="flex items-end justify-between mb-1.5">
           <div>
-            <p class="text-[8px] font-semibold uppercase tracking-[0.20em] mb-0.5" style="color:rgba(255,255,255,0.45)">
+            <p class="mb-0.5 text-[7px] font-semibold uppercase tracking-[0.18em]" style="color:rgba(255,255,255,0.38)">
               Disponible
             </p>
-            <p class="font-mono font-bold leading-none text-white" style="font-size:clamp(14px,4cqw,20px)">
+            <p class="font-mono text-[15px] font-bold leading-none text-white">
               {{ formatCurrency(tarjeta.saldo_disponible) }}
             </p>
           </div>
           <div class="text-right">
-            <p class="text-[8px] font-semibold uppercase tracking-[0.20em] mb-0.5" style="color:rgba(255,255,255,0.45)">
+            <p class="mb-0.5 text-[7px] font-semibold uppercase tracking-[0.18em]" style="color:rgba(255,255,255,0.38)">
               Límite
             </p>
-            <p class="font-mono text-sm font-semibold leading-none" style="color:rgba(255,255,255,0.72)">
+            <p class="font-mono text-xs font-medium leading-none" style="color:rgba(255,255,255,0.60)">
               {{ formatCurrency(tarjeta.limite_credito) }}
             </p>
           </div>
         </div>
 
         <!-- Usage bar -->
-        <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:rgba(255,255,255,0.12)">
+        <div class="h-1 w-full overflow-hidden rounded-full" style="background:rgba(255,255,255,0.10)">
           <div
             class="h-full rounded-full transition-all duration-700"
             :style="{ width: usagePercent + '%', background: usageColor }"
           />
         </div>
-        <p class="mt-1 text-[8px] tabular-nums" style="color:rgba(255,255,255,0.35)">
+        <p class="mt-0.5 text-[7px] tabular-nums" style="color:rgba(255,255,255,0.28)">
           {{ usagePercent }}% utilizado
         </p>
       </div>
@@ -131,22 +118,24 @@ defineEmits(['click', 'edit', 'delete'])
 const GRADIENTS = [
   ['#0A1F3F', '#1A3A6B'],   // azul profundo
   ['#0C2D40', '#1B5B6E'],   // azul petróleo
-  ['#0D2B2A', '#1B5C55'],   // verde esmeralda oscuro
-  ['#1A0A3C', '#3B1A72'],   // púrpura oscuro
+  ['#0D2B2A', '#1B5C55'],   // verde esmeralda
+  ['#1A0A3C', '#3B1A72'],   // púrpura
   ['#2D0E0E', '#6B2020'],   // rojo vino
   ['#1A150A', '#4A3510'],   // café oscuro
   ['#1C2537', '#2E3F5C'],   // gris acero
   ['#0E1C30', '#1E3550'],   // navy
 ]
 
-function bankHash(name) {
+function hashStr(str) {
   let h = 0
-  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h)
+  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h)
   return Math.abs(h) % GRADIENTS.length
 }
 
 const cardStyle = computed(() => {
-  const [from, to] = GRADIENTS[bankHash(props.tarjeta.banco || '')]
+  // Use nombre for variety — banco can be the same for all cards of the same user
+  const key = props.tarjeta.nombre || props.tarjeta.banco || ''
+  const [from, to] = GRADIENTS[hashStr(key)]
   return { background: `linear-gradient(140deg, ${from} 0%, ${to} 100%)` }
 })
 

@@ -29,7 +29,7 @@
     </div>
 
     <!-- Grid de tarjetas -->
-    <div v-else-if="store.tarjetas.length" class="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    <div v-else-if="store.tarjetas.length" class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <TarjetaCard
         v-for="t in store.tarjetas"
         :key="t.id"
