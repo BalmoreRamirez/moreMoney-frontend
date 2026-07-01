@@ -16,8 +16,58 @@
       </button>
     </div>
 
+    <!-- KPIs -->
+    <div v-if="!store.loading && store.prestamos.length" class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <!-- Capital prestado -->
+      <div class="fintech-card px-5 py-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(217,119,6,0.10)">
+            <span class="material-symbols-outlined text-[15px]" style="color:#D97706">handshake</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Capital prestado</span>
+        </div>
+        <p class="font-mono text-xl font-bold text-slate-800">{{ formatCurrency(kpi.capital) }}</p>
+        <p class="mt-0.5 text-[11px] text-slate-400">{{ store.prestamos.length }} préstamo{{ store.prestamos.length !== 1 ? 's' : '' }}</p>
+      </div>
+
+      <!-- Recuperado -->
+      <div class="fintech-card px-5 py-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(5,150,105,0.10)">
+            <span class="material-symbols-outlined text-[15px]" style="color:#10B981">check_circle</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Recuperado</span>
+        </div>
+        <p class="font-mono text-xl font-bold" style="color:#10B981">{{ formatCurrency(kpi.pagado) }}</p>
+        <div class="mt-1.5 h-1 w-full rounded-full overflow-hidden" style="background:#E8EDF5">
+          <div class="h-full rounded-full" :style="{ width: kpi.pct + '%', background: '#10B981' }" />
+        </div>
+        <p class="mt-1 text-[11px] text-slate-400">{{ kpi.pct }}% del total adeudado</p>
+      </div>
+
+      <!-- Por cobrar -->
+      <div class="fintech-card px-5 py-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div
+            class="flex h-7 w-7 items-center justify-center rounded-lg"
+            :style="kpi.restante > 0 ? 'background:rgba(217,119,6,0.10)' : 'background:rgba(5,150,105,0.10)'"
+          >
+            <span
+              class="material-symbols-outlined text-[15px]"
+              :style="kpi.restante > 0 ? 'color:#D97706' : 'color:#10B981'"
+            >{{ kpi.restante > 0 ? 'pending' : 'task_alt' }}</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Por cobrar</span>
+        </div>
+        <p class="font-mono text-xl font-bold" :style="{ color: kpi.restante > 0 ? '#D97706' : '#10B981' }">
+          {{ formatCurrency(kpi.restante) }}
+        </p>
+        <p class="mt-0.5 text-[11px] text-slate-400">{{ kpi.activos }} activo{{ kpi.activos !== 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+
     <!-- Filtros -->
-    <div class="mt-6 flex flex-wrap gap-2">
+    <div class="mt-5 flex flex-wrap gap-2">
       <button
         v-for="f in FILTROS"
         :key="f.value"
@@ -173,7 +223,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePrestamosStore } from '../stores/prestamos'
 import { useCuentasStore }   from '../stores/cuentas'
@@ -193,6 +243,17 @@ const FILTROS = [
 ]
 
 const filtro = ref('activo')
+
+const kpi = computed(() => {
+  const list     = store.prestamos
+  const capital  = list.reduce((s, p) => s + parseFloat(p.capital        || 0), 0)
+  const pagado   = list.reduce((s, p) => s + parseFloat(p.total_pagado   || 0), 0)
+  const restante = list.reduce((s, p) => s + Math.max(0, parseFloat(p.saldo_pendiente || 0)), 0)
+  const activos  = list.filter(p => p.estado === 'activo').length
+  const deuda    = list.reduce((s, p) => s + parseFloat(p.total_deuda    || 0), 0)
+  const pct      = deuda > 0 ? Math.round((pagado / deuda) * 100) : 0
+  return { capital, pagado, restante, activos, pct }
+})
 
 onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos({ estado: 'activo' })]))
 
