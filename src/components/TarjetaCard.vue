@@ -1,61 +1,120 @@
 <template>
   <div
-    class="relative flex h-48 w-full max-w-sm cursor-pointer flex-col justify-between overflow-hidden rounded-2xl p-5 shadow-card transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg select-none"
+    class="group relative cursor-pointer overflow-hidden rounded-2xl shadow-md transition-all duration-200 hover:-translate-y-1.5 hover:shadow-xl select-none"
+    style="aspect-ratio:1.586;width:100%"
     :style="cardStyle"
     @click="$emit('click')"
   >
-    <!-- Círculos decorativos del plástico -->
-    <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full opacity-10" style="background: white" />
-    <div class="pointer-events-none absolute -bottom-12 -right-4 h-48 w-48 rounded-full opacity-[0.06]" style="background: white" />
+    <!-- Shine diagonal overlay -->
+    <div
+      class="pointer-events-none absolute inset-0"
+      style="background:linear-gradient(125deg,rgba(255,255,255,0.13) 0%,rgba(255,255,255,0.04) 40%,rgba(0,0,0,0.10) 100%)"
+    />
 
-    <!-- Fila superior: banco + acciones -->
-    <div class="flex items-start justify-between">
-      <div>
-        <p class="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">{{ tarjeta.banco }}</p>
-        <p class="mt-0.5 text-base font-bold text-white">{{ tarjeta.nombre }}</p>
+    <!-- Circle decoration top-right -->
+    <div
+      class="pointer-events-none absolute rounded-full"
+      style="width:55%;height:55%;top:-18%;right:-15%;background:rgba(255,255,255,0.06)"
+    />
+    <!-- Circle decoration bottom-left -->
+    <div
+      class="pointer-events-none absolute rounded-full"
+      style="width:65%;height:65%;bottom:-25%;left:-18%;background:rgba(0,0,0,0.10)"
+    />
+
+    <!-- All content in absolute layer -->
+    <div class="absolute inset-0 flex flex-col justify-between p-[7%]">
+
+      <!-- Top row: bank + actions -->
+      <div class="flex items-start justify-between">
+        <div class="min-w-0">
+          <p class="text-[9px] font-bold uppercase tracking-[0.25em] truncate" style="color:rgba(255,255,255,0.50)">
+            {{ tarjeta.banco }}
+          </p>
+          <p class="mt-0.5 text-[15px] font-bold text-white leading-tight truncate">
+            {{ tarjeta.nombre }}
+          </p>
+        </div>
+
+        <!-- Action buttons: visible on hover -->
+        <div class="flex gap-1.5 shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <button
+            class="flex h-7 w-7 items-center justify-center rounded-full transition-colors"
+            style="background:rgba(255,255,255,0.15)"
+            title="Editar"
+            @click.stop="$emit('edit', tarjeta)"
+          >
+            <span class="material-symbols-outlined text-[13px] text-white">edit</span>
+          </button>
+          <button
+            class="flex h-7 w-7 items-center justify-center rounded-full transition-colors"
+            style="background:rgba(255,255,255,0.15)"
+            title="Eliminar"
+            @click.stop="$emit('delete', tarjeta)"
+          >
+            <span class="material-symbols-outlined text-[13px] text-white">delete</span>
+          </button>
+        </div>
       </div>
-      <div class="flex gap-2">
-        <button
-          class="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
-          @click.stop="$emit('edit', tarjeta)"
-          title="Editar"
+
+      <!-- Middle row: chip + number -->
+      <div class="flex items-center gap-3">
+        <!-- EMV chip (gold, with SIM-card grid) -->
+        <div
+          class="relative rounded overflow-hidden shrink-0"
+          style="width:42px;height:30px;background:linear-gradient(135deg,#f5d060 0%,#c8960c 50%,#f5d060 100%)"
         >
-          <span class="material-symbols-outlined text-[14px] text-white">edit</span>
-        </button>
-        <button
-          class="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-red-500/40"
-          @click.stop="$emit('delete', tarjeta)"
-          title="Eliminar"
-        >
-          <span class="material-symbols-outlined text-[14px] text-white">delete</span>
-        </button>
+          <!-- Chip grid lines -->
+          <div
+            class="absolute inset-0"
+            style="background-image:
+              repeating-linear-gradient(0deg,transparent,transparent 31%,rgba(0,0,0,0.12) 31%,rgba(0,0,0,0.12) 34%),
+              repeating-linear-gradient(90deg,transparent,transparent 31%,rgba(0,0,0,0.12) 31%,rgba(0,0,0,0.12) 34%)"
+          />
+          <!-- Chip center contact -->
+          <div
+            class="absolute"
+            style="inset:22% 20%;border-radius:2px;background:rgba(180,130,10,0.5)"
+          />
+        </div>
+        <span class="font-mono text-[11px] tracking-[0.20em]" style="color:rgba(255,255,255,0.40)">
+          •••• •••• •••• ••••
+        </span>
       </div>
-    </div>
 
-    <!-- Chip simulado -->
-    <div class="flex items-center gap-3">
-      <div class="h-7 w-10 rounded-sm" style="background: linear-gradient(135deg, #f0c040 0%, #c89520 100%); opacity: 0.85" />
-      <span class="font-mono text-xs tracking-widest text-white/60">•••• •••• •••• ••••</span>
-    </div>
-
-    <!-- Fila inferior: saldos -->
-    <div class="flex items-end justify-between">
+      <!-- Bottom row: amounts + network + bar -->
       <div>
-        <p class="text-[9px] uppercase tracking-widest opacity-60">Disponible</p>
-        <p class="font-mono text-lg font-bold text-white">{{ formatCurrency(tarjeta.saldo_disponible) }}</p>
-      </div>
-      <div class="text-right">
-        <p class="text-[9px] uppercase tracking-widest opacity-60">Límite</p>
-        <p class="font-mono text-sm text-white/80">{{ formatCurrency(tarjeta.limite_credito) }}</p>
-      </div>
-    </div>
+        <!-- Amounts -->
+        <div class="flex items-end justify-between mb-2">
+          <div>
+            <p class="text-[8px] font-semibold uppercase tracking-[0.20em] mb-0.5" style="color:rgba(255,255,255,0.45)">
+              Disponible
+            </p>
+            <p class="font-mono font-bold leading-none text-white" style="font-size:clamp(14px,4cqw,20px)">
+              {{ formatCurrency(tarjeta.saldo_disponible) }}
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="text-[8px] font-semibold uppercase tracking-[0.20em] mb-0.5" style="color:rgba(255,255,255,0.45)">
+              Límite
+            </p>
+            <p class="font-mono text-sm font-semibold leading-none" style="color:rgba(255,255,255,0.72)">
+              {{ formatCurrency(tarjeta.limite_credito) }}
+            </p>
+          </div>
+        </div>
 
-    <!-- Barra de uso del crédito -->
-    <div class="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
-      <div
-        class="h-full transition-all duration-700"
-        :style="{ width: usagePercent + '%', background: usageColor }"
-      />
+        <!-- Usage bar -->
+        <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:rgba(255,255,255,0.12)">
+          <div
+            class="h-full rounded-full transition-all duration-700"
+            :style="{ width: usagePercent + '%', background: usageColor }"
+          />
+        </div>
+        <p class="mt-1 text-[8px] tabular-nums" style="color:rgba(255,255,255,0.35)">
+          {{ usagePercent }}% utilizado
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -70,14 +129,14 @@ const props = defineProps({
 defineEmits(['click', 'edit', 'delete'])
 
 const GRADIENTS = [
-  ['#0D47A1', '#1565C0'],
-  ['#004B49', '#00695C'],
-  ['#1B5E20', '#2E7D32'],
-  ['#4A148C', '#6A1B9A'],
-  ['#880E4F', '#AD1457'],
-  ['#E65100', '#EF6C00'],
-  ['#263238', '#37474F'],
-  ['#1A237E', '#283593'],
+  ['#0A1F3F', '#1A3A6B'],   // azul profundo
+  ['#0C2D40', '#1B5B6E'],   // azul petróleo
+  ['#0D2B2A', '#1B5C55'],   // verde esmeralda oscuro
+  ['#1A0A3C', '#3B1A72'],   // púrpura oscuro
+  ['#2D0E0E', '#6B2020'],   // rojo vino
+  ['#1A150A', '#4A3510'],   // café oscuro
+  ['#1C2537', '#2E3F5C'],   // gris acero
+  ['#0E1C30', '#1E3550'],   // navy
 ]
 
 function bankHash(name) {
@@ -88,7 +147,7 @@ function bankHash(name) {
 
 const cardStyle = computed(() => {
   const [from, to] = GRADIENTS[bankHash(props.tarjeta.banco || '')]
-  return { background: `linear-gradient(135deg, ${from} 0%, ${to} 100%)` }
+  return { background: `linear-gradient(140deg, ${from} 0%, ${to} 100%)` }
 })
 
 const usagePercent = computed(() => {
@@ -99,8 +158,8 @@ const usagePercent = computed(() => {
 })
 
 const usageColor = computed(() => {
-  if (usagePercent.value >= 90) return '#DC2626'
+  if (usagePercent.value >= 90) return '#EF4444'
   if (usagePercent.value >= 70) return '#F59E0B'
-  return '#10B981'
+  return '#34D399'
 })
 </script>
