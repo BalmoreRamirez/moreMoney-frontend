@@ -100,6 +100,19 @@
               <p v-if="!cuentaId && intentoConfirmar" class="mt-1 text-xs text-danger">
                 Debes seleccionar una cuenta para confirmar el pago.
               </p>
+              <!-- A5: Saldo resultante post-pago -->
+              <div v-if="cuentaId" class="mt-2 flex items-center justify-between rounded-lg px-3 py-2 text-xs"
+                   :style="saldoResultante < 0
+                     ? 'background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.2)'
+                     : 'background:rgba(10,25,47,0.04);border:1px solid #E2E8F0'">
+                <span :class="saldoResultante < 0 ? 'text-danger font-medium' : 'text-slate-500'">
+                  Saldo resultante
+                </span>
+                <span class="font-mono font-semibold" :class="saldoResultante < 0 ? 'text-danger' : 'text-slate-700'">
+                  {{ formatCurrency(saldoResultante) }}
+                  <span v-if="saldoResultante < 0"> — Saldo insuficiente</span>
+                </span>
+              </div>
             </div>
 
             <!-- Error -->
@@ -161,7 +174,13 @@ const intentoConfirmar = ref(false)
 
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
-const tituloMes = computed(() => `Pago de ${MONTHS[store.month - 1]} ${store.year}`)
+const tituloMes         = computed(() => `Pago de ${MONTHS[store.month - 1]} ${store.year}`)
+const cuentaSeleccionada = computed(() => cuentas.value.find(c => c.id === cuentaId.value) ?? null)
+const saldoResultante    = computed(() =>
+  cuentaSeleccionada.value
+    ? parseFloat(cuentaSeleccionada.value.saldo_actual) - (store.detalle?.total ?? 0)
+    : 0
+)
 
 // Reset state when modal opens; pre-select the card's default payment account if set
 watch(() => props.modelValue, async (open) => {
