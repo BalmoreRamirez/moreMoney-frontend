@@ -150,6 +150,7 @@
       :tarjeta-id="selectedPago?.tarjeta_id"
       :tarjeta-nombre="selectedPago?.tarjeta_nombre"
       :banco="selectedPago?.banco"
+      :cuenta-pago-id="selectedPago?.cuenta_pago_id ?? null"
       @confirmed="onConfirmed"
     />
   </section>

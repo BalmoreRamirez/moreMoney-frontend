@@ -142,10 +142,11 @@ import { useCuentasStore }    from '../stores/cuentas'
 import { formatCurrency }     from '../utils/currency'
 
 const props = defineProps({
-  modelValue:    Boolean,
-  tarjetaId:     { type: Number, default: null },
-  tarjetaNombre: { type: String, default: '' },
-  banco:         { type: String, default: '' },
+  modelValue:      Boolean,
+  tarjetaId:       { type: Number, default: null },
+  tarjetaNombre:   { type: String, default: '' },
+  banco:           { type: String, default: '' },
+  cuentaPagoId:    { type: Number, default: null },
 })
 const emit = defineEmits(['update:modelValue', 'confirmed'])
 
@@ -162,13 +163,13 @@ const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto
 
 const tituloMes = computed(() => `Pago de ${MONTHS[store.month - 1]} ${store.year}`)
 
-// Reset state when modal opens
+// Reset state when modal opens; pre-select the card's default payment account if set
 watch(() => props.modelValue, async (open) => {
   if (open) {
-    cuentaId.value        = null
     errorMsg.value        = ''
     intentoConfirmar.value = false
     if (!cuentasStore.cuentas.length) await cuentasStore.fetchCuentas()
+    cuentaId.value = props.cuentaPagoId ?? null
   }
 })
 

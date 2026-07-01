@@ -49,6 +49,18 @@
               <p v-if="errors.limite_credito" class="mt-1 text-xs text-danger">{{ errors.limite_credito }}</p>
             </div>
 
+            <!-- Cuenta de pago por defecto -->
+            <div>
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Cuenta de pago (opcional)</label>
+              <select v-model.number="form.cuenta_pago_id" class="fintech-input w-full">
+                <option :value="null">Sin cuenta predeterminada</option>
+                <option v-for="c in cuentas" :key="c.id" :value="c.id">
+                  {{ c.nombre }} ({{ c.tipo }})
+                </option>
+              </select>
+              <p class="mt-1 text-xs text-slate-400">Se usará por defecto al confirmar el pago de esta tarjeta.</p>
+            </div>
+
             <!-- Días -->
             <div class="grid grid-cols-2 gap-3">
               <div>
@@ -107,6 +119,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
+import { useCuentasStore } from '../stores/cuentas'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -116,18 +129,23 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 
 const isEdit = computed(() => !!props.tarjetaEdit)
 
-const EMPTY = { nombre: '', banco: '', limite_credito: '', dia_corte: '', dia_pago: '' }
+const cuentasStore = useCuentasStore()
+const cuentas = computed(() => cuentasStore.cuentas)
+
+const EMPTY = { nombre: '', banco: '', limite_credito: '', dia_corte: '', dia_pago: '', cuenta_pago_id: null }
 const form        = ref({ ...EMPTY })
 const errors      = ref({})
 const serverError = ref('')
 const saving      = ref(false)
 
-watch(() => props.modelValue, (open) => {
+watch(() => props.modelValue, async (open) => {
   if (open) {
+    if (!cuentasStore.cuentas.length) await cuentasStore.fetchCuentas()
     form.value  = props.tarjetaEdit
       ? { nombre: props.tarjetaEdit.nombre, banco: props.tarjetaEdit.banco,
           limite_credito: props.tarjetaEdit.limite_credito, dia_corte: props.tarjetaEdit.dia_corte,
-          dia_pago: props.tarjetaEdit.dia_pago }
+          dia_pago: props.tarjetaEdit.dia_pago,
+          cuenta_pago_id: props.tarjetaEdit.cuenta_pago_id ?? null }
       : { ...EMPTY }
     errors.value      = {}
     serverError.value = ''
