@@ -7,6 +7,7 @@ import Column  from 'primevue/column'
 import Tag     from 'primevue/tag'
 import App from './App.vue'
 import router from './router'
+import 'material-symbols/outlined.css'
 import './style.css'
 
 const app = createApp(App)
