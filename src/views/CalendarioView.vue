@@ -32,11 +32,12 @@
     <!-- Legend -->
     <div class="mt-4 flex flex-wrap items-center gap-3 sm:gap-5">
       <div class="flex items-center gap-2 text-xs text-slate-500">
-        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full" style="background:#3B82F6" />
+        <span class="h-4 w-1 flex-shrink-0 rounded-full" style="background:rgba(59,130,246,0.6)" />
+        <span class="h-4 w-4 flex-shrink-0 rounded" style="background:rgba(59,130,246,0.08)" />
         Corte
       </div>
       <div class="flex items-center gap-2 text-xs text-slate-500">
-        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full" style="background:#10B981" />
+        <span class="h-4 w-4 flex-shrink-0 rounded" style="background:rgba(16,185,129,0.1)" />
         Pago (pendiente)
       </div>
       <div class="flex items-center gap-2 text-xs text-slate-500">
@@ -83,7 +84,7 @@
               day && isToday(day) ? 'today-cell' : '',
               !day ? 'empty-cell' : '',
             ]"
-            style="border-color:rgba(10,25,47,0.03)"
+            :style="cellStyle(day)"
           >
             <!-- Day number -->
             <span
@@ -128,10 +129,10 @@
                   :style="ev.tiene_pendientes ? 'color:#059669' : 'color:#94A3B8'"
                 >{{ ev.tarjeta_nombre }}</span>
                 <span
-                  v-if="ev.tiene_pendientes"
+                  v-if="ev.tiene_pendientes && ev.monto_total > 0"
                   class="ml-auto hidden flex-shrink-0 text-[9px] font-bold sm:block"
                   style="color:#10B981"
-                >{{ ev.pendientes_count }}</span>
+                >{{ formatMonto(ev.monto_total) }}</span>
               </button>
             </div>
           </div>
@@ -160,6 +161,7 @@
 import { computed, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import { useCalendarioStore } from '../stores/calendario'
+import { formatCurrency } from '../utils/currency'
 import PagoDetalleModal from '../components/PagoDetalleModal.vue'
 
 const store = useCalendarioStore()
@@ -206,6 +208,30 @@ function corteEvents(day) {
 
 function pagoEvents(day) {
   return store.events.filter(e => e.day === day && e.type === 'pago')
+}
+
+function cellStyle(day) {
+  const base = { borderRightColor: 'rgba(10,25,47,0.03)' }
+  if (!day || isToday(day)) return base
+
+  const hasCorte        = corteEvents(day).length > 0
+  const pagos           = pagoEvents(day)
+  const hasPagoPendiente = pagos.some(e => e.tiene_pendientes)
+
+  if (hasPagoPendiente) {
+    base.background = 'rgba(16,185,129,0.07)'
+    if (hasCorte) base.boxShadow = 'inset 3px 0 0 rgba(59,130,246,0.45)'
+  } else if (hasCorte) {
+    base.background = 'rgba(59,130,246,0.06)'
+    base.boxShadow  = 'inset 3px 0 0 rgba(59,130,246,0.4)'
+  }
+  return base
+}
+
+function formatMonto(amount) {
+  if (!amount) return ''
+  if (amount >= 10000) return '$' + (amount / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+  return formatCurrency(amount).replace(/\.00$/, '')
 }
 
 function prevMonth() {
