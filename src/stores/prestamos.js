@@ -71,6 +71,20 @@ export const usePrestamosStore = defineStore('prestamos', () => {
     return data
   }
 
+  async function updateAbono(prestamoId, abonoId, payload) {
+    const { data } = await api.put(`/prestamos/${prestamoId}/abono/${abonoId}`, payload)
+    prestamo.value = data
+    _lastFetch     = 0
+    return data
+  }
+
+  async function deleteAbono(prestamoId, abonoId) {
+    const { data } = await api.delete(`/prestamos/${prestamoId}/abono/${abonoId}`)
+    prestamo.value = data
+    _lastFetch     = 0
+    return data
+  }
+
   async function marcarPagado(id) {
     const { data } = await api.post(`/prestamos/${id}/pagar`)
     prestamo.value = data
@@ -81,6 +95,6 @@ export const usePrestamosStore = defineStore('prestamos', () => {
   return {
     prestamos, prestamo, loading, error,
     fetchPrestamos, fetchPrestamo, createPrestamo, updatePrestamo, deletePrestamo,
-    registrarAbono, marcarPagado,
+    registrarAbono, updateAbono, deleteAbono, marcarPagado,
   }
 })
