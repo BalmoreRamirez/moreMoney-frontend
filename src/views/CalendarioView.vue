@@ -73,14 +73,14 @@
           v-for="(week, wi) in calendarWeeks"
           :key="wi"
           class="grid grid-cols-7"
-          :style="wi < calendarWeeks.length - 1 ? 'border-bottom:1px solid rgba(10,25,47,0.03)' : ''"
+          :style="wi < calendarWeeks.length - 1 ? 'border-bottom:1px solid #E2E8F0' : ''"
         >
           <div
             v-for="(day, di) in week"
             :key="di"
             class="relative min-h-[60px] p-1 sm:min-h-[100px] sm:p-2"
             :class="[
-              di < 6 ? 'border-r' : '',
+              di < 6 ? 'border-r border-[#E2E8F0]' : '',
               day && isToday(day) ? 'today-cell' : '',
               !day ? 'empty-cell' : '',
             ]"
@@ -211,7 +211,7 @@ function pagoEvents(day) {
 }
 
 function cellStyle(day) {
-  const base = { borderRightColor: 'rgba(10,25,47,0.03)' }
+  const base = { borderRightColor: '#E2E8F0' }
   if (!day || isToday(day)) return base
 
   const hasCorte        = corteEvents(day).length > 0
