@@ -204,7 +204,7 @@
         </Column>
 
         <!-- Acciones -->
-        <Column header="" style="min-width:110px;width:110px">
+        <Column header="" style="min-width:140px;width:140px">
           <template #body="{ data: inv }">
             <div class="flex items-center justify-end gap-1">
               <button
@@ -217,6 +217,14 @@
                 Cobrar
               </button>
               <button
+                v-if="inv.estado === 'en_curso'"
+                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                title="Editar"
+                @click="openEditInversion(inv)"
+              >
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+              <button
                 v-if="inv.estado === 'en_curso' && !inv.cobros?.length"
                 class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
                 title="Eliminar"
@@ -224,7 +232,18 @@
               >
                 <span class="material-symbols-outlined text-[16px]">delete</span>
               </button>
-              <span v-if="inv.estado === 'vendida'" class="text-xs text-slate-500">{{ inv.fecha_venta }}</span>
+              <template v-if="inv.estado === 'vendida'">
+                <span class="text-xs text-slate-400 mr-1">{{ inv.fecha_venta }}</span>
+                <button
+                  class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
+                  style="background:rgba(217,119,6,0.10);color:#D97706"
+                  title="Resetear a En curso"
+                  @click="doResetearInversion(inv)"
+                >
+                  <span class="material-symbols-outlined text-[14px]">restart_alt</span>
+                  Resetear
+                </button>
+              </template>
             </div>
           </template>
         </Column>
@@ -307,6 +326,7 @@
 
     <InversionFormModal
       v-model="showInversionModal"
+      :edit-data="editInversion"
       @saved="onInversionSaved"
     />
 
@@ -435,12 +455,23 @@ async function onCobrar(payload) {
 
 // ─── INVERSIONES ─────────────────────────────────────────────────────────────
 const showInversionModal = ref(false)
+const editInversion      = ref(null)
 
-function openCreateInversion() { showInversionModal.value = true }
+function openCreateInversion()  { editInversion.value = null; showInversionModal.value = true }
+function openEditInversion(inv) { editInversion.value = inv;  showInversionModal.value = true }
 
 async function onInversionSaved(payload) {
   try {
-    await store.createInversion(payload)
+    if (editInversion.value) await store.updateInversion(editInversion.value.id, payload)
+    else                     await store.createInversion(payload)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function doResetearInversion(inv) {
+  try {
+    await store.resetearInversion(inv.id)
   } catch (e) {
     console.error(e)
   }

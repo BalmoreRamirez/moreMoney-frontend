@@ -101,6 +101,18 @@ export const useIngresosStore = defineStore('ingresos', () => {
     return data
   }
 
+  async function updateInversion(id, payload) {
+    const { data } = await api.put(`/ingresos/inversiones/${id}`, payload)
+    await fetchInversiones()
+    return data
+  }
+
+  async function resetearInversion(id) {
+    const { data } = await api.post(`/ingresos/inversiones/${id}/resetear`)
+    await fetchInversiones()
+    return data
+  }
+
   async function registrarCobro(id, payload) {
     const { data } = await api.post(`/ingresos/inversiones/${id}/cobrar`, payload)
     await fetchInversiones()
@@ -115,7 +127,7 @@ export const useIngresosStore = defineStore('ingresos', () => {
   return {
     sueldos, inversiones, otros, loading, error,
     fetchSueldos, createSueldo, updateSueldo, deleteSueldo, cobrarSueldo,
-    fetchInversiones, createInversion, registrarCobro, deleteInversion,
+    fetchInversiones, createInversion, updateInversion, resetearInversion, registrarCobro, deleteInversion,
     fetchOtros, createOtro, updateOtro, deleteOtro,
   }
 })

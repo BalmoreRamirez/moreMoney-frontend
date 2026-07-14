@@ -10,7 +10,7 @@
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
         style="background:#FFFFFF;border:1px solid #E2E8F0"
       >
-        <h2 class="text-base font-semibold text-slate-900">Registrar inversión</h2>
+        <h2 class="text-base font-semibold text-slate-900">{{ editData ? 'Editar inversión' : 'Registrar inversión' }}</h2>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
@@ -44,7 +44,7 @@
             </p>
           </div>
 
-          <div>
+          <div v-if="!editData">
             <label class="mb-1.5 block text-xs text-slate-500">Cuenta de egreso (donde sale el dinero)</label>
             <select v-model.number="form.cuenta_egreso_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
@@ -59,7 +59,7 @@
               Cancelar
             </button>
             <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
-              {{ saving ? 'Guardando…' : 'Registrar inversión' }}
+              {{ saving ? 'Guardando…' : editData ? 'Guardar cambios' : 'Registrar inversión' }}
             </button>
           </div>
         </form>
@@ -75,6 +75,7 @@ import { formatCurrency }  from '../utils/currency'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
+  editData:   { type: Object,  default: null },
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
@@ -103,7 +104,17 @@ watch(() => props.modelValue, (open) => {
   if (!open) return
   errorMsg.value = ''
   saving.value   = false
-  form.value     = { nombre: '', costo_total: '', precio_esperado: '', fecha_compra: new Date().toISOString().split('T')[0], cuenta_egreso_id: '' }
+  if (props.editData) {
+    form.value = {
+      nombre:          props.editData.nombre,
+      costo_total:     props.editData.costo_total,
+      precio_esperado: props.editData.precio_esperado ?? '',
+      fecha_compra:    props.editData.fecha_compra,
+      cuenta_egreso_id: '',
+    }
+  } else {
+    form.value = { nombre: '', costo_total: '', precio_esperado: '', fecha_compra: new Date().toISOString().split('T')[0], cuenta_egreso_id: '' }
+  }
 })
 
 function close() { emit('update:modelValue', false) }
