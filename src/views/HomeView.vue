@@ -74,6 +74,11 @@
       </div>
     </div>
 
+    <!-- Flujo por cuenta -->
+    <div class="mb-8">
+      <CuentasFlowPanel :mes-actual="mesActual" :anio-actual="anioActual" />
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════════════════
          SECCIÓN: ANALÍTICAS (flujo en el tiempo)
     ═══════════════════════════════════════════════════════════════════════ -->
@@ -278,6 +283,11 @@
       </div>
     </div>
 
+    <!-- Historial de gasto por tarjeta -->
+    <div class="mb-8">
+      <TarjetasHistorialPanel />
+    </div>
+
   </section>
 </template>
 
@@ -287,9 +297,11 @@ import { useTarjetasStore } from '../stores/tarjetas'
 import { useReportesStore } from '../stores/reportes'
 import { useCuentasStore }  from '../stores/cuentas'
 import { formatCurrency }   from '../utils/currency'
-import DonutChart           from '../components/DonutChart.vue'
-import FlowBars             from '../components/FlowBars.vue'
-import AnalyticsPanel       from '../components/AnalyticsPanel.vue'
+import DonutChart              from '../components/DonutChart.vue'
+import FlowBars               from '../components/FlowBars.vue'
+import AnalyticsPanel         from '../components/AnalyticsPanel.vue'
+import CuentasFlowPanel       from '../components/CuentasFlowPanel.vue'
+import TarjetasHistorialPanel from '../components/TarjetasHistorialPanel.vue'
 
 const tarjetasStore = useTarjetasStore()
 const reportesStore = useReportesStore()
@@ -307,6 +319,7 @@ onMounted(() => {
     tarjetasStore.fetchTarjetas(),
     reportesStore.fetchMensual(),
     cuentasStore.fetchStats(anioActual, mesActual),
+    cuentasStore.fetchFlujoCuentas(anioActual, mesActual),
   ])
 })
 

@@ -5,11 +5,12 @@ import api from '../utils/api'
 const TTL = 30_000
 
 export const useCuentasStore = defineStore('cuentas', () => {
-  const cuentas     = ref([])
-  const saldo_total = ref(0)
-  const stats       = ref(null)
-  const loading     = ref(false)
-  const error       = ref(null)
+  const cuentas      = ref([])
+  const saldo_total  = ref(0)
+  const stats        = ref(null)
+  const flujoCuentas = ref(null)
+  const loading      = ref(false)
+  const error        = ref(null)
 
   let _lastFetch = 0
 
@@ -58,6 +59,15 @@ export const useCuentasStore = defineStore('cuentas', () => {
     }
   }
 
+  async function fetchFlujoCuentas(year, month) {
+    try {
+      const { data } = await api.get('/cuentas/flujo-mes', { params: { year, month } })
+      flujoCuentas.value = data
+    } catch (e) {
+      // non-fatal
+    }
+  }
+
   async function transferir(payload) {
     const { data } = await api.post('/cuentas/transferir', payload)
     _lastFetch = 0
@@ -65,5 +75,5 @@ export const useCuentasStore = defineStore('cuentas', () => {
     return data
   }
 
-  return { cuentas, saldo_total, stats, loading, error, fetchCuentas, createCuenta, updateCuenta, deleteCuenta, fetchStats, transferir }
+  return { cuentas, saldo_total, stats, flujoCuentas, loading, error, fetchCuentas, createCuenta, updateCuenta, deleteCuenta, fetchStats, fetchFlujoCuentas, transferir }
 })

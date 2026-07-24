@@ -9,8 +9,9 @@ export const useReportesStore = defineStore('reportes', {
     grand_total: 0,
     loading:     false,
     error:       null,
-    flujo:          { serie: [], categorias: [], loading: false, error: null },
-    flujoTarjetas:  { serie: [],               loading: false, error: null },
+    flujo:              { serie: [], categorias: [], loading: false, error: null },
+    flujoTarjetas:      { serie: [],               loading: false, error: null },
+    historialTarjetas:  { meses: [], tarjetas: [],  loading: false, error: null },
   }),
 
   actions: {
@@ -57,5 +58,18 @@ export const useReportesStore = defineStore('reportes', {
       }
     },
 
+    async fetchHistorialTarjetas(meses = 6) {
+      this.historialTarjetas.loading = true
+      this.historialTarjetas.error   = null
+      try {
+        const { data } = await api.get('/reportes/historial-tarjetas', { params: { meses } })
+        this.historialTarjetas.meses    = data.meses
+        this.historialTarjetas.tarjetas = data.tarjetas
+      } catch (e) {
+        this.historialTarjetas.error = e.message
+      } finally {
+        this.historialTarjetas.loading = false
+      }
+    },
   },
 })
