@@ -12,6 +12,9 @@
         <span class="flex items-center gap-1.5">
           <span class="inline-block h-2 w-2 rounded-full" style="background:#DC2626" />Egresos
         </span>
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-2 w-2 rounded-full" style="background:#6366F1" />Saldo
+        </span>
       </div>
     </div>
 
@@ -32,22 +35,6 @@
         :series="chartSeries"
       />
 
-      <!-- Saldos actuales debajo -->
-      <div class="mt-3 grid gap-2" :class="cuentas.length > 2 ? 'grid-cols-3' : 'grid-cols-2'">
-        <div
-          v-for="c in cuentas"
-          :key="c.id"
-          class="rounded-xl px-3 py-2.5"
-          style="background:rgba(10,25,47,0.03);border:1px solid #E8EDF5"
-        >
-          <p class="text-[10px] text-slate-500 truncate">{{ c.nombre }}</p>
-          <p
-            class="font-mono text-sm font-bold mt-0.5"
-            :style="{ color: c.saldo_actual >= 0 ? '#10B981' : '#DC2626' }"
-          >{{ formatCurrency(c.saldo_actual) }}</p>
-          <p class="text-[9px] text-slate-400 mt-0.5">saldo actual</p>
-        </div>
-      </div>
     </template>
   </div>
 </template>
@@ -71,8 +58,9 @@ const cuentas = computed(() => cuentasStore.flujoCuentas?.data ?? [])
 const chartHeight = computed(() => Math.max(160, cuentas.value.length * 55))
 
 const chartSeries = computed(() => [
-  { name: 'Ingresos', data: cuentas.value.map(c => parseFloat(c.ingresos.toFixed(2))) },
-  { name: 'Egresos',  data: cuentas.value.map(c => parseFloat(c.egresos.toFixed(2)))  },
+  { name: 'Ingresos', data: cuentas.value.map(c => parseFloat(c.ingresos.toFixed(2)))      },
+  { name: 'Egresos',  data: cuentas.value.map(c => parseFloat(c.egresos.toFixed(2)))       },
+  { name: 'Saldo',    data: cuentas.value.map(c => parseFloat(c.saldo_actual.toFixed(2)))  },
 ])
 
 const chartOptions = computed(() => ({
@@ -90,7 +78,7 @@ const chartOptions = computed(() => ({
       dataLabels: { position: 'top' },
     },
   },
-  colors: ['#10B981', '#DC2626'],
+  colors: ['#10B981', '#DC2626', '#6366F1'],
   dataLabels: { enabled: false },
   stroke: { show: true, width: 2, colors: ['transparent'] },
   xaxis: {
