@@ -49,7 +49,7 @@
           v-if="activeTab === 'normales'"
           class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
           style="background:#10B981"
-          @click="showNormalModal = true"
+          @click="openCreateNormal"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
           <span class="hidden sm:inline">Nueva compra</span>
@@ -124,9 +124,16 @@
           </Column>
 
           <!-- Acciones -->
-          <Column header="" style="min-width:70px;width:70px">
+          <Column header="" style="min-width:90px;width:90px">
             <template #body="{ data: c }">
-              <div class="flex items-center justify-end">
+              <div class="flex items-center justify-end gap-1">
+                <button
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                  title="Editar"
+                  @click="openEditNormal(c)"
+                >
+                  <span class="material-symbols-outlined text-[16px]">edit</span>
+                </button>
                 <button
                   class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
                   title="Eliminar"
@@ -217,10 +224,11 @@
       </div>
     </template>
 
-    <!-- Modales de creación -->
+    <!-- Modales de creación/edición -->
     <CompraNormalFormModal
       v-model="showNormalModal"
       :tarjetas="tarjetasStore.tarjetas"
+      :editData="editNormalTarget"
       @saved="onSaveNormal"
     />
     <CompraTasaCeroFormModal
@@ -303,14 +311,21 @@ function setFiltroEstado(val) {
 
 const showNormalModal    = ref(false)
 const showTasaCeroModal  = ref(false)
+const editNormalTarget   = ref(null)
 const editTasaCeroTarget = ref(null)
 
+function openCreateNormal()   { editNormalTarget.value = null; showNormalModal.value = true }
+function openEditNormal(c)    { editNormalTarget.value = c;    showNormalModal.value = true }
 function openCreateTasaCero() { editTasaCeroTarget.value = null; showTasaCeroModal.value = true }
 function openEditTasaCero(c)  { editTasaCeroTarget.value = c;    showTasaCeroModal.value = true }
 
 async function onSaveNormal(payload) {
   try {
-    await comprasStore.createNormal(payload)
+    if (editNormalTarget.value) {
+      await comprasStore.updateNormal(editNormalTarget.value.id, payload)
+    } else {
+      await comprasStore.createNormal(payload)
+    }
     recargarTodo()
     tarjetasStore.fetchTarjetas()
   } catch (e) {

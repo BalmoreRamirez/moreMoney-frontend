@@ -6,7 +6,7 @@
 
         <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
           <div class="mb-5 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-slate-900">Nueva compra normal</h2>
+            <h2 class="text-lg font-semibold text-slate-900">{{ editData ? 'Editar compra' : 'Nueva compra normal' }}</h2>
             <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
@@ -49,6 +49,15 @@
               <p v-if="errors.fecha_compra" class="mt-1 text-xs text-danger">{{ errors.fecha_compra }}</p>
             </div>
 
+            <!-- Estado (solo en edición) -->
+            <div v-if="editData">
+              <label class="mb-1.5 block text-xs font-medium text-slate-500">Estado</label>
+              <select v-model="form.estado" class="fintech-input">
+                <option value="pendiente">Pendiente</option>
+                <option value="pagada">Pagada</option>
+              </select>
+            </div>
+
             <div v-if="serverError" class="rounded-lg px-4 py-3 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid rgba(220,38,38,0.2)">
               {{ serverError }}
             </div>
@@ -56,7 +65,7 @@
             <div class="flex gap-3 pt-2">
               <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">Cancelar</button>
               <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
-                {{ saving ? 'Guardando…' : 'Registrar compra' }}
+                {{ saving ? 'Guardando…' : (editData ? 'Guardar cambios' : 'Registrar compra') }}
               </button>
             </div>
           </form>
@@ -72,11 +81,12 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   modelValue: Boolean,
   tarjetas:   { type: Array, default: () => [] },
+  editData:   { type: Object, default: null },
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
 const today = new Date().toISOString().split('T')[0]
-const EMPTY = { tarjeta_id: '', nombre: '', monto: '', fecha_compra: today }
+const EMPTY = { tarjeta_id: '', nombre: '', monto: '', fecha_compra: today, estado: 'pendiente' }
 
 const form        = ref({ ...EMPTY })
 const errors      = ref({})
@@ -84,7 +94,21 @@ const serverError = ref('')
 const saving      = ref(false)
 
 watch(() => props.modelValue, (open) => {
-  if (open) { form.value = { ...EMPTY }; errors.value = {}; serverError.value = '' }
+  if (open) {
+    errors.value      = {}
+    serverError.value = ''
+    if (props.editData) {
+      form.value = {
+        tarjeta_id:   props.editData.tarjeta_id,
+        nombre:       props.editData.nombre,
+        monto:        props.editData.monto,
+        fecha_compra: props.editData.fecha_compra,
+        estado:       props.editData.estado ?? 'pendiente',
+      }
+    } else {
+      form.value = { ...EMPTY }
+    }
+  }
 })
 
 function close() { emit('update:modelValue', false) }
