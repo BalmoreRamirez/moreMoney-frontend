@@ -54,7 +54,7 @@
     <!-- Calendar grid -->
     <div v-else class="mt-6 fintech-card overflow-hidden p-0">
       <!-- Days of week header -->
-      <div class="grid grid-cols-7 border-b" style="border-color:#E8EDF5">
+      <div class="grid grid-cols-7 border-b" style="border-color:var(--color-border-soft)">
         <div
           v-for="(day, i) in DAYS"
           :key="day"
@@ -73,14 +73,14 @@
           v-for="(week, wi) in calendarWeeks"
           :key="wi"
           class="grid grid-cols-7"
-          :style="wi < calendarWeeks.length - 1 ? 'border-bottom:1px solid #E2E8F0' : ''"
+          :style="wi < calendarWeeks.length - 1 ? 'border-bottom:1px solid var(--color-border)' : ''"
         >
           <div
             v-for="(day, di) in week"
             :key="di"
             class="relative min-h-[60px] p-1 sm:min-h-[100px] sm:p-2"
             :class="[
-              di < 6 ? 'border-r border-[#E2E8F0]' : '',
+              di < 6 ? 'cell-border-r' : '',
               day && isToday(day) ? 'today-cell' : '',
               !day ? 'empty-cell' : '',
             ]"
@@ -211,11 +211,11 @@ function pagoEvents(day) {
 }
 
 function cellStyle(day) {
-  const base = { borderRightColor: '#E2E8F0' }
+  const base = {}
   if (!day || isToday(day)) return base
 
-  const hasCorte        = corteEvents(day).length > 0
-  const pagos           = pagoEvents(day)
+  const hasCorte         = corteEvents(day).length > 0
+  const pagos            = pagoEvents(day)
   const hasPagoPendiente = pagos.some(e => e.tiene_pendientes)
 
   if (hasPagoPendiente) {
@@ -255,9 +255,12 @@ function onConfirmed() {
 
 <style scoped>
 .today-cell {
-  background: rgba(5, 150, 105, 0.07);
+  background: rgba(5, 150, 105, 0.08);
 }
 .empty-cell {
-  background: rgba(10, 25, 47, 0.02);
+  background: var(--color-surface-mid);
+}
+.cell-border-r {
+  border-right: 1px solid var(--color-border);
 }
 </style>

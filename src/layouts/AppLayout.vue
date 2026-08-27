@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen">
+  <div class="flex min-h-screen" style="background:var(--color-primary)">
     <!-- Overlay móvil -->
     <Transition name="overlay">
       <div
@@ -14,19 +14,19 @@
     <aside
       class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col transition-transform duration-300 lg:translate-x-0"
       :class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
-      style="background:#FFFFFF;border-right:1px solid #E2E8F0"
+      style="background:var(--color-surface);border-right:1px solid var(--color-border)"
     >
       <!-- Logo -->
-      <div class="flex h-16 items-center gap-3 px-5" style="border-bottom:1px solid #E8EDF5">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg" style="background:#ECFDF5">
-          <span class="material-symbols-outlined text-[18px]" style="color:#059669">account_balance</span>
+      <div class="flex h-16 items-center gap-3 px-5" style="border-bottom:1px solid var(--color-border-soft)">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg" style="background:var(--color-success-bg)">
+          <span class="material-symbols-outlined text-[18px]" style="color:var(--color-success)">account_balance</span>
         </div>
-        <span class="text-base font-bold tracking-tight" style="color:#0A192F">moreMoney</span>
+        <span class="text-base font-bold tracking-tight" style="color:var(--color-text-primary)">moreMoney</span>
       </div>
 
       <!-- Navegación -->
       <nav class="flex flex-1 flex-col gap-0.5 px-3 py-4 overflow-y-auto">
-        <span class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest" style="color:#94A3B8">General</span>
+        <span class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">General</span>
         <router-link
           v-for="item in navItems"
           :key="item.to"
@@ -37,15 +37,15 @@
         >
           <span
             class="material-symbols-outlined text-[20px] transition-colors duration-150"
-            :class="isActive(item.to) ? 'nav-icon--active' : 'text-slate-400 group-hover:text-slate-600'"
+            :class="isActive(item.to) ? 'nav-icon--active' : 'nav-icon--idle'"
           >{{ item.icon }}</span>
           <span>{{ item.label }}</span>
         </router-link>
       </nav>
 
       <!-- Footer sidebar -->
-      <div class="px-4 py-4" style="border-top:1px solid #E8EDF5">
-        <p class="text-[11px]" style="color:#94A3B8">moreMoney © {{ currentYear }}</p>
+      <div class="px-4 py-4" style="border-top:1px solid var(--color-border-soft)">
+        <p class="text-[11px]" style="color:var(--color-text-muted)">moreMoney © {{ currentYear }}</p>
       </div>
     </aside>
 
@@ -54,28 +54,40 @@
       <!-- Top bar -->
       <header
         class="sticky top-0 z-20 flex h-16 items-center justify-between px-4 lg:px-6"
-        style="background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);border-bottom:1px solid #E8EDF5"
+        style="background:var(--header-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--color-border-soft)"
       >
         <div class="flex items-center gap-2">
           <button
-            class="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 lg:hidden"
-            style="color:#475569"
+            class="flex h-9 w-9 items-center justify-center rounded-lg transition-colors lg:hidden"
+            style="color:var(--color-text-secondary);background:transparent"
+            @mouseenter="e => e.currentTarget.style.background = 'var(--color-surface-high)'"
+            @mouseleave="e => e.currentTarget.style.background = 'transparent'"
             @click="menuOpen = !menuOpen"
           >
             <span class="material-symbols-outlined text-[22px]">{{ menuOpen ? 'close' : 'menu' }}</span>
           </button>
-          <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:#94A3B8">{{ currentNav?.icon }}</span>
-          <span class="text-sm font-semibold" style="color:#0F172A">{{ currentNav?.label }}</span>
+          <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:var(--color-text-muted)">{{ currentNav?.icon }}</span>
+          <span class="text-sm font-semibold" style="color:var(--color-text-primary)">{{ currentNav?.label }}</span>
         </div>
 
         <div class="flex items-center gap-3">
-          <span class="hidden text-xs tabular-nums md:block" style="color:#94A3B8">{{ todayLabel }}</span>
-          <div class="flex items-center gap-2 pl-3" style="border-left:1px solid #E2E8F0">
-            <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:#94A3B8">account_circle</span>
-            <span class="hidden text-xs font-medium sm:block" style="color:#475569">{{ authStore.usuario?.usuario }}</span>
+          <!-- Fecha (solo md+) + toggle siempre visible -->
+          <div class="flex items-center gap-2">
+            <span class="hidden text-xs tabular-nums md:block" style="color:var(--color-text-muted)">{{ todayLabel }}</span>
             <button
-              class="flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all hover:bg-slate-100"
-              style="color:#64748B;border:1px solid #E2E8F0"
+              class="theme-toggle"
+              :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+              @click="toggle"
+            >
+              <span class="material-symbols-outlined text-[17px]">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 pl-3" style="border-left:1px solid var(--color-border)">
+            <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:var(--color-text-muted)">account_circle</span>
+            <span class="hidden text-xs font-medium sm:block" style="color:var(--color-text-secondary)">{{ authStore.usuario?.usuario }}</span>
+            <button
+              class="logout-btn flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all"
               title="Cerrar sesión"
               @click="handleLogout"
             >
@@ -98,11 +110,13 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useTheme } from '../composables/useTheme'
 
 const route     = useRoute()
 const router    = useRouter()
 const authStore = useAuthStore()
 const menuOpen  = ref(false)
+const { isDark, toggle } = useTheme()
 
 function handleLogout() {
   authStore.logout()
@@ -135,20 +149,59 @@ const todayLabel = computed(() =>
 </script>
 
 <style scoped>
+/* Header bg con transparencia adaptado al tema */
+:root { --header-bg: rgba(255,255,255,0.9); }
+[data-theme="dark"] { --header-bg: rgba(22,27,34,0.9); }
+
 .nav-link--active {
-  color: #0A192F;
-  background: #E8EDF5;
-  border: 1px solid #C6D2E5;
+  color: var(--color-text-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border);
 }
 .nav-icon--active { color: #2D5991; }
+[data-theme="dark"] .nav-icon--active { color: #60A5FA; }
 
 .nav-link--idle {
-  color: #64748B;
+  color: var(--color-text-secondary);
   border: 1px solid transparent;
 }
 .nav-link--idle:hover {
-  color: #0A192F;
-  background: #F8FAFC;
+  color: var(--color-text-primary);
+  background: var(--color-surface-mid);
+}
+.nav-icon--idle { color: var(--color-text-muted); }
+.nav-link--idle:hover .nav-icon--idle { color: var(--color-text-secondary); }
+
+/* Botón toggle de tema */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: var(--color-surface-mid);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--color-surface-high);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+/* Botón logout */
+.logout-btn {
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background: var(--color-surface-high);
 }
 
 .overlay-enter-active, .overlay-leave-active { transition: opacity 0.25s ease; }

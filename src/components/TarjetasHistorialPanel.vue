@@ -105,6 +105,10 @@
 import { ref, computed, watch } from 'vue'
 import { useReportesStore } from '../stores/reportes'
 import { formatCurrency }   from '../utils/currency'
+import { useTheme }         from '../composables/useTheme'
+
+const { isDark } = useTheme()
+const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
 
 const COLORS = ['#2D5991', '#10B981', '#D97706', '#7C3AED', '#DC2626', '#0891B2']
 
@@ -210,9 +214,9 @@ const chartOptions = computed(() => ({
     padding: { left: 4, right: 4 },
   },
   legend: { show: false },
-  theme:  { mode: 'light' },
+  theme:  { mode: apexTheme.value },
   tooltip: {
-    theme: 'light',
+    theme: apexTheme.value,
     shared: true,
     intersect: false,
     style: { fontSize: '11px', fontFamily: 'inherit' },

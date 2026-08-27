@@ -36,6 +36,36 @@
 }
 
 /* ──────────────────────────────────────────
+   Tema oscuro
+   ────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* Fondo y superficies */
+  --color-primary:      #0D1117;   /* fondo de página — casi negro */
+  --color-primary-mid:  #161B22;   /* cards — gris muy oscuro */
+  --color-primary-soft: #1C2333;   /* separadores */
+
+  /* Semántica financiera */
+  --color-success:      #34D399;   /* esmeralda vibrante */
+  --color-success-bg:   #064E3B;   /* esmeralda oscuro */
+  --color-alert:        #FBBF24;   /* ámbar */
+  --color-alert-bg:     #451A03;   /* ámbar oscuro */
+  --color-danger:       #F87171;   /* rojo suave */
+  --color-danger-bg:    #450A0A;   /* rojo oscuro */
+
+  /* Superficies */
+  --color-surface:      #161B22;
+  --color-surface-mid:  #1C2333;
+  --color-surface-high: #21293B;
+  --color-border:       #30363D;
+  --color-border-soft:  #21293B;
+
+  /* Texto */
+  --color-text-primary:   #E6EDF3;
+  --color-text-secondary: #8B949E;
+  --color-text-muted:     #484F58;
+}
+
+/* ──────────────────────────────────────────
    Reset y base
    ────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
@@ -53,7 +83,9 @@ html, body, #app {
 }
 
 body {
-  background: #F0F4FA;
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 /* ──────────────────────────────────────────
@@ -122,6 +154,6 @@ body {
     box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
   }
   .fintech-input::placeholder { color: var(--color-text-muted); }
-  .fintech-input option       { background: #FFFFFF; color: #0F172A; }
-  .fintech-input option:disabled { color: #94A3B8; }
+  .fintech-input option       { background: var(--color-surface); color: var(--color-text-primary); }
+  .fintech-input option:disabled { color: var(--color-text-muted); }
 }

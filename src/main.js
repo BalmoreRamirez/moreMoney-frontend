@@ -17,7 +17,7 @@ app.use(VueApexCharts)
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
-    options: { darkModeSelector: '.light' },
+    options: { darkModeSelector: '[data-theme="dark"]' },
   },
 })
 app.component('Column', Column)

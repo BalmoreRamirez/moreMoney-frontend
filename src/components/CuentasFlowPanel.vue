@@ -43,6 +43,10 @@
 import { computed } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
+import { useTheme }        from '../composables/useTheme'
+
+const { isDark } = useTheme()
+const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
 
 const props = defineProps({
   mesActual:  { type: Number, required: true },
@@ -108,9 +112,9 @@ const chartOptions = computed(() => ({
     padding: { left: 0, right: 0, top: 0, bottom: 0 },
   },
   legend:      { show: false },
-  theme:       { mode: 'light' },
+  theme:       { mode: apexTheme.value },
   tooltip: {
-    theme: 'light',
+    theme: apexTheme.value,
     shared: true,
     intersect: false,
     style: { fontSize: '11px', fontFamily: 'inherit' },

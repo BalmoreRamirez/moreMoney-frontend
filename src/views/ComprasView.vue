@@ -3,8 +3,8 @@
     <!-- Encabezado -->
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Compras</h1>
-        <p class="mt-1 text-sm text-slate-500">Gestión de gastos normales y compras a tasa cero.</p>
+        <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Compras</h1>
+        <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Gestión de gastos normales y compras a tasa cero.</p>
       </div>
 
       <div class="flex items-center gap-3">
@@ -22,23 +22,22 @@
     </div>
 
     <!-- Pestañas + botón de acción -->
-    <div class="mt-6 flex flex-wrap items-center justify-between gap-2 border-b" style="border-color:#E2E8F0">
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-2 border-b" style="border-color:var(--color-border)">
       <div class="flex gap-1">
         <button
           v-for="tab in tabs"
           :key="tab.key"
           class="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors sm:gap-2 sm:px-4"
-          :class="activeTab === tab.key
-            ? 'border-b-2 border-success text-success'
-            : 'text-slate-500 hover:text-slate-700'"
+          :class="activeTab === tab.key ? 'border-b-2 border-success' : ''"
+          :style="activeTab === tab.key ? 'color:var(--color-success)' : 'color:var(--color-text-secondary)'"
           @click="activeTab = tab.key"
         >
           <span class="material-symbols-outlined text-[16px]">{{ tab.icon }}</span>
           <span class="hidden sm:inline">{{ tab.label }}</span>
           <span class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
             :style="activeTab === tab.key
-              ? 'background:rgba(16,185,129,0.2);color:#10B981'
-              : 'background:rgba(10,25,47,0.04);color:#94A3B8'"
+              ? 'background:var(--color-success-bg);color:var(--color-success)'
+              : 'background:var(--color-surface-high);color:var(--color-text-muted)'"
           >{{ tab.key === 'normales' ? comprasStore.normales.length : comprasStore.tasaCero.length }}</span>
         </button>
       </div>
@@ -47,7 +46,7 @@
         <button
           v-if="activeTab === 'normales'"
           class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
-          style="background:#10B981"
+          style="background:var(--color-success)"
           @click="openCreateNormal"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
@@ -56,7 +55,7 @@
         <button
           v-else
           class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
-          style="background:#10B981"
+          style="background:var(--color-success)"
           @click="openCreateTasaCero"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
@@ -66,14 +65,14 @@
     </div>
 
     <!-- Filtro de estado (sólo en pestaña tasa cero) -->
-    <div v-if="activeTab === 'tasa_cero'" class="mt-4 flex items-center gap-1 rounded-xl p-1 w-fit" style="background:rgba(10,25,47,0.03);border:1px solid #E2E8F0">
+    <div v-if="activeTab === 'tasa_cero'" class="mt-4 flex items-center gap-1 rounded-xl p-1 w-fit" style="background:var(--color-surface-mid);border:1px solid var(--color-border)">
       <button
         v-for="opt in estadoOpts"
         :key="opt.value"
         class="rounded-lg px-4 py-1.5 text-xs font-semibold transition-colors"
         :style="filtroEstado === opt.value
-          ? 'background:rgba(16,185,129,0.18);color:#10B981'
-          : 'color:#94A3B8'"
+          ? 'background:var(--color-success-bg);color:var(--color-success)'
+          : 'color:var(--color-text-muted)'"
         @click="setFiltroEstado(opt.value)"
       >{{ opt.label }}</button>
     </div>
@@ -94,63 +93,53 @@
 
             <!-- Navegación mes -->
             <div class="flex items-center gap-2">
-              <button
-                class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
-                @click="prevMonth"
-              >
+              <button class="cal-nav-btn" @click="prevMonth">
                 <span class="material-symbols-outlined text-[18px]">chevron_left</span>
               </button>
-              <span class="w-44 text-center text-sm font-semibold capitalize text-slate-800">
+              <span class="w-44 text-center text-sm font-semibold capitalize" style="color:var(--color-text-primary)">
                 {{ monthLabel }}
               </span>
-              <button
-                class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
-                @click="nextMonth"
-              >
+              <button class="cal-nav-btn" @click="nextMonth">
                 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
               </button>
-              <button
-                class="ml-1 rounded-lg border px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
-                style="border-color:#E2E8F0"
-                @click="goToToday"
-              >Hoy</button>
+              <button class="cal-today-btn" @click="goToToday">Hoy</button>
             </div>
 
             <!-- KPIs del mes -->
             <div class="hidden md:flex items-center gap-5">
               <div class="text-center">
-                <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Total mes</p>
-                <p class="font-mono text-sm font-bold text-slate-800">{{ formatCurrency(monthSummary.total) }}</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--color-text-muted)">Total mes</p>
+                <p class="font-mono text-sm font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(monthSummary.total) }}</p>
               </div>
-              <div class="h-8 w-px" style="background:#E2E8F0"></div>
+              <div class="h-8 w-px" style="background:var(--color-border)"></div>
               <div class="text-center">
-                <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Pendiente</p>
-                <p class="font-mono text-sm font-bold" style="color:#D97706">{{ formatCurrency(monthSummary.pendiente) }}</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--color-text-muted)">Pendiente</p>
+                <p class="font-mono text-sm font-bold" style="color:var(--color-alert)">{{ formatCurrency(monthSummary.pendiente) }}</p>
               </div>
-              <div class="h-8 w-px" style="background:#E2E8F0"></div>
+              <div class="h-8 w-px" style="background:var(--color-border)"></div>
               <div class="text-center">
-                <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Pagado</p>
-                <p class="font-mono text-sm font-bold" style="color:#059669">{{ formatCurrency(monthSummary.pagada) }}</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--color-text-muted)">Pagado</p>
+                <p class="font-mono text-sm font-bold" style="color:var(--color-success)">{{ formatCurrency(monthSummary.pagada) }}</p>
               </div>
             </div>
 
             <!-- Toggle vista -->
-            <div class="flex items-center gap-1 rounded-lg p-1" style="background:rgba(10,25,47,0.04);border:1px solid #E2E8F0">
+            <div class="flex items-center gap-1 rounded-lg p-1" style="background:var(--color-surface-mid);border:1px solid var(--color-border)">
               <button
                 class="flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-                :style="calView === 'cal' ? 'background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1)' : ''"
-                :title="'Vista calendario'"
+                :style="calView === 'cal' ? 'background:var(--color-surface);box-shadow:0 1px 3px rgba(0,0,0,0.15)' : ''"
+                title="Vista calendario"
                 @click="calView = 'cal'"
               >
-                <span class="material-symbols-outlined text-[16px]" :class="calView === 'cal' ? 'text-success' : 'text-slate-400'">calendar_month</span>
+                <span class="material-symbols-outlined text-[16px]" :style="calView === 'cal' ? 'color:var(--color-success)' : 'color:var(--color-text-muted)'">calendar_month</span>
               </button>
               <button
                 class="flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-                :style="calView === 'list' ? 'background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1)' : ''"
-                :title="'Vista lista'"
+                :style="calView === 'list' ? 'background:var(--color-surface);box-shadow:0 1px 3px rgba(0,0,0,0.15)' : ''"
+                title="Vista lista"
                 @click="calView = 'list'"
               >
-                <span class="material-symbols-outlined text-[16px]" :class="calView === 'list' ? 'text-success' : 'text-slate-400'">view_list</span>
+                <span class="material-symbols-outlined text-[16px]" :style="calView === 'list' ? 'color:var(--color-success)' : 'color:var(--color-text-muted)'">view_list</span>
               </button>
             </div>
           </div>
@@ -161,63 +150,73 @@
           <div class="fintech-card overflow-hidden">
 
             <!-- Cabecera días de la semana -->
-            <div class="grid grid-cols-7 border-b" style="border-color:#E2E8F0">
+            <div class="grid grid-cols-7 border-b" style="border-color:var(--color-border-soft)">
               <div
                 v-for="d in dayNames"
                 :key="d"
-                class="py-2.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+                class="py-2.5 text-center text-[11px] font-semibold uppercase tracking-wide"
+                style="color:var(--color-text-muted)"
               >{{ d }}</div>
             </div>
 
             <!-- Celdas del calendario -->
-            <div class="grid grid-cols-7 divide-x divide-y" style="border-color:#E2E8F0">
+            <div>
               <div
-                v-for="(cell, i) in calendarCells"
-                :key="i"
-                class="min-h-[110px] p-2 transition-colors"
-                :class="[
-                  !cell.currentMonth ? 'bg-slate-50/70 cursor-default' : 'cursor-pointer hover:bg-blue-50/30',
-                  cell.isToday && cell.currentMonth ? 'bg-emerald-50/40' : '',
-                  selectedDay === cell.dateStr ? 'ring-2 ring-inset ring-success/50' : ''
-                ]"
-                @click="handleDayClick(cell)"
+                v-for="(rowCells, ri) in calendarRows"
+                :key="ri"
+                class="grid grid-cols-7"
+                :style="ri < calendarRows.length - 1 ? 'border-bottom:1px solid var(--color-border)' : ''"
               >
-                <!-- Número del día -->
-                <div class="mb-1.5 flex items-start justify-between">
-                  <span
-                    class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
-                    :class="cell.isToday && cell.currentMonth
-                      ? 'bg-success text-white'
-                      : cell.currentMonth
-                        ? 'text-slate-600'
-                        : 'text-slate-300'"
-                  >{{ cell.day }}</span>
+                <div
+                  v-for="(cell, ci) in rowCells"
+                  :key="ci"
+                  class="cal-cell relative min-h-[100px] p-2 transition-colors"
+                  :class="[
+                    ci < 6 ? 'cal-cell-border-r' : '',
+                    !cell.currentMonth ? 'cal-cell-empty' : 'cal-cell-active',
+                    cell.isToday && cell.currentMonth ? 'cal-cell-today' : '',
+                    cell.dateStr && selectedDay === cell.dateStr ? 'cal-cell-selected' : '',
+                  ]"
+                  @click="handleDayClick(cell)"
+                >
+                  <!-- Número del día -->
+                  <div class="mb-1.5 flex items-start justify-between">
+                    <span
+                      class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
+                      :style="cell.isToday && cell.currentMonth
+                        ? 'background:#10B981;color:#fff'
+                        : cell.currentMonth
+                          ? 'color:var(--color-text-secondary)'
+                          : 'color:var(--color-text-muted)'"
+                    >{{ cell.day }}</span>
 
-                  <!-- Total del día -->
-                  <span
-                    v-if="cell.currentMonth && cell.purchases.length"
-                    class="font-mono text-[10px] font-semibold text-slate-400"
-                  >{{ formatCurrency(cell.dayTotal) }}</span>
-                </div>
-
-                <!-- Chips de compras -->
-                <div class="space-y-0.5">
-                  <div
-                    v-for="c in cell.purchases.slice(0, 2)"
-                    :key="c.id"
-                    class="flex items-center justify-between gap-1 rounded px-1.5 py-0.5 leading-tight"
-                    :class="c.estado === 'pagada'
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-amber-100 text-amber-700'"
-                  >
-                    <span class="truncate text-[10px] font-medium" style="max-width:80px">{{ c.nombre }}</span>
-                    <span class="shrink-0 font-mono text-[10px] font-semibold">{{ formatAmount(c.monto) }}</span>
+                    <!-- Total del día -->
+                    <span
+                      v-if="cell.currentMonth && cell.purchases.length"
+                      class="font-mono text-[10px] font-semibold"
+                      style="color:var(--color-text-muted)"
+                    >{{ formatCurrency(cell.dayTotal) }}</span>
                   </div>
-                  <div
-                    v-if="cell.purchases.length > 2"
-                    class="rounded px-1.5 py-0.5 text-center text-[10px] font-semibold text-slate-500"
-                    style="background:rgba(10,25,47,0.06)"
-                  >+{{ cell.purchases.length - 2 }} más</div>
+
+                  <!-- Chips de compras -->
+                  <div class="space-y-0.5">
+                    <div
+                      v-for="c in cell.purchases.slice(0, 2)"
+                      :key="c.id"
+                      class="flex items-center justify-between gap-1 rounded px-1.5 py-0.5 leading-tight"
+                      :style="c.estado === 'pagada'
+                        ? 'background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);color:var(--color-success)'
+                        : 'background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);color:var(--color-alert)'"
+                    >
+                      <span class="truncate text-[10px] font-medium" style="max-width:80px">{{ c.nombre }}</span>
+                      <span class="shrink-0 font-mono text-[10px] font-semibold">{{ formatAmount(c.monto) }}</span>
+                    </div>
+                    <div
+                      v-if="cell.purchases.length > 2"
+                      class="rounded px-1.5 py-0.5 text-center text-[10px] font-semibold"
+                      style="background:var(--color-surface-high);color:var(--color-text-muted)"
+                    >+{{ cell.purchases.length - 2 }} más</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -226,8 +225,8 @@
           <!-- Empty state calendario -->
           <div v-if="!comprasStore.loading && !comprasStore.normales.length" class="mt-4 fintech-card flex flex-col items-center py-14 text-center">
             <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.25)">receipt_long</span>
-            <p class="mt-3 font-semibold text-slate-600">Sin compras este mes</p>
-            <p class="mt-1 text-sm text-slate-500">Registra una nueva compra para verla en el calendario.</p>
+            <p class="mt-3 font-semibold" style="color:var(--color-text-primary)">Sin compras este mes</p>
+            <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Registra una nueva compra para verla en el calendario.</p>
           </div>
         </div>
 
@@ -241,14 +240,14 @@
           >
             <Column field="fecha_compra" header="Fecha" sortable style="min-width:110px">
               <template #body="{ data: c }">
-                <span class="text-sm text-slate-600">{{ formatDate(c.fecha_compra) }}</span>
+                <span class="text-sm" style="color:var(--color-text-secondary)">{{ formatDate(c.fecha_compra) }}</span>
               </template>
             </Column>
 
             <Column field="nombre" header="Compra" sortable style="min-width:200px">
               <template #body="{ data: c }">
-                <p class="text-sm font-medium text-slate-700 truncate">{{ c.nombre }}</p>
-                <span class="text-[11px] text-slate-500">{{ c.tarjeta?.nombre }} · {{ c.tarjeta?.banco }}</span>
+                <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
+                <span class="text-[11px]" style="color:var(--color-text-muted)">{{ c.tarjeta?.nombre }} · {{ c.tarjeta?.banco }}</span>
               </template>
             </Column>
 
@@ -260,25 +259,17 @@
 
             <Column field="monto" header="Monto" sortable style="min-width:120px">
               <template #body="{ data: c }">
-                <span class="font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(c.monto) }}</span>
+                <span class="font-mono text-sm font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto) }}</span>
               </template>
             </Column>
 
             <Column header="" style="min-width:90px;width:90px">
               <template #body="{ data: c }">
                 <div class="flex items-center justify-end gap-1">
-                  <button
-                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                    title="Editar"
-                    @click="openEditNormal(c)"
-                  >
+                  <button class="tbl-action-btn" title="Editar" @click="openEditNormal(c)">
                     <span class="material-symbols-outlined text-[16px]">edit</span>
                   </button>
-                  <button
-                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
-                    title="Eliminar"
-                    @click="confirmDeleteNormal(c)"
-                  >
+                  <button class="tbl-action-btn tbl-action-btn--danger" title="Eliminar" @click="confirmDeleteNormal(c)">
                     <span class="material-symbols-outlined text-[16px]">delete</span>
                   </button>
                 </div>
@@ -292,8 +283,8 @@
       <div v-if="activeTab === 'tasa_cero'" class="mt-4 space-y-4">
         <div v-if="!comprasStore.tasaCero.length" class="fintech-card flex flex-col items-center py-14 text-center">
           <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">payments</span>
-          <p class="mt-3 font-semibold text-slate-600">Sin compras a tasa cero</p>
-          <p class="mt-1 text-sm text-slate-500">Registra una compra con cuotas para verla aquí.</p>
+          <p class="mt-3 font-semibold" style="color:var(--color-text-primary)">Sin compras a tasa cero</p>
+          <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Registra una compra con cuotas para verla aquí.</p>
         </div>
 
         <div
@@ -304,31 +295,25 @@
           <div class="flex items-start justify-between gap-4">
             <div class="flex-1">
               <div class="flex items-center gap-2">
-                <p class="font-semibold text-slate-700">{{ c.nombre }}</p>
+                <p class="font-semibold" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
                 <span :class="c.estado === 'activa' ? 'badge-success' : 'badge-alert'">{{ c.estado }}</span>
               </div>
-              <p class="mt-0.5 text-xs text-slate-500">
+              <p class="mt-0.5 text-xs" style="color:var(--color-text-muted)">
                 {{ c.tarjeta?.nombre }} — {{ c.tarjeta?.banco }} &nbsp;·&nbsp; {{ formatDate(c.fecha_compra) }}
               </p>
             </div>
 
             <div class="flex items-center gap-2">
               <div class="text-right mr-1">
-                <p class="font-mono text-lg font-bold text-slate-900">{{ formatCurrency(c.monto_total) }}</p>
-                <p class="text-xs text-slate-500">{{ formatCurrency(cuotaMonto(c)) }}/mes</p>
+                <p class="font-mono text-lg font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto_total) }}</p>
+                <p class="text-xs" style="color:var(--color-text-muted)">{{ formatCurrency(cuotaMonto(c)) }}/mes</p>
               </div>
-              <button
-                class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                title="Editar"
-                @click="openEditTasaCero(c)"
-              >
+              <button class="tbl-action-btn" title="Editar" @click="openEditTasaCero(c)">
                 <span class="material-symbols-outlined text-[18px]">edit</span>
               </button>
               <button
-                class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
-                :class="tieneCuotasPagadas(c)
-                  ? 'cursor-not-allowed text-slate-400'
-                  : 'text-slate-500 hover:bg-red-500/10 hover:text-danger'"
+                class="tbl-action-btn"
+                :class="tieneCuotasPagadas(c) ? 'tbl-action-btn--disabled' : 'tbl-action-btn--danger'"
                 :title="tieneCuotasPagadas(c) ? 'No se puede eliminar: ya tiene cuotas pagadas' : 'Eliminar'"
                 :disabled="tieneCuotasPagadas(c)"
                 @click="!tieneCuotasPagadas(c) && confirmDeleteTasaCero(c)"
@@ -340,10 +325,10 @@
 
           <div class="mt-4">
             <div class="mb-1.5 flex items-center justify-between text-xs">
-              <span class="text-slate-500">Progreso de cuotas</span>
-              <span class="font-mono text-slate-600">
+              <span style="color:var(--color-text-secondary)">Progreso de cuotas</span>
+              <span class="font-mono" style="color:var(--color-text-primary)">
                 {{ cuotasBlocks(c) }}
-                <span class="ml-1 text-slate-500">{{ cuotasPagadas(c) }}/{{ c.total_cuotas }}</span>
+                <span class="ml-1" style="color:var(--color-text-muted)">{{ cuotasPagadas(c) }}/{{ c.total_cuotas }}</span>
               </span>
             </div>
             <div class="progress-bar-track">
@@ -353,7 +338,7 @@
                 :style="{ width: cuotasPct(c) + '%' }"
               />
             </div>
-            <p v-if="tieneCuotasPagadas(c)" class="mt-1.5 flex items-center gap-1 text-[10px]" style="color:#F59E0B">
+            <p v-if="tieneCuotasPagadas(c)" class="mt-1.5 flex items-center gap-1 text-[10px]" style="color:var(--color-alert)">
               <span class="material-symbols-outlined text-[12px]">lock</span>
               No eliminable — {{ cuotasPagadas(c) }} cuota{{ cuotasPagadas(c) > 1 ? 's' : '' }} pagada{{ cuotasPagadas(c) > 1 ? 's' : '' }}
             </p>
@@ -370,12 +355,12 @@
         style="background:rgba(15,23,42,0.5);backdrop-filter:blur(2px)"
         @click.self="clearDay"
       >
-        <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl flex flex-col" style="max-height:85vh">
+        <div class="modal-box w-full max-w-lg rounded-2xl shadow-2xl flex flex-col" style="max-height:85vh">
           <!-- Header -->
-          <div class="flex items-center justify-between px-6 py-4 border-b" style="border-color:#E2E8F0">
+          <div class="flex items-center justify-between px-6 py-4 border-b" style="border-color:var(--color-border)">
             <div>
-              <h3 class="font-semibold text-slate-800 capitalize">{{ selectedDayLabel }}</h3>
-              <p class="text-xs text-slate-500 mt-0.5">
+              <h3 class="font-semibold capitalize" style="color:var(--color-text-primary)">{{ selectedDayLabel }}</h3>
+              <p class="text-xs mt-0.5" style="color:var(--color-text-secondary)">
                 <template v-if="selectedDayData && selectedDayData.purchases.length">
                   {{ selectedDayData.purchases.length }} compra{{ selectedDayData.purchases.length !== 1 ? 's' : '' }}
                   &nbsp;·&nbsp;
@@ -384,10 +369,7 @@
                 <template v-else>Sin compras registradas</template>
               </p>
             </div>
-            <button
-              class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
-              @click="clearDay"
-            >
+            <button class="modal-close-btn" @click="clearDay">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -400,10 +382,10 @@
               class="flex flex-col items-center py-10 text-center"
             >
               <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.25)">receipt_long</span>
-              <p class="mt-3 text-sm text-slate-500">No hay compras para este día.</p>
+              <p class="mt-3 text-sm" style="color:var(--color-text-secondary)">No hay compras para este día.</p>
               <button
                 class="mt-4 flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-                style="background:#10B981"
+                style="background:var(--color-success)"
                 @click="clearDay(); openCreateNormal()"
               >
                 <span class="material-symbols-outlined text-[16px]">add</span>
@@ -422,38 +404,33 @@
                 <div class="flex items-center gap-3 min-w-0">
                   <span
                     class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                    :class="c.estado === 'pagada' ? 'bg-emerald-100' : 'bg-amber-100'"
+                    :style="c.estado === 'pagada'
+                      ? 'background:var(--color-success-bg)'
+                      : 'background:var(--color-alert-bg)'"
                   >
-                    <span class="material-symbols-outlined text-[18px]"
-                      :class="c.estado === 'pagada' ? 'text-emerald-600' : 'text-amber-600'"
+                    <span
+                      class="material-symbols-outlined text-[18px]"
+                      :style="c.estado === 'pagada' ? 'color:var(--color-success)' : 'color:var(--color-alert)'"
                     >receipt_long</span>
                   </span>
                   <div class="min-w-0">
-                    <p class="truncate text-sm font-semibold text-slate-700">{{ c.nombre }}</p>
-                    <p class="text-[11px] text-slate-400">{{ c.tarjeta?.nombre }} · {{ c.tarjeta?.banco }}</p>
+                    <p class="truncate text-sm font-semibold" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
+                    <p class="text-[11px]" style="color:var(--color-text-muted)">{{ c.tarjeta?.nombre }} · {{ c.tarjeta?.banco }}</p>
                   </div>
                 </div>
 
                 <div class="flex items-center gap-3 shrink-0">
                   <div class="text-right">
-                    <p class="font-mono text-sm font-bold text-slate-800">{{ formatCurrency(c.monto) }}</p>
+                    <p class="font-mono text-sm font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto) }}</p>
                     <span :class="c.estado === 'pagada' ? 'badge-success' : 'badge-alert'" style="font-size:10px;padding:1px 6px">
                       {{ c.estado }}
                     </span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <button
-                      class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-                      title="Editar"
-                      @click="clearDay(); openEditNormal(c)"
-                    >
+                    <button class="modal-action-btn" title="Editar" @click="clearDay(); openEditNormal(c)">
                       <span class="material-symbols-outlined text-[15px]">edit</span>
                     </button>
-                    <button
-                      class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-danger transition-colors"
-                      title="Eliminar"
-                      @click="clearDay(); confirmDeleteNormal(c)"
-                    >
+                    <button class="modal-action-btn modal-action-btn--danger" title="Eliminar" @click="clearDay(); confirmDeleteNormal(c)">
                       <span class="material-symbols-outlined text-[15px]">delete</span>
                     </button>
                   </div>
@@ -463,10 +440,10 @@
           </div>
 
           <!-- Footer -->
-          <div class="flex justify-end gap-2 px-6 py-4 border-t" style="border-color:#E2E8F0">
+          <div class="flex justify-end gap-2 px-6 py-4 border-t" style="border-color:var(--color-border)">
             <button
               class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-              style="background:#10B981"
+              style="background:var(--color-success)"
               @click="clearDay(); openCreateNormal()"
             >
               <span class="material-symbols-outlined text-[16px]">add</span>
@@ -609,6 +586,14 @@ const calendarCells = computed(() => {
   }
 
   return cells
+})
+
+// Agrupa las 42 celdas en filas de 7 para el nuevo layout (igual que CalendarioView)
+const calendarRows = computed(() => {
+  const cells = calendarCells.value
+  const rows = []
+  for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7))
+  return rows
 })
 
 const selectedDayData = computed(() =>
@@ -755,4 +740,118 @@ function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 </script>
+
+<style scoped>
+/* Celdas del calendario */
+.cal-cell-border-r { border-right: 1px solid var(--color-border); }
+
+.cal-cell-empty    { background: var(--color-surface-mid); cursor: default; }
+.cal-cell-active   { cursor: pointer; }
+.cal-cell-active:hover { background: var(--color-surface-high); }
+
+.cal-cell-today    { background: rgba(5, 150, 105, 0.08); }
+.cal-cell-selected { box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.5); }
+
+/* Botones de navegación del toolbar */
+.cal-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.5rem;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cal-nav-btn:hover { background: var(--color-surface-high); }
+
+.cal-today-btn {
+  margin-left: 0.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cal-today-btn:hover { background: var(--color-surface-high); }
+
+/* Modal */
+.modal-box {
+  background: var(--color-surface);
+}
+.modal-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.5rem;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.modal-close-btn:hover {
+  background: var(--color-surface-high);
+  color: var(--color-text-primary);
+}
+.modal-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.75rem;
+  width: 1.75rem;
+  border-radius: 0.5rem;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.modal-action-btn:hover {
+  background: var(--color-surface-high);
+  color: var(--color-text-primary);
+}
+.modal-action-btn--danger:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* Botones de acción en tablas y tarjetas tasa cero */
+.tbl-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.5rem;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.tbl-action-btn:hover {
+  background: var(--color-surface-high);
+  color: var(--color-text-primary);
+}
+.tbl-action-btn--danger:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+.tbl-action-btn--disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>
 
