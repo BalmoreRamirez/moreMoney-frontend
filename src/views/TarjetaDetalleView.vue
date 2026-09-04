@@ -79,6 +79,21 @@
             </div>
           </div>
 
+          <!-- Próximo pago destacado -->
+          <div class="flex items-center justify-between rounded-lg px-3 py-2.5"
+            style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2)">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px]" style="color:var(--color-alert)">payment</span>
+              <div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-alert)">Próximo pago</p>
+                <p class="text-[10px]" style="color:var(--color-text-muted)">Día {{ data.tarjeta.dia_pago }} — {{ labelProximoPago }}</p>
+              </div>
+            </div>
+            <p class="font-mono text-lg font-bold" style="color:var(--color-alert)">
+              {{ formatCurrency(totalCorteAPagar + totalCuotasCorte) }}
+            </p>
+          </div>
+
           <!-- Barra de uso -->
           <div>
             <div class="mb-1.5 flex items-center justify-between">
@@ -358,6 +373,16 @@ const lastCutDate = computed(() => {
 
 const labelUltimoCorte = computed(() => {
   return lastCutDate.value.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+})
+
+const labelProximoPago = computed(() => {
+  const dia   = data.value?.tarjeta?.dia_pago ?? 1
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const payThisMonth = new Date(today.getFullYear(), today.getMonth(), dia)
+  const next = today <= payThisMonth
+    ? payThisMonth
+    : new Date(today.getFullYear(), today.getMonth() + 1, dia)
+  return next.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 })
 
 // Compras normales pendientes por corte
