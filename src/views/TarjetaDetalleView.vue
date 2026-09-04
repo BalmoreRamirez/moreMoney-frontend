@@ -1,12 +1,26 @@
 <template>
   <section>
-    <!-- Back -->
-    <button class="mb-5 flex items-center gap-1 text-sm transition-colors"
-      style="color:var(--color-text-muted)"
-      @click="router.back()">
-      <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-      Volver a tarjetas
-    </button>
+    <!-- Back + acciones -->
+    <div class="mb-5 flex items-center justify-between gap-3">
+      <button class="flex items-center gap-1 text-sm transition-colors shrink-0"
+        style="color:var(--color-text-muted)"
+        @click="router.back()">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        Volver a tarjetas
+      </button>
+
+      <!-- Botones nueva compra (solo cuando hay datos cargados) -->
+      <div v-if="data" class="flex gap-2">
+        <button class="add-btn" @click="openNormal">
+          <span class="material-symbols-outlined text-[15px]">add</span>
+          Compra normal
+        </button>
+        <button class="add-btn add-btn--outline" @click="openTasaCero">
+          <span class="material-symbols-outlined text-[15px]">add</span>
+          Tasa cero
+        </button>
+      </div>
+    </div>
 
     <!-- Loading -->
     <div v-if="store.loading" class="flex justify-center py-20">
@@ -241,6 +255,21 @@
       </div>
 
     </template>
+
+    <!-- Modales de compra -->
+    <CompraNormalFormModal
+      v-model="showNormal"
+      :tarjetas="tarjetaComoArray"
+      :default-tarjeta-id="tarjetaId"
+      @saved="onNormalSaved"
+    />
+    <CompraTasaCeroFormModal
+      v-model="showTasaCero"
+      :tarjetas="tarjetaComoArray"
+      :default-tarjeta-id="tarjetaId"
+      @saved="onTasaCeroSaved"
+    />
+
   </section>
 </template>
 
@@ -248,13 +277,44 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTarjetasStore } from '../stores/tarjetas'
+import { useComprasStore }  from '../stores/compras'
 import { formatCurrency } from '../utils/currency'
+import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
+import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
 
-const route  = useRoute()
-const router = useRouter()
-const store  = useTarjetasStore()
+const route        = useRoute()
+const router       = useRouter()
+const store        = useTarjetasStore()
+const comprasStore = useComprasStore()
+
+const tarjetaId = computed(() => Number(route.params.id))
 
 onMounted(() => store.fetchTarjeta(route.params.id))
+
+// ── Modales de compra ─────────────────────────────────────
+const showNormal   = ref(false)
+const showTasaCero = ref(false)
+
+const tarjetaComoArray = computed(() =>
+  data.value?.tarjeta ? [{ ...data.value.tarjeta, ...data.value.saldos }] : []
+)
+
+function openNormal()   { showNormal.value   = true }
+function openTasaCero() { showTasaCero.value = true }
+
+async function onNormalSaved(payload) {
+  try {
+    await comprasStore.createNormal(payload)
+    await store.fetchTarjeta(route.params.id)
+  } catch (e) { console.error(e) }
+}
+
+async function onTasaCeroSaved(payload) {
+  try {
+    await comprasStore.createTasaCero(payload)
+    await store.fetchTarjeta(route.params.id)
+  } catch (e) { console.error(e) }
+}
 
 const data = computed(() => store.tarjeta)
 
@@ -364,4 +424,27 @@ function formatDate(d) {
 .purchase-row + .purchase-row {
   border-top: 1px solid var(--color-border);
 }
+
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  background: var(--color-success);
+  color: #fff;
+  border: none;
+}
+.add-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.add-btn--outline {
+  background: transparent;
+  color: var(--color-success);
+  border: 1.5px solid var(--color-success);
+}
+.add-btn--outline:hover { background: var(--color-success-bg); }
 </style>

@@ -79,9 +79,10 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  modelValue: Boolean,
-  tarjetas:   { type: Array, default: () => [] },
-  editData:   { type: Object, default: null },
+  modelValue:       Boolean,
+  tarjetas:         { type: Array, default: () => [] },
+  editData:         { type: Object, default: null },
+  defaultTarjetaId: { type: [Number, String], default: null },
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
@@ -106,7 +107,7 @@ watch(() => props.modelValue, (open) => {
         estado:       props.editData.estado ?? 'pendiente',
       }
     } else {
-      form.value = { ...EMPTY }
+      form.value = { ...EMPTY, tarjeta_id: props.defaultTarjetaId ?? '' }
     }
   }
 })
