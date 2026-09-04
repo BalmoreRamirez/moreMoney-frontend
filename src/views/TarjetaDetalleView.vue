@@ -1,186 +1,245 @@
 <template>
   <section>
     <!-- Back -->
-    <button class="mb-5 flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-700" @click="router.back()">
+    <button class="mb-5 flex items-center gap-1 text-sm transition-colors"
+      style="color:var(--color-text-muted)"
+      @click="router.back()">
       <span class="material-symbols-outlined text-[18px]">arrow_back</span>
       Volver a tarjetas
     </button>
 
     <!-- Loading -->
     <div v-if="store.loading" class="flex justify-center py-20">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-success border-t-transparent" />
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" style="border-color:var(--color-success);border-top-color:transparent" />
     </div>
 
-    <div v-else-if="store.error" class="rounded-xl px-5 py-4 text-sm" style="background: var(--color-danger-bg); color: var(--color-danger)">
+    <div v-else-if="store.error" class="rounded-xl px-5 py-4 text-sm"
+      style="background:var(--color-danger-bg);color:var(--color-danger)">
       {{ store.error }}
     </div>
 
     <template v-else-if="data">
-      <!-- Encabezado de la tarjeta -->
-      <div class="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-start lg:gap-6">
-        <!-- Plástico grande -->
-        <div
-          class="relative flex h-48 w-full flex-col justify-between overflow-hidden rounded-2xl p-5 shadow-card sm:h-52 sm:max-w-xs"
-          :style="cardStyle"
-        >
-          <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full opacity-10" style="background:white" />
-          <div class="pointer-events-none absolute -bottom-12 -right-4 h-48 w-48 rounded-full opacity-[0.06]" style="background:white" />
+
+      <!-- ── Encabezado compacto ───────────────────────────────── -->
+      <div class="fintech-card flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:gap-6">
+
+        <!-- Plástico mini -->
+        <div class="relative flex h-32 w-full shrink-0 flex-col justify-between overflow-hidden rounded-xl p-4 shadow-card sm:w-48"
+          :style="cardStyle">
+          <div class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-10" style="background:white" />
           <div>
-            <p class="text-[10px] font-semibold uppercase tracking-widest opacity-70">{{ data.tarjeta.banco }}</p>
-            <p class="mt-0.5 text-lg font-bold text-white">{{ data.tarjeta.nombre }}</p>
+            <p class="text-[9px] font-semibold uppercase tracking-widest opacity-60">{{ data.tarjeta.banco }}</p>
+            <p class="mt-0.5 text-sm font-bold text-white leading-tight">{{ data.tarjeta.nombre }}</p>
           </div>
-          <div class="flex items-center gap-3">
-            <div class="h-7 w-10 rounded-sm" style="background: linear-gradient(135deg,#f0c040,#c89520); opacity:.85" />
-            <span class="font-mono text-xs tracking-widest text-white/60">•••• •••• •••• ••••</span>
+          <div>
+            <p class="text-[8px] uppercase tracking-widest opacity-50">Disponible</p>
+            <p class="font-mono text-base font-bold text-white">{{ formatCurrency(data.saldos.saldo_disponible) }}</p>
           </div>
-          <div class="flex items-end justify-between">
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
+            <div class="h-full transition-all duration-700" :style="{ width: usagePct + '%', background: usageColor }" />
+          </div>
+        </div>
+
+        <!-- Separador -->
+        <div class="hidden sm:block self-stretch w-px" style="background:var(--color-border)" />
+
+        <!-- Stats + barra -->
+        <div class="flex flex-1 flex-col gap-4">
+          <!-- KPIs en fila -->
+          <div class="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
             <div>
-              <p class="text-[9px] uppercase tracking-widest opacity-60">Disponible</p>
-              <p class="font-mono text-xl font-bold text-white">{{ formatCurrency(data.saldos.saldo_disponible) }}</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Disponible</p>
+              <p class="font-mono text-base font-bold" style="color:var(--color-success)">{{ formatCurrency(data.saldos.saldo_disponible) }}</p>
             </div>
-            <div class="text-right">
-              <p class="text-[9px] uppercase tracking-widest opacity-60">Límite</p>
-              <p class="font-mono text-sm text-white/80">{{ formatCurrency(data.saldos.limite_credito) }}</p>
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Gastado</p>
+              <p class="font-mono text-base font-bold" :style="{ color: usageColor }">{{ formatCurrency(data.saldos.saldo_gastado) }}</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Día de corte</p>
+              <p class="text-base font-bold" style="color:var(--color-text-primary)">{{ data.tarjeta.dia_corte }}</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Día de pago</p>
+              <p class="text-base font-bold" style="color:var(--color-text-primary)">{{ data.tarjeta.dia_pago }}</p>
             </div>
           </div>
-          <div class="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
-            <div class="h-full" :style="{ width: usagePct + '%', background: usageColor, transition: 'width .7s ease' }" />
-          </div>
-        </div>
 
-        <!-- Gráfico donut -->
-        <div class="fintech-card flex w-full flex-col items-center justify-center p-6 lg:flex-1">
-          <DonutChart
-            :limite="data.saldos.limite_credito"
-            :gastado="data.saldos.saldo_gastado"
-            :disponible="data.saldos.saldo_disponible"
-            :size="180"
-          />
-        </div>
-
-        <!-- Info adicional -->
-        <div class="fintech-card w-full space-y-4 p-5 lg:flex-1">
-          <h3 class="text-sm font-semibold text-slate-600">Información</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-xl p-3" style="background: var(--color-surface-mid)">
-              <p class="text-[10px] uppercase tracking-wider text-slate-500">Día de corte</p>
-              <p class="mt-1 text-xl font-bold text-slate-900">{{ data.tarjeta.dia_corte }}</p>
+          <!-- Barra de uso -->
+          <div>
+            <div class="mb-1.5 flex items-center justify-between">
+              <p class="text-[11px]" style="color:var(--color-text-muted)">Uso del límite — {{ formatCurrency(data.saldos.limite_credito) }}</p>
+              <p class="text-[11px] font-bold" :style="{ color: usageColor }">{{ usagePct }}%</p>
             </div>
-            <div class="rounded-xl p-3" style="background: var(--color-surface-mid)">
-              <p class="text-[10px] uppercase tracking-wider text-slate-500">Día de pago</p>
-              <p class="mt-1 text-xl font-bold text-slate-900">{{ data.tarjeta.dia_pago }}</p>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill transition-all duration-700"
+                :style="{ width: usagePct + '%', background: usageColor }" />
             </div>
-          </div>
-          <div class="rounded-xl p-3" style="background: var(--color-surface-mid)">
-            <p class="text-[10px] uppercase tracking-wider text-slate-500">Saldo gastado</p>
-            <p class="mt-1 font-mono text-lg font-semibold" :style="{ color: usageColor }">
-              {{ formatCurrency(data.saldos.saldo_gastado) }}
-            </p>
-            <p class="mt-0.5 text-[10px] text-slate-500">{{ usagePct }}% del límite usado</p>
           </div>
         </div>
       </div>
 
-      <!-- Pestañas de compras -->
-      <div class="mt-8">
-        <div class="flex gap-1 border-b" style="border-color: #E2E8F0">
-          <button
-            v-for="tab in tabs"
-            :key="tab.key"
-            class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors"
-            :class="activeTab === tab.key
-              ? 'border-b-2 border-success text-success'
-              : 'text-slate-500 hover:text-slate-700'"
-            @click="activeTab = tab.key"
-          >
-            <span class="material-symbols-outlined text-[16px]">{{ tab.icon }}</span>
-            {{ tab.label }}
-            <span
-              class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
-              :style="activeTab === tab.key
-                ? 'background: rgba(16,185,129,0.2); color: #10B981'
-                : 'background: rgba(10,25,47,0.04); color: #94A3B8'"
-            >{{ tab.count }}</span>
-          </button>
-        </div>
+      <!-- ── Cortes ────────────────────────────────────────────── -->
+      <div class="mt-8 grid gap-5 lg:grid-cols-2">
 
-        <!-- Tab: Compras normales -->
-        <div v-if="activeTab === 'normales'" class="mt-4">
-          <div v-if="!data.compras_normales.length" class="py-10 text-center text-sm text-slate-500">
-            Sin compras normales registradas.
-          </div>
-          <div v-else class="fintech-card overflow-x-auto">
-            <table class="w-full min-w-[420px] text-sm">
-              <thead>
-                <tr style="border-bottom: 1px solid #E8EDF5">
-                  <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Nombre</th>
-                  <th class="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">Fecha</th>
-                  <th class="px-4 py-3 text-right text-[10px] font-semibold uppercase tracking-wider text-slate-500">Monto</th>
-                  <th class="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-500">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="c in data.compras_normales"
-                  :key="c.id"
-                  class="transition-colors"
-                  style="border-bottom: 1px solid rgba(10,25,47,0.03)"
-                >
-                  <td class="px-4 py-3 font-medium text-slate-700">{{ c.nombre }}</td>
-                  <td class="px-4 py-3 text-slate-500">{{ formatDate(c.fecha_compra) }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-slate-700">{{ formatCurrency(c.monto) }}</td>
-                  <td class="px-4 py-3 text-center">
-                    <span :class="c.estado === 'pagada' ? 'badge-success' : 'badge-alert'">
-                      {{ c.estado }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab: Tasa cero -->
-        <div v-if="activeTab === 'tasa_cero'" class="mt-4 space-y-4">
-          <div v-if="!data.compras_tasa_cero.length" class="py-10 text-center text-sm text-slate-500">
-            Sin compras a tasa cero registradas.
-          </div>
-          <div
-            v-for="c in data.compras_tasa_cero"
-            :key="c.id"
-            class="fintech-card p-4"
-          >
-            <div class="flex items-start justify-between">
+        <!-- CORTE A PAGAR -->
+        <div class="fintech-card overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--color-border)">
+            <div class="flex items-center gap-2">
+              <span class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(245,158,11,0.12)">
+                <span class="material-symbols-outlined text-[15px]" style="color:var(--color-alert)">credit_card_clock</span>
+              </span>
               <div>
-                <p class="font-semibold text-slate-700">{{ c.nombre }}</p>
-                <p class="mt-0.5 text-xs text-slate-500">{{ formatDate(c.fecha_compra) }}</p>
-              </div>
-              <div class="text-right">
-                <p class="font-mono text-base font-bold text-slate-900">{{ formatCurrency(c.monto_total) }}</p>
-                <span :class="c.estado === 'activa' ? 'badge-success' : 'badge-alert'">{{ c.estado }}</span>
+                <p class="text-sm font-semibold" style="color:var(--color-text-primary)">Corte a pagar</p>
+                <p class="text-[10px]" style="color:var(--color-text-muted)">hasta el día {{ data.tarjeta.dia_corte }} — {{ labelUltimoCorte }}</p>
               </div>
             </div>
+            <div class="text-right">
+              <p class="font-mono text-base font-bold" style="color:var(--color-alert)">{{ formatCurrency(totalCorteAPagar) }}</p>
+              <p class="text-[10px]" style="color:var(--color-text-muted)">{{ corteAPagar.length }} compra{{ corteAPagar.length !== 1 ? 's' : '' }}</p>
+            </div>
+          </div>
 
-            <!-- Barra de progreso de cuotas -->
+          <div v-if="!corteAPagar.length" class="flex items-center justify-center gap-2 py-8 text-sm" style="color:var(--color-text-muted)">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            Sin compras pendientes en este corte
+          </div>
+
+          <div v-else>
+            <div
+              v-for="c in corteAPagar"
+              :key="c.id"
+              class="purchase-row flex items-center justify-between px-5 py-3 gap-3"
+            >
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
+                <p class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
+              </div>
+              <span class="font-mono text-sm font-semibold shrink-0" style="color:var(--color-alert)">{{ formatCurrency(c.monto) }}</span>
+            </div>
+
+            <!-- Tasa cero cuotas del corte actual -->
+            <template v-if="cuotasCorteActual.length">
+              <div class="px-5 py-2 text-[10px] font-semibold uppercase tracking-wider"
+                style="background:var(--color-surface-mid);color:var(--color-text-muted)">
+                Cuotas tasa cero
+              </div>
+              <div
+                v-for="q in cuotasCorteActual"
+                :key="'q-' + q.cuotaId"
+                class="purchase-row flex items-center justify-between px-5 py-3 gap-3"
+              >
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ q.nombre }}</p>
+                  <p class="text-[11px]" style="color:var(--color-text-muted)">Cuota {{ q.numeroCuota }}/{{ q.totalCuotas }} · {{ formatDate(q.fechaEstimada) }}</p>
+                </div>
+                <span class="font-mono text-sm font-semibold shrink-0" style="color:var(--color-alert)">{{ formatCurrency(q.monto) }}</span>
+              </div>
+            </template>
+
+            <!-- Total -->
+            <div class="flex items-center justify-between px-5 py-3" style="background:var(--color-surface-mid);border-top:1px solid var(--color-border)">
+              <span class="text-xs font-semibold" style="color:var(--color-text-muted)">Total a pagar</span>
+              <span class="font-mono font-bold" style="color:var(--color-alert)">{{ formatCurrency(totalCorteAPagar + totalCuotasCorte) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CORTE EN PROCESO -->
+        <div class="fintech-card overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--color-border)">
+            <div class="flex items-center gap-2">
+              <span class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(59,130,246,0.1)">
+                <span class="material-symbols-outlined text-[15px]" style="color:#3B82F6">schedule</span>
+              </span>
+              <div>
+                <p class="text-sm font-semibold" style="color:var(--color-text-primary)">Corte en proceso</p>
+                <p class="text-[10px]" style="color:var(--color-text-muted)">desde el día {{ data.tarjeta.dia_corte }} — acumulando</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-mono text-base font-bold" style="color:#3B82F6">{{ formatCurrency(totalCorteEnProceso) }}</p>
+              <p class="text-[10px]" style="color:var(--color-text-muted)">{{ corteEnProceso.length }} compra{{ corteEnProceso.length !== 1 ? 's' : '' }}</p>
+            </div>
+          </div>
+
+          <div v-if="!corteEnProceso.length" class="flex items-center justify-center gap-2 py-8 text-sm" style="color:var(--color-text-muted)">
+            <span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+            Sin compras en el siguiente corte
+          </div>
+
+          <div v-else>
+            <div
+              v-for="c in corteEnProceso"
+              :key="c.id"
+              class="purchase-row flex items-center justify-between px-5 py-3 gap-3"
+            >
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
+                <p class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
+              </div>
+              <span class="font-mono text-sm font-semibold shrink-0" style="color:#3B82F6">{{ formatCurrency(c.monto) }}</span>
+            </div>
+            <div class="flex items-center justify-between px-5 py-3" style="background:var(--color-surface-mid);border-top:1px solid var(--color-border)">
+              <span class="text-xs font-semibold" style="color:var(--color-text-muted)">Acumulado</span>
+              <span class="font-mono font-bold" style="color:#3B82F6">{{ formatCurrency(totalCorteEnProceso) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tasa cero ──────────────────────────────────────────── -->
+      <div class="mt-6">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px]" style="color:var(--color-text-muted)">payments</span>
+          <h2 class="text-xs font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">
+            Tasa cero
+            <span class="ml-1 rounded-full px-1.5 py-0.5 text-[10px]"
+              style="background:rgba(16,185,129,0.15);color:var(--color-success)">
+              {{ data.compras_tasa_cero.length }}
+            </span>
+          </h2>
+        </div>
+
+        <div v-if="!data.compras_tasa_cero.length" class="fintech-card flex items-center justify-center gap-2 py-8 text-sm" style="color:var(--color-text-muted)">
+          <span class="material-symbols-outlined text-[18px]">info</span>
+          Sin compras a tasa cero registradas
+        </div>
+
+        <div v-else class="space-y-3">
+          <div v-for="c in data.compras_tasa_cero" :key="c.id" class="fintech-card p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
+                <p class="mt-0.5 text-xs" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-mono text-base font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto_total) }}</p>
+                <span class="text-[11px] rounded-full px-2 py-0.5"
+                  :style="c.estado === 'activa'
+                    ? 'background:rgba(16,185,129,0.12);color:var(--color-success)'
+                    : 'background:rgba(100,116,139,0.1);color:var(--color-text-muted)'">
+                  {{ c.estado }}
+                </span>
+              </div>
+            </div>
             <div class="mt-4">
               <div class="mb-1.5 flex items-center justify-between text-xs">
-                <span class="text-slate-500">Progreso de cuotas</span>
-                <span class="font-mono text-slate-600">{{ cuotasPagadas(c) }}/{{ c.total_cuotas }}</span>
+                <span style="color:var(--color-text-muted)">Cuotas pagadas</span>
+                <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ cuotasPagadas(c) }}/{{ c.total_cuotas }}</span>
               </div>
               <div class="progress-bar-track">
-                <div
-                  class="progress-bar-fill"
-                  :class="cuotasPct(c) >= 90 ? 'progress-bar-fill--danger' : cuotasPct(c) >= 50 ? '' : ''"
-                  :style="{ width: cuotasPct(c) + '%' }"
-                />
+                <div class="progress-bar-fill" :style="{ width: cuotasPct(c) + '%' }" />
               </div>
-              <p class="mt-1.5 text-[10px] text-slate-500">
-                Cuota mensual: <span class="font-mono text-slate-600">{{ formatCurrency(cuotaMonto(c)) }}</span>
+              <p class="mt-1.5 text-[10px]" style="color:var(--color-text-muted)">
+                Cuota mensual:
+                <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(cuotaMonto(c)) }}</span>
               </p>
             </div>
           </div>
         </div>
       </div>
+
     </template>
   </section>
 </template>
@@ -189,7 +248,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTarjetasStore } from '../stores/tarjetas'
-import DonutChart from '../components/DonutChart.vue'
 import { formatCurrency } from '../utils/currency'
 
 const route  = useRoute()
@@ -200,11 +258,11 @@ onMounted(() => store.fetchTarjeta(route.params.id))
 
 const data = computed(() => store.tarjeta)
 
-// Plástico
+// ── Plástico ──────────────────────────────────────────────
 const GRADIENTS = [
-  ['#0D47A1', '#1565C0'], ['#004B49', '#00695C'], ['#1B5E20', '#2E7D32'],
-  ['#4A148C', '#6A1B9A'], ['#880E4F', '#AD1457'], ['#E65100', '#EF6C00'],
-  ['#263238', '#37474F'], ['#1A237E', '#283593'],
+  ['#0D47A1','#1565C0'], ['#004B49','#00695C'], ['#1B5E20','#2E7D32'],
+  ['#4A148C','#6A1B9A'], ['#880E4F','#AD1457'], ['#E65100','#EF6C00'],
+  ['#263238','#37474F'], ['#1A237E','#283593'],
 ]
 function bankHash(name = '') {
   let h = 0; for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h)
@@ -227,14 +285,66 @@ const usageColor = computed(() => {
   return '#10B981'
 })
 
-// Pestañas
-const activeTab = ref('normales')
-const tabs = computed(() => [
-  { key: 'normales',  icon: 'receipt_long',  label: 'Compras normales', count: data.value?.compras_normales.length ?? 0 },
-  { key: 'tasa_cero', icon: 'payments',      label: 'Tasa cero',        count: data.value?.compras_tasa_cero.length ?? 0 },
-])
+// ── Lógica de cortes ──────────────────────────────────────
+// Último corte: si hoy >= dia_corte → corte de este mes; si no → corte del mes pasado
+const lastCutDate = computed(() => {
+  const dia   = data.value?.tarjeta?.dia_corte ?? 1
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const cutThisMonth = new Date(today.getFullYear(), today.getMonth(), dia)
+  return today >= cutThisMonth
+    ? cutThisMonth
+    : new Date(today.getFullYear(), today.getMonth() - 1, dia)
+})
 
-// Helpers tasa cero
+const labelUltimoCorte = computed(() => {
+  return lastCutDate.value.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+})
+
+// Compras normales pendientes por corte
+const comprasPendientes = computed(() =>
+  (data.value?.compras_normales ?? []).filter(c => c.estado === 'pendiente')
+)
+
+const corteAPagar = computed(() =>
+  comprasPendientes.value.filter(c => new Date(c.fecha_compra + 'T00:00:00') <= lastCutDate.value)
+)
+
+const corteEnProceso = computed(() =>
+  comprasPendientes.value.filter(c => new Date(c.fecha_compra + 'T00:00:00') > lastCutDate.value)
+)
+
+const totalCorteAPagar    = computed(() => corteAPagar.value.reduce((s, c) => s + parseFloat(c.monto), 0))
+const totalCorteEnProceso = computed(() => corteEnProceso.value.reduce((s, c) => s + parseFloat(c.monto), 0))
+
+// Cuotas tasa cero pendientes del corte actual (primera cuota pendiente de cada compra)
+const cuotasCorteActual = computed(() => {
+  const result = []
+  for (const c of (data.value?.compras_tasa_cero ?? [])) {
+    if (c.estado !== 'activa') continue
+    const primera = (c.cuotas ?? [])
+      .filter(q => q.estado === 'pendiente')
+      .sort((a, b) => a.numero_cuota - b.numero_cuota)[0]
+    if (!primera) continue
+    const fechaEst = new Date(primera.fecha_estimada_pago + 'T00:00:00')
+    if (fechaEst <= lastCutDate.value) {
+      result.push({
+        cuotaId:     primera.id,
+        nombre:      c.nombre,
+        numeroCuota: primera.numero_cuota,
+        totalCuotas: c.total_cuotas,
+        fechaEstimada: primera.fecha_estimada_pago,
+        monto:       parseFloat(primera.monto_cuota),
+      })
+    }
+  }
+  return result
+})
+
+const totalCuotasCorte = computed(() =>
+  cuotasCorteActual.value.reduce((s, q) => s + q.monto, 0)
+)
+
+// ── Tasa cero helpers ─────────────────────────────────────
 function cuotasPagadas(c) { return c.cuotas?.filter(q => q.estado === 'pagada').length ?? 0 }
 function cuotasPct(c) {
   if (!c.total_cuotas) return 0
@@ -249,3 +359,9 @@ function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 </script>
+
+<style scoped>
+.purchase-row + .purchase-row {
+  border-top: 1px solid var(--color-border);
+}
+</style>
