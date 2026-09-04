@@ -35,77 +35,60 @@
     <template v-else-if="data">
 
       <!-- ── Encabezado compacto ───────────────────────────────── -->
-      <div class="fintech-card flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:gap-6">
+      <div class="fintech-card flex items-center gap-4 p-4">
 
         <!-- Plástico mini -->
-        <div class="relative flex h-32 w-full shrink-0 flex-col justify-between overflow-hidden rounded-xl p-4 shadow-card sm:w-48"
+        <div class="relative hidden sm:flex h-24 w-40 shrink-0 flex-col justify-between overflow-hidden rounded-xl p-3.5"
           :style="cardStyle">
-          <div class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-10" style="background:white" />
+          <div class="pointer-events-none absolute -right-4 -top-4 h-16 w-16 rounded-full opacity-10" style="background:white" />
+          <p class="text-[9px] font-bold uppercase tracking-widest text-white/60">{{ data.tarjeta.banco }}</p>
           <div>
-            <p class="text-[9px] font-semibold uppercase tracking-widest opacity-60">{{ data.tarjeta.banco }}</p>
-            <p class="mt-0.5 text-sm font-bold text-white leading-tight">{{ data.tarjeta.nombre }}</p>
-          </div>
-          <div>
-            <p class="text-[8px] uppercase tracking-widest opacity-50">Disponible</p>
-            <p class="font-mono text-base font-bold text-white">{{ formatCurrency(data.saldos.saldo_disponible) }}</p>
-          </div>
-          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
-            <div class="h-full transition-all duration-700" :style="{ width: usagePct + '%', background: usageColor }" />
+            <p class="text-[8px] uppercase tracking-widest text-white/40">{{ data.tarjeta.nombre }}</p>
+            <p class="font-mono text-sm font-bold text-white leading-tight">{{ formatCurrency(data.saldos.saldo_disponible) }}</p>
           </div>
         </div>
 
-        <!-- Separador -->
-        <div class="hidden sm:block self-stretch w-px" style="background:var(--color-border)" />
+        <!-- Stats -->
+        <div class="flex flex-1 flex-col gap-2.5">
 
-        <!-- Stats + barra -->
-        <div class="flex flex-1 flex-col gap-3">
-
-          <!-- KPIs — chips con fondo semántico -->
-          <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <div class="kpi-chip" style="background:rgba(16,185,129,0.09)">
+          <!-- Fila 1: métricas + badge próximo pago -->
+          <div class="flex flex-wrap items-end gap-x-5 gap-y-2">
+            <div>
               <p class="kpi-label">Disponible</p>
               <p class="kpi-value font-mono" style="color:var(--color-success)">{{ formatCurrency(data.saldos.saldo_disponible) }}</p>
             </div>
-            <div class="kpi-chip" :style="usagePct >= 70 ? 'background:rgba(220,38,38,0.07)' : 'background:rgba(100,116,139,0.07)'">
+            <div>
               <p class="kpi-label">Gastado</p>
               <p class="kpi-value font-mono" :style="{ color: usageColor }">{{ formatCurrency(data.saldos.saldo_gastado) }}</p>
             </div>
-            <div class="kpi-chip" style="background:var(--color-surface-mid)">
-              <p class="kpi-label">Día corte</p>
-              <p class="kpi-value" style="color:var(--color-text-primary)">{{ data.tarjeta.dia_corte }}</p>
+            <div>
+              <p class="kpi-label">Corte</p>
+              <p class="kpi-value" style="color:var(--color-text-primary)">día {{ data.tarjeta.dia_corte }}</p>
             </div>
-            <div class="kpi-chip" style="background:var(--color-surface-mid)">
-              <p class="kpi-label">Día pago</p>
-              <p class="kpi-value" style="color:var(--color-text-primary)">{{ data.tarjeta.dia_pago }}</p>
+            <div>
+              <p class="kpi-label">Pago</p>
+              <p class="kpi-value" style="color:var(--color-text-primary)">día {{ data.tarjeta.dia_pago }}</p>
             </div>
-          </div>
 
-          <!-- Próximo pago — tarjeta gradiente premium -->
-          <div class="next-pay-card relative flex items-center justify-between overflow-hidden rounded-xl px-5 py-4">
-            <div class="next-pay-glow-1" />
-            <div class="next-pay-glow-2" />
-            <div class="relative z-10">
-              <div class="flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[13px] text-white/60">calendar_month</span>
-                <p class="text-[9px] font-bold uppercase tracking-widest text-white/60">Próximo pago</p>
+            <!-- Próximo pago badge — alineado al extremo derecho -->
+            <div class="ml-auto flex items-center gap-2.5 rounded-lg px-3 py-2 next-pay-badge">
+              <span class="material-symbols-outlined text-[14px]" style="color:#b45309">payment</span>
+              <div>
+                <p class="kpi-label" style="color:#b45309">Próximo pago · {{ labelProximoPago }}</p>
+                <p class="font-mono text-base font-bold leading-tight" style="color:#92400e">
+                  {{ formatCurrency(totalCorteAPagar + totalCuotasCorte) }}
+                </p>
               </div>
-              <p class="mt-0.5 text-sm font-semibold text-white/90">{{ labelProximoPago }}</p>
-            </div>
-            <div class="relative z-10 text-right">
-              <p class="font-mono text-2xl font-bold leading-none text-white">
-                {{ formatCurrency(totalCorteAPagar + totalCuotasCorte) }}
-              </p>
-              <p class="mt-0.5 text-[10px] text-white/50">compras + cuotas</p>
             </div>
           </div>
 
-          <!-- Barra de uso -->
+          <!-- Fila 2: barra de uso -->
           <div>
-            <div class="mb-1.5 flex items-center justify-between">
-              <p class="text-[11px]" style="color:var(--color-text-muted)">
-                Uso del límite — <span class="font-mono">{{ formatCurrency(data.saldos.limite_credito) }}</span>
+            <div class="mb-1 flex items-center justify-between">
+              <p class="text-[10px]" style="color:var(--color-text-muted)">
+                Límite <span class="font-mono">{{ formatCurrency(data.saldos.limite_credito) }}</span>
               </p>
-              <p class="text-[11px] font-bold" :style="{ color: usageColor }">{{ usagePct }}%</p>
+              <p class="text-[10px] font-bold" :style="{ color: usageColor }">{{ usagePct }}%</p>
             </div>
             <div class="progress-bar-track">
               <div class="progress-bar-fill transition-all duration-700"
@@ -454,11 +437,7 @@ function formatDate(d) {
 </script>
 
 <style scoped>
-/* ── KPI chips ─────────────────────────────────── */
-.kpi-chip {
-  border-radius: 12px;
-  padding: 10px 12px;
-}
+/* ── KPIs ──────────────────────────────────────── */
 .kpi-label {
   font-size: 9px;
   font-weight: 700;
@@ -467,38 +446,16 @@ function formatDate(d) {
   color: var(--color-text-muted);
 }
 .kpi-value {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
-  margin-top: 3px;
-  line-height: 1.1;
+  margin-top: 2px;
+  line-height: 1.15;
 }
 
-/* ── Próximo pago ──────────────────────────────── */
-.next-pay-card {
-  background: linear-gradient(135deg, #78350f 0%, #b45309 55%, #d97706 100%);
-  box-shadow: 0 4px 20px rgba(180, 83, 9, 0.35);
-}
-.next-pay-glow-1 {
-  position: absolute;
-  right: -20px;
-  top: -20px;
-  width: 100px;
-  height: 100px;
-  border-radius: 9999px;
-  background: white;
-  opacity: 0.12;
-  pointer-events: none;
-}
-.next-pay-glow-2 {
-  position: absolute;
-  bottom: -30px;
-  right: 80px;
-  width: 80px;
-  height: 80px;
-  border-radius: 9999px;
-  background: white;
-  opacity: 0.06;
-  pointer-events: none;
+/* ── Badge próximo pago ────────────────────────── */
+.next-pay-badge {
+  background: rgba(180, 83, 9, 0.09);
+  border: 1px solid rgba(180, 83, 9, 0.2);
 }
 
 /* ── Filas de compras ──────────────────────────── */
