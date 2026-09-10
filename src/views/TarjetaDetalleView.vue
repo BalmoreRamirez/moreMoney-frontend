@@ -401,17 +401,14 @@ const cuotasCorteActual = computed(() => {
       .filter(q => q.estado === 'pendiente')
       .sort((a, b) => a.numero_cuota - b.numero_cuota)[0]
     if (!primera) continue
-    const fechaEst = new Date(primera.fecha_estimada_pago + 'T00:00:00')
-    if (fechaEst <= lastCutDate.value) {
-      result.push({
-        cuotaId:     primera.id,
-        nombre:      c.nombre,
-        numeroCuota: primera.numero_cuota,
-        totalCuotas: c.total_cuotas,
-        fechaEstimada: primera.fecha_estimada_pago,
-        monto:       parseFloat(primera.monto_cuota),
-      })
-    }
+    result.push({
+      cuotaId:     primera.id,
+      nombre:      c.nombre,
+      numeroCuota: primera.numero_cuota,
+      totalCuotas: c.total_cuotas,
+      fechaEstimada: primera.fecha_estimada_pago,
+      monto:       parseFloat(primera.monto_cuota),
+    })
   }
   return result
 })
