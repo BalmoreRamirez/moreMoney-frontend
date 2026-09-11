@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-8" @mousedown.self="close">
         <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="modal-box relative w-full max-w-lg rounded-2xl shadow-card">
+        <div class="modal-box relative w-full max-w-lg rounded-2xl shadow-card flex flex-col" style="max-height:calc(100vh - 4rem)">
           <!-- Header -->
-          <div class="flex items-start justify-between p-6 pb-4">
+          <div class="flex shrink-0 items-start justify-between p-6 pb-4">
             <div>
               <h2 class="text-lg font-semibold" style="color:var(--color-text-primary)">{{ tituloMes }}</h2>
               <p class="mt-0.5 text-sm" style="color:var(--color-text-secondary)">{{ tarjetaNombre }} — {{ banco }}</p>
@@ -17,12 +17,12 @@
           </div>
 
           <!-- Loading -->
-          <div v-if="store.loadingDetalle" class="flex items-center justify-center py-12">
+          <div v-if="store.loadingDetalle" class="flex items-center justify-center overflow-y-auto py-12">
             <span class="material-symbols-outlined animate-spin text-3xl" style="color:var(--color-success)">progress_activity</span>
           </div>
 
           <!-- Content -->
-          <div v-else-if="store.detalle" class="px-6 pb-6 space-y-5">
+          <div v-else-if="store.detalle" class="overflow-y-auto px-6 pb-6 space-y-5">
 
             <!-- Compras normales -->
             <div>
