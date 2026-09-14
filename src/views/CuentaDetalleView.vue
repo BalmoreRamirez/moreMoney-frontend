@@ -223,7 +223,7 @@ const fechaHasta  = ref('')
 const tipoOpts    = [{ value: '', label: 'Todos' }, { value: 'ingreso', label: 'Ingresos' }, { value: 'egreso', label: 'Egresos' }]
 
 onMounted(async () => {
-  await cuentasStore.fetchCuentas()
+  await cuentasStore.fetchCuentas(true)
   recargar()
 })
 

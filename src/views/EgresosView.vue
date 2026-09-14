@@ -9,7 +9,7 @@
       <button
         class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         style="background:#DC2626"
-        @click="showForm = true"
+        @click="abrirCrear"
       >
         <span class="material-symbols-outlined text-[18px]">add</span>
         Nuevo egreso
@@ -158,6 +158,8 @@ function formatDate(d) {
   const [y, m, dd] = d.split('-')
   return `${dd}/${m}/${y}`
 }
+
+function abrirCrear() { egresoEditar.value = null; showForm.value = true }
 
 function editarEgreso(e) {
   egresoEditar.value = e

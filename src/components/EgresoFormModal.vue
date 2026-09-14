@@ -124,7 +124,7 @@ watch(() => props.modelValue, async (open) => {
       form.value = {
         descripcion: props.egreso.descripcion,
         monto:       parseFloat(props.egreso.monto),
-        fecha:       props.egreso.fecha,
+        fecha:       (props.egreso.fecha ?? '').split('T')[0],
         cuenta_id:   props.egreso.cuenta_id,
       }
     } else {

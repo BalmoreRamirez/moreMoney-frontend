@@ -153,7 +153,7 @@ import TransferenciaModal from '../components/TransferenciaModal.vue'
 const store  = useCuentasStore()
 const router = useRouter()
 
-onMounted(() => store.fetchCuentas())
+onMounted(() => store.fetchCuentas(true))
 
 function goToDetalle(id) { router.push(`/cuentas/${id}`) }
 
