@@ -4,12 +4,12 @@
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
         <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
+        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
           <div class="mb-5 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-slate-900">
+            <h2 class="text-lg font-semibold" style="color:var(--color-text-primary)">
               {{ isEdit ? 'Editar compra tasa cero' : 'Nueva compra tasa cero' }}
             </h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900" @click="close">
+            <button class="icon-btn" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -23,7 +23,7 @@
           <form @submit.prevent="submit" class="space-y-4">
             <!-- Tarjeta -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Tarjeta</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Tarjeta</label>
               <select v-model="form.tarjeta_id" class="fintech-input" :disabled="isEdit && hasPaidCuotas" required>
                 <option value="" disabled>Selecciona una tarjeta…</option>
                 <option v-for="t in tarjetas" :key="t.id" :value="t.id">
