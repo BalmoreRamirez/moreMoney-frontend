@@ -35,7 +35,7 @@
 
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Descripción del producto</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Descripción del producto</label>
               <input v-model.trim="form.nombre" type="text" class="fintech-input" placeholder="Ej: Laptop Dell" required />
               <p v-if="errors.nombre" class="mt-1 text-xs text-danger">{{ errors.nombre }}</p>
             </div>
@@ -43,9 +43,9 @@
             <!-- Monto total + cuotas -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-500">Monto total</label>
+                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Monto total</label>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-500">$</span>
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm" style="color:var(--color-text-muted)">$</span>
                   <input
                     v-model="form.monto_total" type="number" step="0.01" min="0.01"
                     class="fintech-input pl-7 font-mono"
@@ -57,7 +57,7 @@
                 <p v-if="errors.monto_total" class="mt-1 text-xs text-danger">{{ errors.monto_total }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-500">N° de cuotas</label>
+                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">N° de cuotas</label>
                 <input
                   v-model.number="form.total_cuotas" type="number" min="1" max="60"
                   class="fintech-input"
@@ -71,13 +71,13 @@
 
             <!-- Preview cuota mensual -->
             <div v-if="cuotaMensual" class="flex items-center justify-between rounded-xl px-4 py-3" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
-              <span class="text-xs text-slate-500">Cuota mensual estimada</span>
+              <span class="text-xs" style="color:var(--color-text-muted)">Cuota mensual estimada</span>
               <span class="font-mono text-lg font-bold text-success">{{ cuotaMensual }}</span>
             </div>
 
             <!-- Fecha -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Fecha de compra</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Fecha de compra</label>
               <input
                 v-model="form.fecha_compra" type="date"
                 class="fintech-input"
@@ -93,8 +93,8 @@
             </div>
 
             <div class="flex gap-3 pt-2">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">Cancelar</button>
-              <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
+              <button type="button" class="btn-ghost flex-1" @click="close">Cancelar</button>
+              <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
                 {{ saving
                   ? (isEdit ? 'Guardando…' : 'Generando cuotas…')
                   : (isEdit ? 'Guardar cambios' : 'Crear y generar cuotas') }}

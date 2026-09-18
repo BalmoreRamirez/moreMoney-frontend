@@ -41,7 +41,7 @@
         text-anchor="middle"
         font-family="Roboto Mono, monospace"
         font-size="11"
-        fill="#94A3B8"
+        :style="{ fill: 'var(--color-text-muted)' }"
       >Disponible</text>
       <text
         :x="center" :y="center + 14"
@@ -57,21 +57,21 @@
     <div class="mt-4 flex w-full max-w-[220px] flex-col gap-2">
       <div class="flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
-          <span class="h-2.5 w-2.5 rounded-full" style="background:#10B981" />
-          <span class="text-slate-600">Disponible</span>
+          <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-success)" />
+          <span style="color:var(--color-text-secondary)">Disponible</span>
         </div>
         <span class="font-mono font-semibold text-success">{{ formatCurrency(disponible) }}</span>
       </div>
       <div class="flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
           <span class="h-2.5 w-2.5 rounded-full" :style="{ background: gastadoColor }" />
-          <span class="text-slate-600">Gastado</span>
+          <span style="color:var(--color-text-secondary)">Gastado</span>
         </div>
         <span class="font-mono font-semibold" :style="{ color: gastadoColor }">{{ formatCurrency(gastado) }}</span>
       </div>
-      <div class="mt-1 flex items-center justify-between border-t pt-2 text-xs" style="border-color:#E2E8F0">
-        <span class="text-slate-600">Límite total</span>
-        <span class="font-mono text-slate-700">{{ formatCurrency(limite) }}</span>
+      <div class="mt-1 flex items-center justify-between border-t pt-2 text-xs" style="border-color:var(--color-border)">
+        <span style="color:var(--color-text-secondary)">Límite total</span>
+        <span class="font-mono" style="color:var(--color-text-primary)">{{ formatCurrency(limite) }}</span>
       </div>
     </div>
   </div>
@@ -107,13 +107,13 @@ const gastadoLen    = computed(() => (gastadoPct.value / 100) * circumference.va
 const gastadoDeg = computed(() => -90 + (disponiblePct.value / 100) * 360)
 
 const gastadoColor = computed(() => {
-  if (gastadoPct.value >= 90) return '#DC2626'
-  if (gastadoPct.value >= 70) return '#F59E0B'
-  return '#94A3B8'
+  if (gastadoPct.value >= 90) return 'var(--color-danger)'
+  if (gastadoPct.value >= 70) return 'var(--color-alert)'
+  return 'var(--color-text-muted)'
 })
 const disponibleColor = computed(() => {
-  if (disponiblePct.value <= 10) return '#DC2626'
-  if (disponiblePct.value <= 30) return '#F59E0B'
-  return '#10B981'
+  if (disponiblePct.value <= 10) return 'var(--color-danger)'
+  if (disponiblePct.value <= 30) return 'var(--color-alert)'
+  return 'var(--color-success)'
 })
 </script>

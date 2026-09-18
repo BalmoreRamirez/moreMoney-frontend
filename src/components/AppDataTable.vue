@@ -20,7 +20,7 @@
         <div class="flex flex-col items-center py-8 text-center">
           <span
             class="material-symbols-outlined text-4xl mb-2"
-            style="color:var(--color-border)"
+            style="color:var(--color-text-muted);opacity:0.3"
           >{{ emptyIcon }}</span>
           <p class="text-sm" style="color:var(--color-text-muted)">{{ emptyText }}</p>
         </div>

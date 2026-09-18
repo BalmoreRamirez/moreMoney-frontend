@@ -147,8 +147,8 @@ const usagePercent = computed(() => {
 })
 
 const usageColor = computed(() => {
-  if (usagePercent.value >= 90) return '#EF4444'
-  if (usagePercent.value >= 70) return '#F59E0B'
-  return '#34D399'
+  if (usagePercent.value >= 90) return 'var(--color-danger)'
+  if (usagePercent.value >= 70) return 'var(--color-alert)'
+  return 'var(--color-success)'
 })
 </script>
