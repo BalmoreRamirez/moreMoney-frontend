@@ -52,18 +52,18 @@
               required
               class="fintech-input w-full"
             />
-            <p v-if="nuevoTotal !== null" class="mt-1 text-xs text-slate-600">
-              Total cobrado después: <span class="font-mono font-semibold text-slate-600">{{ formatCurrency(nuevoTotal) }}</span>
+            <p v-if="nuevoTotal !== null" class="mt-1 text-xs" style="color:var(--color-text-secondary)">
+              Total cobrado después: <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(nuevoTotal) }}</span>
             </p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-600">Fecha de cobro</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Fecha de cobro</label>
             <input v-model="form.fecha_cobro" type="date" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-600">Cuenta de ingreso</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Cuenta de ingreso</label>
             <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -71,27 +71,26 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-600">Nota <span class="text-slate-600">(opcional)</span></label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Nota <span style="color:var(--color-text-secondary)">(opcional)</span></label>
             <input v-model="form.nota" type="text" placeholder="Ej. Pago parcial cliente" class="fintech-input w-full" />
           </div>
 
           <!-- Toggle pago final (solo si no hay precio esperado o aún no se cubre) -->
           <label v-if="mostrarToggleFinal" class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
             <input v-model="form.es_pago_final" type="checkbox" class="h-4 w-4 accent-blue-500" />
-            <span class="text-sm text-slate-600">Este es el pago final — cerrar inversión</span>
+            <span class="text-sm" style="color:var(--color-text-secondary)">Este es el pago final — cerrar inversión</span>
           </label>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-1">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
             <button
               type="submit"
               :disabled="saving"
-              class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-              style="background:#10B981"
+              class="btn-brand flex-1 disabled:opacity-50"
             >
               {{ saving ? 'Guardando…' : 'Registrar cobro' }}
             </button>

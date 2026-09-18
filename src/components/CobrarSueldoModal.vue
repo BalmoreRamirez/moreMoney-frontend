@@ -8,37 +8,37 @@
       />
       <div
         class="relative w-full max-w-sm rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">Registrar cobro</h2>
-        <p class="mt-1 text-xs text-slate-500">{{ sueldo?.nombre }}</p>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Registrar cobro</h2>
+        <p class="mt-1 text-xs" style="color:var(--color-text-muted)">{{ sueldo?.nombre }}</p>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-500">Mes</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Mes</label>
               <select v-model.number="form.mes" required class="fintech-input w-full">
                 <option v-for="(m, i) in MESES" :key="i" :value="i + 1">{{ m }}</option>
               </select>
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-500">Año</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Año</label>
               <input v-model.number="form.anio" type="number" min="2000" max="2099" required class="fintech-input w-full" />
             </div>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Fecha de cobro</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de cobro</label>
             <input v-model="form.fecha_cobro" type="date" required class="fintech-input w-full" />
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Registrando…' : 'Confirmar cobro' }}
             </button>
           </div>

@@ -8,32 +8,32 @@
       />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">Registrar venta</h2>
-        <p class="mt-1 text-xs text-slate-500">{{ inversion?.nombre }}</p>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Registrar venta</h2>
+        <p class="mt-1 text-xs" style="color:var(--color-text-muted)">{{ inversion?.nombre }}</p>
 
-        <div v-if="inversion" class="mt-3 rounded-lg px-4 py-2.5 text-xs" style="background:rgba(10,25,47,0.04)">
-          <span class="text-slate-500">Costo: </span>
-          <span class="font-mono font-semibold text-slate-600">{{ formatCurrency(inversion.costo_total) }}</span>
+        <div v-if="inversion" class="mt-3 rounded-lg px-4 py-2.5 text-xs" style="background:var(--color-surface-mid)">
+          <span style="color:var(--color-text-muted)">Costo: </span>
+          <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(inversion.costo_total) }}</span>
         </div>
 
         <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Precio de venta total ($)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Precio de venta total ($)</label>
             <input v-model.number="form.precio_venta_total" type="number" min="0.01" step="0.01" placeholder="200.00" required class="fintech-input w-full" />
-            <p v-if="ganancia !== null" class="mt-1 text-xs" :style="{ color: ganancia >= 0 ? '#10B981' : '#DC2626' }">
+            <p v-if="ganancia !== null" class="mt-1 text-xs" :style="{ color: ganancia >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
               Ganancia: {{ formatCurrency(ganancia) }}
             </p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Fecha de venta</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de venta</label>
             <input v-model="form.fecha_venta" type="date" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Cuenta de ingreso (donde entra el dinero)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de ingreso (donde entra el dinero)</label>
             <select v-model.number="form.cuenta_ingreso_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -43,10 +43,10 @@
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Guardando…' : 'Confirmar venta' }}
             </button>
           </div>

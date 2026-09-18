@@ -4,11 +4,11 @@
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
         <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="relative w-full max-w-md rounded-2xl shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
+        <div class="relative w-full max-w-md rounded-2xl shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
           <!-- Header -->
           <div class="flex items-center justify-between p-6 pb-4">
-            <h2 class="text-lg font-semibold text-slate-900">{{ egreso ? 'Editar egreso' : 'Nuevo egreso' }}</h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900" @click="close">
+            <h2 class="text-lg font-semibold" style="color:var(--color-text-primary)">{{ egreso ? 'Editar egreso' : 'Nuevo egreso' }}</h2>
+            <button class="icon-btn" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -18,7 +18,7 @@
 
             <!-- Descripción -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Descripción</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Descripción</label>
               <input
                 v-model="form.descripcion"
                 type="text"
@@ -30,7 +30,7 @@
 
             <!-- Monto -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Monto</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Monto</label>
               <input
                 v-model.number="form.monto"
                 type="number"
@@ -44,7 +44,7 @@
 
             <!-- Fecha -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Fecha</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Fecha</label>
               <input
                 v-model="form.fecha"
                 type="date"
