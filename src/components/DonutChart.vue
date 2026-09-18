@@ -5,7 +5,7 @@
       <circle
         :cx="center" :cy="center" :r="radius"
         fill="none"
-        stroke="#E8EDF5"
+        :style="{ stroke: 'var(--color-border)' }"
         :stroke-width="thickness"
       />
 
@@ -14,7 +14,7 @@
         v-if="disponiblePct > 0"
         :cx="center" :cy="center" :r="radius"
         fill="none"
-        stroke="#10B981"
+        :style="{ stroke: 'var(--color-success)' }"
         :stroke-width="thickness"
         stroke-linecap="butt"
         :stroke-dasharray="`${disponibleLen} ${circumference}`"

@@ -8,32 +8,32 @@
       />
       <div
         class="relative w-full max-w-sm rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">Pagar cuota</h2>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Pagar cuota</h2>
 
-        <div v-if="cuota" class="mt-3 rounded-xl px-4 py-3 text-xs space-y-1.5" style="background:rgba(10,25,47,0.04)">
-          <div class="flex justify-between text-slate-600">
+        <div v-if="cuota" class="mt-3 rounded-xl px-4 py-3 text-xs space-y-1.5" style="background:var(--color-surface-mid)">
+          <div class="flex justify-between" style="color:var(--color-text-secondary)">
             <span>Cuota</span>
-            <span class="text-slate-600">{{ cuota.numero_cuota }} / {{ credito?.num_cuotas }}</span>
+            <span style="color:var(--color-text-secondary)">{{ cuota.numero_cuota }} / {{ credito?.num_cuotas }}</span>
           </div>
-          <div class="flex justify-between text-slate-600">
+          <div class="flex justify-between" style="color:var(--color-text-secondary)">
             <span>Capital</span>
-            <span class="font-mono text-slate-600">{{ formatCurrency(cuota.capital_cuota) }}</span>
+            <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(cuota.capital_cuota) }}</span>
           </div>
-          <div class="flex justify-between text-slate-600">
+          <div class="flex justify-between" style="color:var(--color-text-secondary)">
             <span>Interés</span>
-            <span class="font-mono" style="color:#D97706">{{ formatCurrency(cuota.interes_cuota) }}</span>
+            <span class="font-mono" style="color:var(--color-alert)">{{ formatCurrency(cuota.interes_cuota) }}</span>
           </div>
-          <div class="flex justify-between text-slate-600 pt-1" style="border-top:1px solid #E8EDF5">
-            <span class="font-semibold text-slate-600">Total a pagar</span>
-            <span class="font-mono font-bold" style="color:#3B82F6">{{ formatCurrency(cuota.monto_total_cuota) }}</span>
+          <div class="flex justify-between pt-1" style="border-top:1px solid var(--color-border);color:var(--color-text-secondary)">
+            <span class="font-semibold" style="color:var(--color-text-secondary)">Total a pagar</span>
+            <span class="font-mono font-bold" style="color:var(--color-brand)">{{ formatCurrency(cuota.monto_total_cuota) }}</span>
           </div>
         </div>
 
         <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Cuenta de donde sale el pago</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de donde sale el pago</label>
             <select v-model.number="form.cuenta_pago_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -41,17 +41,17 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Fecha de pago</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de pago</label>
             <input v-model="form.fecha_pago" type="date" required class="fintech-input w-full" />
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#3B82F6">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Procesando…' : 'Confirmar pago' }}
             </button>
           </div>

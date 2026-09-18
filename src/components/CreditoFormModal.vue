@@ -8,50 +8,50 @@
       />
       <div
         class="relative w-full max-w-lg rounded-2xl p-6 shadow-card overflow-y-auto max-h-[90vh]"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">Nuevo crédito recibido</h2>
-        <p class="mt-1 text-xs text-slate-600">Préstamo que tú recibiste para cubrir un gasto.</p>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Nuevo crédito recibido</h2>
+        <p class="mt-1 text-xs" style="color:var(--color-text-secondary)">Préstamo que tú recibiste para cubrir un gasto.</p>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-600">Nombre / descripción</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Nombre / descripción</label>
             <input v-model="form.nombre" type="text" placeholder="Ej. Préstamo para pagar Visa BHD" required class="fintech-input w-full" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-600">Capital recibido ($)</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Capital recibido ($)</label>
               <input v-model.number="form.capital" type="number" min="0.01" step="0.01" placeholder="5000.00" required class="fintech-input w-full" />
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-600">Número de cuotas</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Número de cuotas</label>
               <input v-model.number="form.num_cuotas" type="number" min="1" step="1" placeholder="12" required class="fintech-input w-full" />
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-600">Tipo de interés</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Tipo de interés</label>
               <select v-model="form.tipo_interes" required class="fintech-input w-full">
                 <option value="simple">Interés simple</option>
                 <option value="compuesto">Interés compuesto</option>
               </select>
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-600">Tasa mensual (%)</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Tasa mensual (%)</label>
               <input v-model.number="form.tasa_display" type="number" min="0" max="100" step="0.01" placeholder="3" required class="fintech-input w-full" />
-              <p class="mt-1 text-[10px] text-slate-600">Ej: 3 = 3% por mes</p>
+              <p class="mt-1 text-[10px]" style="color:var(--color-text-secondary)">Ej: 3 = 3% por mes</p>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-600">Fecha de inicio</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Fecha de inicio</label>
               <input v-model="form.fecha_inicio" type="date" required class="fintech-input w-full" />
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-600">Cuenta donde entra el dinero</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Cuenta donde entra el dinero</label>
               <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
                 <option value="" disabled>Selecciona</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }}</option>
@@ -61,34 +61,34 @@
 
           <!-- Propósito opcional -->
           <div>
-            <label class="mb-1.5 block text-xs text-slate-600">Propósito (opcional)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Propósito (opcional)</label>
             <input v-model="form.proposito_tipo" type="text" placeholder="Ej. pago_tarjeta, egreso, compra" class="fintech-input w-full" />
           </div>
 
           <!-- Resumen de amortización -->
-          <div v-if="resumen" class="rounded-xl px-4 py-3 text-xs space-y-1" style="background:rgba(10,25,47,0.04);border:1px solid #E2E8F0">
-            <p class="font-semibold text-slate-600 mb-2">Resumen estimado</p>
-            <div class="flex justify-between text-slate-600">
+          <div v-if="resumen" class="rounded-xl px-4 py-3 text-xs space-y-1" style="background:var(--color-surface-mid);border:1px solid var(--color-border)">
+            <p class="font-semibold mb-2" style="color:var(--color-text-secondary)">Resumen estimado</p>
+            <div class="flex justify-between" style="color:var(--color-text-secondary)">
               <span>Cuota mensual</span>
-              <span class="font-mono text-slate-600">{{ formatCurrency(resumen.cuota) }}</span>
+              <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(resumen.cuota) }}</span>
             </div>
-            <div class="flex justify-between text-slate-600">
+            <div class="flex justify-between" style="color:var(--color-text-secondary)">
               <span>Total intereses</span>
-              <span class="font-mono" style="color:#D97706">{{ formatCurrency(resumen.totalInteres) }}</span>
+              <span class="font-mono" style="color:var(--color-alert)">{{ formatCurrency(resumen.totalInteres) }}</span>
             </div>
-            <div class="flex justify-between text-slate-600">
+            <div class="flex justify-between" style="color:var(--color-text-secondary)">
               <span>Total a pagar</span>
-              <span class="font-mono text-slate-700 font-semibold">{{ formatCurrency(resumen.totalPagar) }}</span>
+              <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(resumen.totalPagar) }}</span>
             </div>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#3B82F6">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Guardando…' : 'Registrar crédito' }}
             </button>
           </div>

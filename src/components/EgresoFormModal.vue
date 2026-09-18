@@ -55,7 +55,7 @@
 
             <!-- Cuenta -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Cuenta</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Cuenta</label>
               <select v-model.number="form.cuenta_id" class="fintech-input" required>
                 <option :value="null" disabled>Selecciona una cuenta</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
@@ -65,18 +65,18 @@
             </div>
 
             <!-- Error -->
-            <p v-if="errorMsg" class="text-sm" style="color:#DC2626">{{ errorMsg }}</p>
+            <p v-if="errorMsg" class="text-sm" style="color:var(--color-danger)">{{ errorMsg }}</p>
 
             <!-- Actions -->
             <div class="flex gap-3 pt-1">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+              <button type="button" class="btn-ghost flex-1" @click="close">
                 Cancelar
               </button>
               <button
                 type="submit"
                 :disabled="saving"
                 class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-40"
-                style="background:#DC2626"
+                style="background:var(--color-danger)"
               >
                 {{ saving ? 'Guardando…' : (egreso ? 'Guardar cambios' : 'Registrar egreso') }}
               </button>
