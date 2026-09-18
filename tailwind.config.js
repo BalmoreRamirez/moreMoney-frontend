@@ -4,23 +4,29 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Urbanist', 'sans-serif'],
         mono: ['Roboto Mono', 'monospace'],
       },
       colors: {
-        // Primario — confianza institucional
+        // Primario — brand navy
         navy: {
-          DEFAULT: '#0A192F',
-          50:  '#E8EDF5',
-          100: '#C6D2E5',
-          200: '#8FA8C8',
-          300: '#5880AD',
+          DEFAULT: '#03246B',
+          50:  '#E8EDF8',
+          100: '#C6D2EC',
+          200: '#8FA8D5',
+          300: '#5880BE',
           400: '#2D5991',
-          500: '#0A192F',
-          600: '#081423',
-          700: '#060F1A',
-          800: '#040A12',
-          900: '#020509',
+          500: '#03246B',
+          600: '#021C53',
+          700: '#01133B',
+          800: '#010D2A',
+          900: '#000714',
+        },
+        // Accent — golden
+        gold: {
+          DEFAULT: '#F8BD26',
+          light:   '#FEDE81',
+          dark:    '#D9970A',
         },
         // Éxito / Disponible / Pagado
         success: {

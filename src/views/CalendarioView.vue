@@ -3,25 +3,25 @@
     <!-- Page header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Calendario</h1>
-        <p class="mt-1 text-sm" style="color:#64748B">Cortes y fechas de pago de tus tarjetas.</p>
+        <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Calendario</h1>
+        <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Cortes y fechas de pago de tus tarjetas.</p>
       </div>
     </div>
 
     <!-- Month navigation -->
     <div class="mt-6 flex items-center justify-between">
       <button
-        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium nav-btn transition-colors"
         @click="prevMonth"
       >
         <span class="material-symbols-outlined text-[18px]">chevron_left</span>
         Anterior
       </button>
 
-      <h2 class="text-xl font-semibold text-slate-900">{{ MONTHS[store.month - 1] }} {{ store.year }}</h2>
+      <h2 class="text-xl font-semibold" style="color:var(--color-text-primary)">{{ MONTHS[store.month - 1] }} {{ store.year }}</h2>
 
       <button
-        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium nav-btn transition-colors"
         @click="nextMonth"
       >
         Siguiente
@@ -31,17 +31,17 @@
 
     <!-- Legend -->
     <div class="mt-4 flex flex-wrap items-center gap-3 sm:gap-5">
-      <div class="flex items-center gap-2 text-xs text-slate-500">
+      <div class="flex items-center gap-2 text-xs legend-text">
         <span class="h-4 w-1 flex-shrink-0 rounded-full" style="background:rgba(59,130,246,0.6)" />
         <span class="h-4 w-4 flex-shrink-0 rounded" style="background:rgba(59,130,246,0.08)" />
         Corte
       </div>
-      <div class="flex items-center gap-2 text-xs text-slate-500">
+      <div class="flex items-center gap-2 text-xs legend-text">
         <span class="h-4 w-4 flex-shrink-0 rounded" style="background:rgba(16,185,129,0.1)" />
         Pago (pendiente)
       </div>
-      <div class="flex items-center gap-2 text-xs text-slate-500">
-        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full" style="background:#374151" />
+      <div class="flex items-center gap-2 text-xs legend-text">
+        <span class="h-2.5 w-2.5 flex-shrink-0 rounded-full legend-dot-neutral" />
         Pago (al día)
       </div>
     </div>
@@ -59,7 +59,7 @@
           v-for="(day, i) in DAYS"
           :key="day"
           class="py-2 text-center text-[10px] font-semibold uppercase tracking-wider sm:py-3 sm:text-xs"
-          style="color:#94A3B8"
+          style="color:var(--color-text-secondary)"
         >
           <!-- Inicial en móvil, abreviatura completa en sm+ -->
           <span class="sm:hidden">{{ DAYS_SHORT[i] }}</span>
@@ -90,8 +90,8 @@
             <span
               v-if="day"
               class="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium sm:h-6 sm:w-6 sm:text-xs"
-              :class="isToday(day) ? 'text-white font-bold' : 'text-slate-500'"
-              :style="isToday(day) ? 'background:#10B981' : ''"
+              :class="isToday(day) ? 'text-white font-bold' : ''"
+              :style="isToday(day) ? 'background:var(--color-brand)' : 'color:var(--color-text-secondary)'"
             >{{ day }}</span>
 
             <!-- Events: solo puntos de color en móvil, etiquetas en sm+ -->
@@ -104,8 +104,8 @@
                 style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2)"
                 :title="`Corte: ${ev.tarjeta_nombre} (${ev.banco})`"
               >
-                <span class="h-1.5 w-1.5 flex-shrink-0 rounded-full" style="background:#3B82F6" />
-                <span class="hidden truncate text-[10px] sm:block" style="color:#2D5991">{{ ev.tarjeta_nombre }}</span>
+                <span class="h-1.5 w-1.5 flex-shrink-0 rounded-full" style="background:var(--color-brand)" />
+                <span class="hidden truncate text-[10px] sm:block" style="color:var(--color-brand)">{{ ev.tarjeta_nombre }}</span>
               </div>
 
               <!-- Pago events -->
@@ -115,23 +115,23 @@
                 type="button"
                 class="flex w-full items-center gap-1 rounded-md px-1 py-0.5 text-left transition-opacity hover:opacity-80 sm:px-1.5"
                 :style="ev.tiene_pendientes
-                  ? 'background:rgba(5,150,105,0.10);border:1px solid rgba(16,185,129,0.25)'
-                  : 'background:rgba(10,25,47,0.02);border:1px solid #E8EDF5'"
+                  ? 'background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25)'
+                  : 'background:var(--color-surface-mid);border:1px solid var(--color-border)'"
                 :title="`Pago: ${ev.tarjeta_nombre} · ${ev.tiene_pendientes ? ev.pendientes_count + ' pendientes' : 'Al día'}`"
                 @click="openPago(ev)"
               >
                 <span
                   class="h-1.5 w-1.5 flex-shrink-0 rounded-full"
-                  :style="ev.tiene_pendientes ? 'background:#10B981' : 'background:#374151'"
+                  :style="ev.tiene_pendientes ? 'background:var(--color-success)' : 'background:var(--color-text-muted)'"
                 />
                 <span
                   class="hidden truncate text-[10px] sm:block"
-                  :style="ev.tiene_pendientes ? 'color:#059669' : 'color:#94A3B8'"
+                  :style="ev.tiene_pendientes ? 'color:var(--color-success)' : 'color:var(--color-text-muted)'"
                 >{{ ev.tarjeta_nombre }}</span>
                 <span
                   v-if="ev.tiene_pendientes && ev.monto_total > 0"
                   class="ml-auto hidden flex-shrink-0 text-[9px] font-bold sm:block"
-                  style="color:#10B981"
+                  style="color:var(--color-success)"
                 >{{ formatMonto(ev.monto_total) }}</span>
               </button>
             </div>
@@ -141,7 +141,7 @@
     </div>
 
     <!-- Empty state: no tarjetas -->
-    <div v-if="!store.loading && store.tarjetas.length === 0" class="mt-4 rounded-xl px-6 py-8 text-center text-sm text-slate-500" style="background:rgba(10,25,47,0.02);border:1px dashed #E2E8F0">
+    <div v-if="!store.loading && store.tarjetas.length === 0" class="mt-4 rounded-xl px-6 py-8 text-center text-sm" style="color:var(--color-text-secondary);background:var(--color-surface-mid);border:1px dashed var(--color-border)">
       No tienes tarjetas registradas. Añade una desde la sección <router-link to="/tarjetas" class="text-success hover:underline">Tarjetas</router-link>.
     </div>
 
@@ -262,5 +262,17 @@ function onConfirmed() {
 }
 .cell-border-r {
   border-right: 1px solid var(--color-border);
+}
+.nav-btn {
+  color: var(--color-text-secondary);
+}
+.nav-btn:hover {
+  background: var(--color-surface-high);
+}
+.legend-text {
+  color: var(--color-text-secondary);
+}
+.legend-dot-neutral {
+  background: var(--color-text-muted);
 }
 </style>

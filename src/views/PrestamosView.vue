@@ -3,14 +3,10 @@
     <!-- Encabezado -->
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Préstamos</h1>
-        <p class="mt-1 text-sm text-slate-400">Créditos otorgados a terceros con interés simple.</p>
+        <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Préstamos</h1>
+        <p class="mt-1 text-sm" style="color:var(--color-text-muted)">Créditos otorgados a terceros con interés simple.</p>
       </div>
-      <button
-        class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-        style="background:#10B981"
-        @click="showFormModal = true"
-      >
+      <button class="btn-brand" @click="showFormModal = true">
         <span class="material-symbols-outlined text-[18px]">add</span>
         <span class="hidden sm:inline">Nuevo préstamo</span>
       </button>
@@ -21,28 +17,28 @@
       <!-- Capital prestado -->
       <div class="fintech-card px-5 py-4">
         <div class="flex items-center gap-2 mb-2">
-          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(217,119,6,0.10)">
-            <span class="material-symbols-outlined text-[15px]" style="color:#D97706">handshake</span>
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
+            <span class="material-symbols-outlined text-[15px]" style="color:var(--color-alert)">handshake</span>
           </div>
-          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Capital prestado</span>
+          <span class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">Capital prestado</span>
         </div>
-        <p class="font-mono text-xl font-bold text-slate-800">{{ formatCurrency(kpi.capital) }}</p>
-        <p class="mt-0.5 text-[11px] text-slate-400">{{ store.prestamos.length }} préstamo{{ store.prestamos.length !== 1 ? 's' : '' }}</p>
+        <p class="font-mono text-xl font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(kpi.capital) }}</p>
+        <p class="mt-0.5 text-[11px]" style="color:var(--color-text-muted)">{{ store.prestamos.length }} préstamo{{ store.prestamos.length !== 1 ? 's' : '' }}</p>
       </div>
 
       <!-- Recuperado -->
       <div class="fintech-card px-5 py-4">
         <div class="flex items-center gap-2 mb-2">
-          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(5,150,105,0.10)">
-            <span class="material-symbols-outlined text-[15px]" style="color:#10B981">check_circle</span>
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-success-bg)">
+            <span class="material-symbols-outlined text-[15px]" style="color:var(--color-success)">check_circle</span>
           </div>
-          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Recuperado</span>
+          <span class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">Recuperado</span>
         </div>
-        <p class="font-mono text-xl font-bold" style="color:#10B981">{{ formatCurrency(kpi.pagado) }}</p>
-        <div class="mt-1.5 h-1 w-full rounded-full overflow-hidden" style="background:#E8EDF5">
-          <div class="h-full rounded-full" :style="{ width: kpi.pct + '%', background: '#10B981' }" />
+        <p class="font-mono text-xl font-bold" style="color:var(--color-success)">{{ formatCurrency(kpi.pagado) }}</p>
+        <div class="progress-bar-track mt-1.5">
+          <div class="progress-bar-fill" :style="{ width: kpi.pct + '%' }" />
         </div>
-        <p class="mt-1 text-[11px] text-slate-400">{{ kpi.pct }}% del total adeudado</p>
+        <p class="mt-1 text-[11px]" style="color:var(--color-text-muted)">{{ kpi.pct }}% del total adeudado</p>
       </div>
 
       <!-- Por cobrar -->
@@ -50,19 +46,19 @@
         <div class="flex items-center gap-2 mb-2">
           <div
             class="flex h-7 w-7 items-center justify-center rounded-lg"
-            :style="kpi.restante > 0 ? 'background:rgba(217,119,6,0.10)' : 'background:rgba(5,150,105,0.10)'"
+            :style="kpi.restante > 0 ? 'background:var(--color-alert-bg)' : 'background:var(--color-success-bg)'"
           >
             <span
               class="material-symbols-outlined text-[15px]"
-              :style="kpi.restante > 0 ? 'color:#D97706' : 'color:#10B981'"
+              :style="kpi.restante > 0 ? 'color:var(--color-alert)' : 'color:var(--color-success)'"
             >{{ kpi.restante > 0 ? 'pending' : 'task_alt' }}</span>
           </div>
-          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Por cobrar</span>
+          <span class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">Por cobrar</span>
         </div>
-        <p class="font-mono text-xl font-bold" :style="{ color: kpi.restante > 0 ? '#D97706' : '#10B981' }">
+        <p class="font-mono text-xl font-bold" :style="{ color: kpi.restante > 0 ? 'var(--color-alert)' : 'var(--color-success)' }">
           {{ formatCurrency(kpi.restante) }}
         </p>
-        <p class="mt-0.5 text-[11px] text-slate-400">{{ kpi.activos }} activo{{ kpi.activos !== 1 ? 's' : '' }}</p>
+        <p class="mt-0.5 text-[11px]" style="color:var(--color-text-muted)">{{ kpi.activos }} activo{{ kpi.activos !== 1 ? 's' : '' }}</p>
       </div>
     </div>
 
@@ -72,10 +68,9 @@
         v-for="f in FILTROS"
         :key="f.value"
         class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
-        :class="filtro === f.value ? 'text-slate-900' : 'text-slate-400 hover:text-slate-700'"
         :style="filtro === f.value
-          ? 'background:rgba(5,150,105,0.12);border:1px solid rgba(5,150,105,0.3)'
-          : 'background:rgba(10,25,47,0.03);border:1px solid transparent'"
+          ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid rgba(3,36,107,0.25)'
+          : 'background:var(--color-surface-mid);color:var(--color-text-secondary);border:1px solid transparent'"
         @click="setFiltro(f.value)"
       >
         {{ f.label }}
@@ -103,12 +98,12 @@
             class="flex items-center gap-3 cursor-pointer"
             @click="goToDetalle(p.id)"
           >
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:rgba(217,119,6,0.1)">
-              <span class="material-symbols-outlined text-[16px]" style="color:#D97706">person</span>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
+              <span class="material-symbols-outlined text-[16px]" style="color:var(--color-alert)">person</span>
             </div>
             <div class="min-w-0">
-              <p class="font-semibold text-slate-800 truncate">{{ p.deudor_nombre }}</p>
-              <p class="text-[11px] text-slate-500 truncate">{{ p.deudor_contacto || '—' }}</p>
+              <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ p.deudor_nombre }}</p>
+              <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.deudor_contacto || '—' }}</p>
             </div>
           </div>
         </template>
@@ -127,7 +122,7 @@
       <!-- Capital -->
       <Column field="capital" header="Capital" sortable style="min-width:120px">
         <template #body="{ data: p }">
-          <span class="font-mono font-semibold text-slate-600">{{ formatCurrency(p.capital) }}</span>
+          <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(p.capital) }}</span>
         </template>
       </Column>
 
@@ -135,8 +130,8 @@
       <Column field="interes_generado" header="Interés" sortable style="min-width:130px">
         <template #body="{ data: p }">
           <div>
-            <span class="font-mono text-slate-600">{{ formatCurrency(p.interes_generado) }}</span>
-            <p class="text-[10px] text-slate-600">{{ pctTasa(p.tasa_interes_mensual) }}%/mes</p>
+            <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(p.interes_generado) }}</span>
+            <p class="text-[10px]" style="color:var(--color-text-muted)">{{ pctTasa(p.tasa_interes_mensual) }}%/mes</p>
           </div>
         </template>
       </Column>
@@ -144,7 +139,7 @@
       <!-- Total pagado -->
       <Column field="total_pagado" header="Pagado" sortable style="min-width:120px">
         <template #body="{ data: p }">
-          <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(p.total_pagado) }}</span>
+          <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(p.total_pagado) }}</span>
         </template>
       </Column>
 
@@ -153,7 +148,7 @@
         <template #body="{ data: p }">
           <span
             class="font-mono font-semibold"
-            :style="{ color: p.saldo_pendiente <= 0 ? '#10B981' : '#D97706' }"
+            :style="{ color: p.saldo_pendiente <= 0 ? 'var(--color-success)' : 'var(--color-alert)' }"
           >{{ formatCurrency(Math.max(0, p.saldo_pendiente)) }}</span>
         </template>
       </Column>
@@ -162,14 +157,15 @@
       <Column header="Progreso" style="min-width:140px">
         <template #body="{ data: p }">
           <div>
-            <div class="flex justify-between text-[10px] text-slate-600 mb-1">
+            <div class="flex justify-between text-[10px] mb-1" style="color:var(--color-text-muted)">
               <span>{{ progresoPct(p) }}%</span>
               <span>{{ formatCurrency(p.total_pagado) }} / {{ formatCurrency(p.total_deuda) }}</span>
             </div>
-            <div class="h-1.5 rounded-full overflow-hidden" style="background:#E8EDF5">
+            <div class="progress-bar-track">
               <div
-                class="h-full rounded-full transition-all"
-                :style="{ width: progresoPct(p) + '%', background: p.saldo_pendiente <= 0 ? '#10B981' : '#FBBF24' }"
+                class="progress-bar-fill transition-all"
+                :class="p.saldo_pendiente <= 0 ? '' : 'progress-bar-fill--accent'"
+                :style="{ width: progresoPct(p) + '%' }"
               />
             </div>
           </div>
@@ -180,26 +176,14 @@
       <Column header="" style="min-width:100px;width:100px">
         <template #body="{ data: p }">
           <div class="flex items-center justify-end gap-1">
-            <button
-              class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-              title="Ver detalle"
-              @click="goToDetalle(p.id)"
-            >
+            <button class="icon-btn" title="Ver detalle" @click="goToDetalle(p.id)">
               <span class="material-symbols-outlined text-[16px]">open_in_new</span>
             </button>
             <template v-if="p.estado === 'activo' && !p.pagos?.length">
-              <button
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                title="Editar"
-                @click="openEdit(p)"
-              >
+              <button class="icon-btn" title="Editar" @click="openEdit(p)">
                 <span class="material-symbols-outlined text-[16px]">edit</span>
               </button>
-              <button
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-50 hover:text-danger"
-                title="Eliminar"
-                @click="confirmDelete(p)"
-              >
+              <button class="icon-btn-danger" title="Eliminar" @click="confirmDelete(p)">
                 <span class="material-symbols-outlined text-[16px]">delete</span>
               </button>
             </template>

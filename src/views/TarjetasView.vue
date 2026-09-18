@@ -9,8 +9,7 @@
         </p>
       </div>
       <button
-        class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-        style="background: #10B981"
+        class="btn-brand"
         @click="openCreate"
       >
         <span class="material-symbols-outlined text-[18px]">add</span>
@@ -110,22 +109,16 @@
 
     <!-- Estado vacío -->
     <div v-else class="mt-10 fintech-card flex flex-col items-center justify-center p-16 text-center">
-      <span class="material-symbols-outlined text-5xl" style="color: rgba(16,185,129,0.35)">credit_card_off</span>
-      <p class="mt-3 font-semibold text-slate-600">No tienes tarjetas registradas</p>
-      <p class="mt-1 text-sm text-slate-500">Crea tu primera tarjeta para comenzar a controlar tus gastos.</p>
-      <button
-        class="mt-5 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
-        style="background: #10B981"
-        @click="openCreate"
-      >
-        Agregar tarjeta
-      </button>
+      <span class="material-symbols-outlined text-5xl" style="color:var(--color-brand-light)">credit_card_off</span>
+      <p class="mt-3 font-semibold" style="color:var(--color-text-secondary)">No tienes tarjetas registradas</p>
+      <p class="mt-1 text-sm" style="color:var(--color-text-muted)">Crea tu primera tarjeta para comenzar a controlar tus gastos.</p>
+      <button class="btn-brand mt-5" @click="openCreate">Agregar tarjeta</button>
     </div>
 
     <!-- Paginación -->
     <div v-if="store.totalPages > 1" class="mt-6 flex items-center justify-center gap-2">
       <button
-        class="flex h-8 w-8 items-center justify-center rounded-lg text-sm text-slate-500 transition-colors disabled:opacity-30 hover:bg-slate-100"
+        class="icon-btn disabled:opacity-30"
         :disabled="store.page === 1"
         @click="changePage(store.page - 1)"
       >
@@ -136,17 +129,16 @@
         v-for="p in pageRange"
         :key="p"
         class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-colors"
-        :class="p === store.page
-          ? 'text-white'
-          : 'text-slate-500 hover:bg-slate-100'"
-        :style="p === store.page ? 'background: rgba(16,185,129,0.2); color: #10B981' : ''"
+        :style="p === store.page
+          ? 'background:var(--color-brand-light);color:var(--color-brand);font-weight:700'
+          : 'color:var(--color-text-muted)'"
         @click="changePage(p)"
       >
         {{ p }}
       </button>
 
       <button
-        class="flex h-8 w-8 items-center justify-center rounded-lg text-sm text-slate-500 transition-colors disabled:opacity-30 hover:bg-slate-100"
+        class="icon-btn disabled:opacity-30"
         :disabled="store.page === store.totalPages"
         @click="changePage(store.page + 1)"
       >
@@ -183,7 +175,7 @@
               <button class="flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors" style="color:var(--color-text-secondary);background:var(--color-surface-mid);border:none;cursor:pointer" @click="deleteTarget = null">Cancelar</button>
               <button
                 class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-                style="background: #DC2626"
+                style="background:var(--color-danger)"
                 :disabled="deleting"
                 @click="doDelete"
               >

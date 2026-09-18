@@ -8,24 +8,24 @@
       />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">Registrar cobro</h2>
-        <p class="mt-0.5 text-xs text-slate-600">{{ inversion?.nombre }}</p>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Registrar cobro</h2>
+        <p class="mt-0.5 text-xs" style="color:var(--color-text-secondary)">{{ inversion?.nombre }}</p>
 
         <!-- Resumen -->
-        <div v-if="inversion" class="mt-4 grid grid-cols-3 gap-2 rounded-xl p-3" style="background:rgba(10,25,47,0.04)">
+        <div v-if="inversion" class="mt-4 grid grid-cols-3 gap-2 rounded-xl p-3" style="background:var(--color-surface-mid)">
           <div class="text-center">
-            <p class="text-[10px] uppercase tracking-wider text-slate-600">Costo</p>
-            <p class="mt-0.5 font-mono text-sm font-semibold text-slate-600">{{ formatCurrency(inversion.costo_total) }}</p>
+            <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-secondary)">Costo</p>
+            <p class="mt-0.5 font-mono text-sm font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(inversion.costo_total) }}</p>
           </div>
           <div class="text-center">
-            <p class="text-[10px] uppercase tracking-wider text-slate-600">Ya cobrado</p>
-            <p class="mt-0.5 font-mono text-sm font-semibold" style="color:#10B981">{{ formatCurrency(inversion.total_cobrado ?? 0) }}</p>
+            <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-secondary)">Ya cobrado</p>
+            <p class="mt-0.5 font-mono text-sm font-semibold" style="color:var(--color-success)">{{ formatCurrency(inversion.total_cobrado ?? 0) }}</p>
           </div>
           <div class="text-center">
-            <p class="text-[10px] uppercase tracking-wider text-slate-600">Pendiente</p>
-            <p class="mt-0.5 font-mono text-sm font-semibold" style="color:#D97706">
+            <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-secondary)">Pendiente</p>
+            <p class="mt-0.5 font-mono text-sm font-semibold" style="color:var(--color-alert)">
               {{ inversion.saldo_por_cobrar != null ? formatCurrency(Math.max(0, inversion.saldo_por_cobrar)) : '—' }}
             </p>
           </div>
@@ -33,18 +33,18 @@
 
         <!-- Barra de progreso -->
         <div v-if="inversion?.precio_esperado" class="mt-3">
-          <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(10,25,47,0.04)">
+          <div class="progress-bar-track h-1.5">
             <div
-              class="h-full rounded-full transition-all"
-              :style="{ width: progresoPct + '%', background: '#10B981' }"
+              class="progress-bar-fill h-full transition-all"
+              :style="{ width: progresoPct + '%' }"
             />
           </div>
-          <p class="mt-1 text-right text-[10px] text-slate-600">{{ progresoPct }}% cobrado</p>
+          <p class="mt-1 text-right text-[10px]" style="color:var(--color-text-secondary)">{{ progresoPct }}% cobrado</p>
         </div>
 
         <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-600">Monto a cobrar ($)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Monto a cobrar ($)</label>
             <input
               v-model.number="form.monto"
               type="number" min="0.01" step="0.01"

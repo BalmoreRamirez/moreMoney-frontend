@@ -8,28 +8,28 @@
       />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">{{ editData ? 'Editar sueldo' : 'Nuevo sueldo' }}</h2>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">{{ editData ? 'Editar sueldo' : 'Nuevo sueldo' }}</h2>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Nombre</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nombre</label>
             <input v-model="form.nombre" type="text" placeholder="Ej. Sueldo empresa XYZ" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Monto mensual ($)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Monto mensual ($)</label>
             <input v-model.number="form.monto" type="number" min="0.01" step="0.01" placeholder="700.00" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Día de cobro (1–31)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Día de cobro (1–31)</label>
             <input v-model.number="form.dia_cobro" type="number" min="1" max="31" placeholder="15" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Cuenta de ingreso</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de ingreso</label>
             <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -38,16 +38,16 @@
 
           <div v-if="editData" class="flex items-center gap-2">
             <input id="chk-activo" v-model="form.activo" type="checkbox" class="h-4 w-4 rounded" />
-            <label for="chk-activo" class="text-sm text-slate-600">Sueldo activo</label>
+            <label for="chk-activo" class="text-sm" style="color:var(--color-text-secondary)">Sueldo activo</label>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Guardando…' : (editData ? 'Guardar cambios' : 'Crear sueldo') }}
             </button>
           </div>

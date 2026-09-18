@@ -2,7 +2,8 @@
   <section>
     <!-- Back -->
     <button
-      class="mb-5 flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-700"
+      class="mb-5 flex items-center gap-1.5 text-sm transition-colors"
+      style="color:var(--color-text-muted)"
       @click="router.back()"
     >
       <span class="material-symbols-outlined text-[18px]">arrow_back</span>
@@ -11,7 +12,7 @@
 
     <!-- Loading -->
     <div v-if="store.loading && !store.credito" class="flex justify-center py-20">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" style="border-color:#3B82F6;border-top-color:transparent" />
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" style="border-color:var(--color-brand);border-top-color:transparent" />
     </div>
 
     <template v-else-if="store.credito">
@@ -19,17 +20,17 @@
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div class="flex items-center gap-3">
-            <h1 class="text-2xl font-bold text-slate-800">{{ store.credito.nombre }}</h1>
+            <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">{{ store.credito.nombre }}</h1>
             <span
               class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
               :style="store.credito.estado === 'activo'
-                ? 'background:rgba(59,130,246,0.15);color:#3B82F6'
-                : 'background:rgba(16,185,129,0.15);color:#10B981'"
+                ? 'background:var(--color-brand-light);color:var(--color-brand)'
+                : 'background:rgba(16,185,129,0.15);color:var(--color-success)'"
             >
               {{ store.credito.estado === 'activo' ? 'Activo' : 'Pagado' }}
             </span>
           </div>
-          <p class="mt-1 text-sm text-slate-400">
+          <p class="mt-1 text-sm" style="color:var(--color-text-muted)">
             {{ tipoLabel }} · {{ pctTasa(store.credito.tasa_mensual) }}% mensual ·
             {{ store.credito.num_cuotas }} cuotas · Cuenta: {{ store.credito.cuenta?.nombre }}
           </p>
@@ -39,20 +40,20 @@
       <!-- KPIs -->
       <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div class="fintech-card p-4">
-          <p class="text-[10px] uppercase tracking-wider text-slate-600">Capital</p>
-          <p class="mt-1.5 font-mono text-xl font-bold text-slate-700">{{ formatCurrency(store.credito.capital) }}</p>
+          <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-muted)">Capital</p>
+          <p class="mt-1.5 font-mono text-xl font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(store.credito.capital) }}</p>
         </div>
         <div class="fintech-card p-4">
-          <p class="text-[10px] uppercase tracking-wider text-slate-600">Total interés</p>
-          <p class="mt-1.5 font-mono text-xl font-bold" style="color:#D97706">{{ formatCurrency(store.credito.total_interes) }}</p>
+          <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-muted)">Total interés</p>
+          <p class="mt-1.5 font-mono text-xl font-bold" style="color:var(--color-alert)">{{ formatCurrency(store.credito.total_interes) }}</p>
         </div>
         <div class="fintech-card p-4">
-          <p class="text-[10px] uppercase tracking-wider text-slate-600">Ya pagado</p>
-          <p class="mt-1.5 font-mono text-xl font-bold" style="color:#10B981">{{ formatCurrency(store.credito.total_pagado) }}</p>
+          <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-muted)">Ya pagado</p>
+          <p class="mt-1.5 font-mono text-xl font-bold" style="color:var(--color-success)">{{ formatCurrency(store.credito.total_pagado) }}</p>
         </div>
         <div class="fintech-card p-4">
-          <p class="text-[10px] uppercase tracking-wider text-slate-600">Saldo pendiente</p>
-          <p class="mt-1.5 font-mono text-xl font-bold" :style="{ color: store.credito.saldo_pendiente <= 0 ? '#10B981' : '#DC2626' }">
+          <p class="text-[10px] uppercase tracking-wider" style="color:var(--color-text-muted)">Saldo pendiente</p>
+          <p class="mt-1.5 font-mono text-xl font-bold" :style="{ color: store.credito.saldo_pendiente <= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
             {{ formatCurrency(Math.max(0, store.credito.saldo_pendiente)) }}
           </p>
         </div>
@@ -60,61 +61,61 @@
 
       <!-- Barra de progreso -->
       <div class="mt-4 fintech-card p-5">
-        <div class="flex justify-between text-xs text-slate-500 mb-2">
+        <div class="flex justify-between text-xs mb-2" style="color:var(--color-text-muted)">
           <span>Progreso de pago</span>
           <span>{{ store.credito.cuotas_pagadas }} / {{ store.credito.num_cuotas }} cuotas — {{ progresoPct }}%</span>
         </div>
-        <div class="h-2.5 rounded-full overflow-hidden" style="background:#E8EDF5">
+        <div class="progress-bar-track">
           <div
-            class="h-full rounded-full transition-all duration-500"
-            :style="{ width: progresoPct + '%', background: store.credito.saldo_pendiente <= 0 ? '#10B981' : '#3B82F6' }"
+            class="progress-bar-fill progress-bar-fill--brand transition-all duration-500"
+            :style="{ width: progresoPct + '%' }"
           />
         </div>
-        <p class="mt-2 text-xs text-slate-500">
+        <p class="mt-2 text-xs" style="color:var(--color-text-muted)">
           Deuda total:
-          <span class="font-mono font-semibold text-slate-700">{{ formatCurrency(store.credito.total_deuda) }}</span>
+          <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(store.credito.total_deuda) }}</span>
           (capital + intereses)
         </p>
       </div>
 
       <!-- Tabla de amortización -->
       <div class="mt-6">
-        <h2 class="mb-3 text-sm font-semibold text-slate-600">Tabla de amortización</h2>
+        <h2 class="mb-3 text-sm font-semibold" style="color:var(--color-text-secondary)">Tabla de amortización</h2>
 
         <div class="fintech-card overflow-x-auto">
           <table class="min-w-[600px] w-full text-sm">
             <thead>
-              <tr style="border-bottom:1px solid #E2E8F0">
-                <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">#</th>
-                <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fecha estimada</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capital</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Interés</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total cuota</th>
-                <th class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500">Estado</th>
-                <th class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500">Acción</th>
+              <tr style="border-bottom:1px solid var(--color-border)">
+                <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">#</th>
+                <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Fecha estimada</th>
+                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Capital</th>
+                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Interés</th>
+                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Total cuota</th>
+                <th class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Estado</th>
+                <th class="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Acción</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="cuota in store.credito.cuotas"
                 :key="cuota.id"
-                class="transition-colors hover:bg-slate-50"
-                style="border-bottom:1px solid #E2E8F0"
+                class="transition-colors"
+                style="border-bottom:1px solid var(--color-border)"
               >
-                <td class="px-4 py-3 text-slate-500 font-mono text-xs">{{ cuota.numero_cuota }}</td>
-                <td class="px-4 py-3 text-slate-400 text-xs">
+                <td class="px-4 py-3 font-mono text-xs" style="color:var(--color-text-muted)">{{ cuota.numero_cuota }}</td>
+                <td class="px-4 py-3 text-xs" style="color:var(--color-text-muted)">
                   {{ cuota.fecha_pago || cuota.fecha_estimada }}
-                  <span v-if="cuota.fecha_pago" class="ml-1 text-[10px]" style="color:#10B981">(pagada)</span>
+                  <span v-if="cuota.fecha_pago" class="ml-1 text-[10px]" style="color:var(--color-success)">(pagada)</span>
                 </td>
-                <td class="px-4 py-3 text-right font-mono text-xs text-slate-600">{{ formatCurrency(cuota.capital_cuota) }}</td>
-                <td class="px-4 py-3 text-right font-mono text-xs" style="color:#D97706">{{ formatCurrency(cuota.interes_cuota) }}</td>
-                <td class="px-4 py-3 text-right font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(cuota.monto_total_cuota) }}</td>
+                <td class="px-4 py-3 text-right font-mono text-xs" style="color:var(--color-text-secondary)">{{ formatCurrency(cuota.capital_cuota) }}</td>
+                <td class="px-4 py-3 text-right font-mono text-xs" style="color:var(--color-alert)">{{ formatCurrency(cuota.interes_cuota) }}</td>
+                <td class="px-4 py-3 text-right font-mono text-sm font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(cuota.monto_total_cuota) }}</td>
                 <td class="px-4 py-3 text-center">
                   <span
                     class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
                     :style="cuota.estado === 'pagada'
-                      ? 'background:rgba(16,185,129,0.15);color:#10B981'
-                      : 'background:rgba(10,25,47,0.08);color:#64748B'"
+                      ? 'background:rgba(16,185,129,0.15);color:var(--color-success)'
+                      : 'background:var(--color-surface-mid);color:var(--color-text-muted)'"
                   >
                     {{ cuota.estado === 'pagada' ? 'Pagada' : 'Pendiente' }}
                   </span>
@@ -122,13 +123,12 @@
                 <td class="px-4 py-3 text-center">
                   <button
                     v-if="cuota.estado === 'pendiente' && store.credito.estado === 'activo' && esSiguiente(cuota)"
-                    class="rounded-lg px-3 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-80"
-                    style="background:#3B82F6"
+                    class="btn-brand rounded-lg px-3 py-1 text-[11px]"
                     @click="openPagar(cuota)"
                   >
                     Pagar
                   </button>
-                  <span v-else-if="cuota.estado === 'pendiente'" class="text-[11px] text-slate-600">—</span>
+                  <span v-else-if="cuota.estado === 'pendiente'" class="text-[11px]" style="color:var(--color-text-muted)">—</span>
                 </td>
               </tr>
             </tbody>

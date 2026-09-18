@@ -5,7 +5,7 @@
       <div
         v-if="menuOpen"
         class="fixed inset-0 z-20 lg:hidden"
-        style="background:rgba(15,23,42,0.4);backdrop-filter:blur(4px)"
+        style="background:rgba(3,36,107,0.45);backdrop-filter:blur(4px)"
         @click="menuOpen = false"
       />
     </Transition>
@@ -14,24 +14,30 @@
     <aside
       class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col transition-transform duration-300 lg:translate-x-0"
       :class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
-      style="background:var(--color-surface);border-right:1px solid var(--color-border)"
+      style="background:var(--sidebar-bg)"
     >
       <!-- Logo -->
-      <div class="flex h-16 items-center gap-3 px-5" style="border-bottom:1px solid var(--color-border-soft)">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg" style="background:var(--color-success-bg)">
-          <span class="material-symbols-outlined text-[18px]" style="color:var(--color-success)">account_balance</span>
+      <div class="flex h-16 items-center gap-3 px-5" style="border-bottom:1px solid var(--sidebar-border)">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0"
+          style="background:var(--sidebar-logo-icon-bg)"
+        >
+          <span class="material-symbols-outlined text-[18px]" style="color:var(--sidebar-logo-icon-color)">account_balance</span>
         </div>
-        <span class="text-base font-bold tracking-tight" style="color:var(--color-text-primary)">moreMoney</span>
+        <span class="text-base font-bold tracking-tight" style="color:var(--sidebar-text)">moreMoney</span>
       </div>
 
       <!-- Navegación -->
       <nav class="flex flex-1 flex-col gap-0.5 px-3 py-4 overflow-y-auto">
-        <span class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">General</span>
+        <span
+          class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest"
+          style="color:var(--sidebar-text-muted)"
+        >General</span>
         <router-link
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="nav-link group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150"
+          class="nav-link group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150"
           :class="isActive(item.to) ? 'nav-link--active' : 'nav-link--idle'"
           @click="menuOpen = false"
         >
@@ -44,8 +50,8 @@
       </nav>
 
       <!-- Footer sidebar -->
-      <div class="px-4 py-4" style="border-top:1px solid var(--color-border-soft)">
-        <p class="text-[11px]" style="color:var(--color-text-muted)">moreMoney © {{ currentYear }}</p>
+      <div class="px-4 py-4" style="border-top:1px solid var(--sidebar-border)">
+        <p class="text-[11px]" style="color:var(--sidebar-text-muted)">moreMoney © {{ currentYear }}</p>
       </div>
     </aside>
 
@@ -66,12 +72,11 @@
           >
             <span class="material-symbols-outlined text-[22px]">{{ menuOpen ? 'close' : 'menu' }}</span>
           </button>
-          <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:var(--color-text-muted)">{{ currentNav?.icon }}</span>
-          <span class="text-sm font-semibold" style="color:var(--color-text-primary)">{{ currentNav?.label }}</span>
+          <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:var(--color-brand)">{{ currentNav?.icon }}</span>
+          <span class="text-sm font-bold" style="color:var(--color-text-primary)">{{ currentNav?.label }}</span>
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- Fecha (solo md+) + toggle siempre visible -->
           <div class="flex items-center gap-2">
             <span class="hidden text-xs tabular-nums md:block" style="color:var(--color-text-muted)">{{ todayLabel }}</span>
             <button
@@ -84,8 +89,13 @@
           </div>
 
           <div class="flex items-center gap-2 pl-3" style="border-left:1px solid var(--color-border)">
-            <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:var(--color-text-muted)">account_circle</span>
-            <span class="hidden text-xs font-medium sm:block" style="color:var(--color-text-secondary)">{{ authStore.usuario?.usuario }}</span>
+            <div
+              class="hidden h-7 w-7 items-center justify-center rounded-full sm:flex"
+              style="background:var(--color-brand-light)"
+            >
+              <span class="material-symbols-outlined text-[15px]" style="color:var(--color-brand)">person</span>
+            </div>
+            <span class="hidden text-xs font-semibold sm:block" style="color:var(--color-text-secondary)">{{ authStore.usuario?.usuario }}</span>
             <button
               class="logout-btn flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all"
               title="Cerrar sesión"
@@ -149,28 +159,30 @@ const todayLabel = computed(() =>
 </script>
 
 <style scoped>
-/* Header bg con transparencia adaptado al tema */
-:root { --header-bg: rgba(255,255,255,0.9); }
-[data-theme="dark"] { --header-bg: rgba(22,27,34,0.9); }
+/* Header */
+:root         { --header-bg: rgba(255,255,255,0.92); }
+[data-theme="dark"] { --header-bg: rgba(22,27,34,0.92); }
 
+/* Nav links — sobre fondo navy oscuro */
 .nav-link--active {
-  color: var(--color-text-primary);
-  background: var(--color-primary-soft);
-  border: 1px solid var(--color-border);
+  color: var(--sidebar-text);
+  background: var(--sidebar-active-bg);
+  border: 1px solid var(--sidebar-active-border);
+  font-weight: 700;
 }
-.nav-icon--active { color: #2D5991; }
-[data-theme="dark"] .nav-icon--active { color: #60A5FA; }
+.nav-icon--active { color: var(--sidebar-active-icon); }
 
 .nav-link--idle {
-  color: var(--color-text-secondary);
+  color: var(--sidebar-text);
   border: 1px solid transparent;
+  opacity: 0.75;
 }
 .nav-link--idle:hover {
-  color: var(--color-text-primary);
-  background: var(--color-surface-mid);
+  background: var(--sidebar-hover-bg);
+  opacity: 1;
 }
-.nav-icon--idle { color: var(--color-text-muted); }
-.nav-link--idle:hover .nav-icon--idle { color: var(--color-text-secondary); }
+.nav-icon--idle { color: var(--sidebar-text); }
+.nav-link--idle:hover .nav-icon--idle { color: var(--sidebar-text); }
 
 /* Botón toggle de tema */
 .theme-toggle {
@@ -188,9 +200,9 @@ const todayLabel = computed(() =>
   flex-shrink: 0;
 }
 .theme-toggle:hover {
-  background: var(--color-surface-high);
-  color: var(--color-text-primary);
-  border-color: var(--color-border);
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+  border-color: rgba(3,36,107,0.2);
 }
 
 /* Botón logout */
@@ -202,6 +214,8 @@ const todayLabel = computed(() =>
 }
 .logout-btn:hover {
   background: var(--color-surface-high);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 .overlay-enter-active, .overlay-leave-active { transition: opacity 0.25s ease; }

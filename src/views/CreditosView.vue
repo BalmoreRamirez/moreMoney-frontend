@@ -3,14 +3,10 @@
     <!-- Encabezado -->
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Créditos recibidos</h1>
-        <p class="mt-1 text-sm text-slate-400">Préstamos que tomaste para cubrir gastos, con interés simple o compuesto.</p>
+        <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Créditos recibidos</h1>
+        <p class="mt-1 text-sm" style="color:var(--color-text-muted)">Préstamos que tomaste para cubrir gastos, con interés simple o compuesto.</p>
       </div>
-      <button
-        class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-        style="background:#3B82F6"
-        @click="showFormModal = true"
-      >
+      <button class="btn-brand" @click="showFormModal = true">
         <span class="material-symbols-outlined text-[18px]">add</span>
         <span class="hidden sm:inline">Nuevo crédito</span>
       </button>
@@ -22,10 +18,9 @@
         v-for="f in FILTROS"
         :key="f.value"
         class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
-        :class="filtro === f.value ? 'text-slate-900' : 'text-slate-600 hover:text-slate-700'"
         :style="filtro === f.value
-          ? 'background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3)'
-          : 'background:rgba(10,25,47,0.03);border:1px solid transparent'"
+          ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid rgba(3,36,107,0.25)'
+          : 'background:var(--color-surface-mid);color:var(--color-text-secondary);border:1px solid transparent'"
         @click="setFiltro(f.value)"
       >
         {{ f.label }}
@@ -50,12 +45,12 @@
       <Column field="nombre" header="Crédito" sortable style="min-width:200px">
         <template #body="{ data: c }">
           <div class="flex items-center gap-3 cursor-pointer" @click="goToDetalle(c.id)">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:rgba(59,130,246,0.12)">
-              <span class="material-symbols-outlined text-[16px]" style="color:#3B82F6">credit_score</span>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:var(--color-brand-light)">
+              <span class="material-symbols-outlined text-[16px]" style="color:var(--color-brand)">credit_score</span>
             </div>
             <div class="min-w-0">
-              <p class="font-semibold text-slate-800 truncate">{{ c.nombre }}</p>
-              <p class="text-[11px] text-slate-500">
+              <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
+              <p class="text-[11px]" style="color:var(--color-text-muted)">
                 {{ c.tipo_interes === 'simple' ? 'Simple' : 'Compuesto' }} · {{ pctTasa(c.tasa_mensual) }}%/mes
               </p>
             </div>
@@ -76,28 +71,28 @@
       <!-- Capital -->
       <Column field="capital" header="Capital" sortable style="min-width:120px">
         <template #body="{ data: c }">
-          <span class="font-mono font-semibold text-slate-700">{{ formatCurrency(c.capital) }}</span>
+          <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(c.capital) }}</span>
         </template>
       </Column>
 
       <!-- Interés -->
       <Column field="total_interes" header="Interés" sortable style="min-width:120px">
         <template #body="{ data: c }">
-          <span class="font-mono font-semibold" style="color:#D97706">{{ formatCurrency(c.total_interes) }}</span>
+          <span class="font-mono font-semibold" style="color:var(--color-alert)">{{ formatCurrency(c.total_interes) }}</span>
         </template>
       </Column>
 
       <!-- Pagado -->
       <Column field="total_pagado" header="Pagado" sortable style="min-width:120px">
         <template #body="{ data: c }">
-          <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(c.total_pagado) }}</span>
+          <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(c.total_pagado) }}</span>
         </template>
       </Column>
 
       <!-- Pendiente -->
       <Column field="saldo_pendiente" header="Pendiente" sortable style="min-width:120px">
         <template #body="{ data: c }">
-          <span class="font-mono font-semibold" :style="{ color: c.saldo_pendiente <= 0 ? '#10B981' : '#DC2626' }">
+          <span class="font-mono font-semibold" :style="{ color: c.saldo_pendiente <= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
             {{ formatCurrency(Math.max(0, c.saldo_pendiente)) }}
           </span>
         </template>
@@ -107,14 +102,14 @@
       <Column header="Progreso" style="min-width:140px">
         <template #body="{ data: c }">
           <div>
-            <div class="flex justify-between text-[10px] text-slate-600 mb-1">
+            <div class="flex justify-between text-[10px] mb-1" style="color:var(--color-text-muted)">
               <span>{{ progresoPct(c) }}%</span>
               <span>{{ c.cuotas_pagadas }}/{{ c.num_cuotas }}</span>
             </div>
-            <div class="h-1.5 rounded-full overflow-hidden" style="background:#E8EDF5">
+            <div class="progress-bar-track">
               <div
-                class="h-full rounded-full transition-all"
-                :style="{ width: progresoPct(c) + '%', background: c.saldo_pendiente <= 0 ? '#10B981' : '#3B82F6' }"
+                class="progress-bar-fill progress-bar-fill--brand transition-all"
+                :style="{ width: progresoPct(c) + '%' }"
               />
             </div>
           </div>
@@ -125,16 +120,12 @@
       <Column header="" style="min-width:90px;width:90px">
         <template #body="{ data: c }">
           <div class="flex items-center justify-end gap-1">
-            <button
-              class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
-              title="Ver detalle"
-              @click="goToDetalle(c.id)"
-            >
+            <button class="icon-btn" title="Ver detalle" @click="goToDetalle(c.id)">
               <span class="material-symbols-outlined text-[16px]">open_in_new</span>
             </button>
             <button
               v-if="c.estado === 'activo' && c.cuotas_pagadas === 0"
-              class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+              class="icon-btn-danger"
               title="Eliminar"
               @click.stop="confirmDelete(c)"
             >

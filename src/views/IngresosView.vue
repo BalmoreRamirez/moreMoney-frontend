@@ -3,26 +3,24 @@
     <!-- Encabezado -->
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Ingresos</h1>
-        <p class="mt-1 text-sm text-slate-400">Sueldos e inversiones registradas.</p>
+        <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Ingresos</h1>
+        <p class="mt-1 text-sm" style="color:var(--color-text-muted)">Sueldos e inversiones registradas.</p>
       </div>
-      <button
-        class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
-        style="background:#10B981"
-        @click="onTabCreate"
-      >
+      <button class="btn-brand" @click="onTabCreate">
         <span class="material-symbols-outlined text-[18px]">add</span>
         <span class="hidden sm:inline">{{ tabCreateLabel }}</span>
       </button>
     </div>
 
     <!-- Tabs -->
-    <div class="mt-6 flex gap-1 rounded-xl p-1" style="background:rgba(10,25,47,0.03);width:fit-content">
+    <div class="mt-6 flex gap-1 rounded-xl p-1 w-fit" style="background:var(--color-surface-mid);border:1px solid var(--color-border)">
       <button
         v-for="tab in TABS"
         :key="tab.key"
-        class="rounded-lg px-4 py-2 text-sm font-medium transition-all"
-        :class="activeTab === tab.key ? 'bg-success text-white shadow' : 'text-slate-600 hover:text-slate-900'"
+        class="rounded-lg px-4 py-2 text-sm font-semibold transition-all"
+        :style="activeTab === tab.key
+          ? 'background:var(--color-brand);color:#fff;box-shadow:0 2px 8px rgba(3,36,107,0.2)'
+          : 'color:var(--color-text-secondary)'"
         @click="activeTab = tab.key"
       >
         <span class="material-symbols-outlined align-middle text-[16px] mr-1">{{ tab.icon }}</span>
@@ -48,10 +46,10 @@
         <Column field="nombre" header="Nombre" sortable style="min-width:200px">
           <template #body="{ data: s }">
             <div class="flex items-center gap-2">
-              <p class="font-semibold text-slate-800">{{ s.nombre }}</p>
+              <p class="font-semibold" style="color:var(--color-text-primary)">{{ s.nombre }}</p>
               <span
                 class="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                :style="s.activo ? 'background:rgba(5,150,105,0.12);color:#10B981' : 'background:rgba(100,116,139,0.12);color:#64748B'"
+                :style="s.activo ? 'background:var(--color-success-bg);color:var(--color-success)' : 'background:var(--color-surface-high);color:var(--color-text-muted)'"
               >{{ s.activo ? 'Activo' : 'Inactivo' }}</span>
             </div>
           </template>
@@ -60,28 +58,28 @@
         <!-- Cuenta -->
         <Column field="cuenta.nombre" header="Cuenta" sortable style="min-width:140px">
           <template #body="{ data: s }">
-            <span class="text-sm text-slate-600">{{ s.cuenta?.nombre ?? '—' }}</span>
+            <span class="text-sm" style="color:var(--color-text-secondary)">{{ s.cuenta?.nombre ?? '—' }}</span>
           </template>
         </Column>
 
         <!-- Día de cobro -->
         <Column field="dia_cobro" header="Día cobro" sortable style="min-width:110px">
           <template #body="{ data: s }">
-            <span class="text-sm text-slate-600">Día {{ s.dia_cobro }}</span>
+            <span class="text-sm" style="color:var(--color-text-secondary)">Día {{ s.dia_cobro }}</span>
           </template>
         </Column>
 
         <!-- Último cobro -->
         <Column header="Último cobro" style="min-width:120px">
           <template #body="{ data: s }">
-            <span class="text-sm text-slate-600">{{ ultimoCobro(s) }}</span>
+            <span class="text-sm" style="color:var(--color-text-secondary)">{{ ultimoCobro(s) }}</span>
           </template>
         </Column>
 
         <!-- Monto -->
         <Column field="monto" header="Monto/mes" sortable style="min-width:120px">
           <template #body="{ data: s }">
-            <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(s.monto) }}</span>
+            <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(s.monto) }}</span>
           </template>
         </Column>
 
@@ -92,21 +90,21 @@
               <button
                 v-if="s.activo"
                 class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                style="background:rgba(5,150,105,0.12);color:#10B981"
+                style="background:var(--color-success-bg);color:var(--color-success)"
                 @click="openCobrar(s)"
               >
                 <span class="material-symbols-outlined text-[14px]">check_circle</span>
                 Cobrar
               </button>
               <button
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                class="icon-btn"
                 title="Editar"
                 @click="openEditSueldo(s)"
               >
                 <span class="material-symbols-outlined text-[16px]">edit</span>
               </button>
               <button
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                class="icon-btn-danger"
                 title="Eliminar"
                 @click="confirmDeleteSueldo(s)"
               >
@@ -126,8 +124,9 @@
           v-for="f in FILTROS_ESTADO"
           :key="f.value"
           class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
-          :class="filtroEstado === f.value ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'"
-          :style="filtroEstado === f.value ? 'background:rgba(5,150,105,0.12);border:1px solid rgba(5,150,105,0.3)' : 'background:rgba(10,25,47,0.03);border:1px solid transparent'"
+          :style="filtroEstado === f.value
+            ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid rgba(3,36,107,0.25)'
+            : 'background:var(--color-surface-mid);color:var(--color-text-secondary);border:1px solid transparent'"
           @click="setFiltroEstado(f.value)"
         >{{ f.label }}</button>
       </div>
@@ -143,8 +142,8 @@
         <Column field="nombre" header="Inversión" sortable style="min-width:200px">
           <template #body="{ data: inv }">
             <div class="min-w-0">
-              <p class="font-semibold text-slate-800 truncate">{{ inv.nombre }}</p>
-              <div v-if="inv.fecha_compra" class="text-[11px] text-slate-500">{{ formatDate(inv.fecha_compra) }}</div>
+              <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ inv.nombre }}</p>
+              <div v-if="inv.fecha_compra" class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(inv.fecha_compra) }}</div>
             </div>
           </template>
         </Column>
@@ -154,7 +153,7 @@
           <template #body="{ data: inv }">
             <span
               class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-              :style="inv.estado === 'en_curso' ? 'background:rgba(217,119,6,0.10);color:#D97706' : 'background:rgba(5,150,105,0.12);color:#10B981'"
+              :style="inv.estado === 'en_curso' ? 'background:var(--color-alert-bg);color:var(--color-alert)' : 'background:var(--color-success-bg);color:var(--color-success)'"
             >{{ inv.estado === 'en_curso' ? 'En curso' : 'Vendida' }}</span>
           </template>
         </Column>
@@ -162,7 +161,7 @@
         <!-- Costo -->
         <Column field="costo_total" header="Costo" sortable style="min-width:120px">
           <template #body="{ data: inv }">
-            <span class="font-mono text-sm font-semibold text-slate-700">{{ formatCurrency(inv.costo_total) }}</span>
+            <span class="font-mono text-sm font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(inv.costo_total) }}</span>
           </template>
         </Column>
 
@@ -171,16 +170,16 @@
           <template #body="{ data: inv }">
             <div class="text-sm">
               <div v-if="inv.estado === 'en_curso' && inv.total_cobrado > 0">
-                <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(inv.total_cobrado) }}</span>
-                <span v-if="inv.saldo_por_cobrar > 0" class="ml-1 text-[11px]" style="color:#D97706">falta {{ formatCurrency(inv.saldo_por_cobrar) }}</span>
+                <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(inv.total_cobrado) }}</span>
+                <span v-if="inv.saldo_por_cobrar > 0" class="ml-1 text-[11px]" style="color:var(--color-alert)">falta {{ formatCurrency(inv.saldo_por_cobrar) }}</span>
               </div>
-              <span v-if="inv.ganancia != null" class="font-mono font-semibold" :style="{ color: inv.ganancia >= 0 ? '#10B981' : '#DC2626' }">
+              <span v-if="inv.ganancia != null" class="font-mono font-semibold" :style="{ color: inv.ganancia >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
                 +{{ formatCurrency(inv.ganancia) }}
               </span>
-              <span v-else-if="inv.ganancia_esperada != null" class="font-mono font-semibold" style="color:#D97706">
+              <span v-else-if="inv.ganancia_esperada != null" class="font-mono font-semibold" style="color:var(--color-alert)">
                 ~{{ formatCurrency(inv.ganancia_esperada) }}
               </span>
-              <span v-else class="text-slate-400 text-[11px]">—</span>
+              <span v-else class="text-[11px]" style="color:var(--color-text-muted)">—</span>
             </div>
           </template>
         </Column>
@@ -189,17 +188,17 @@
         <Column header="Progreso" style="min-width:130px">
           <template #body="{ data: inv }">
             <template v-if="inv.estado === 'en_curso' && inv.precio_esperado && inv.total_cobrado > 0">
-              <div class="text-[10px] text-slate-500 mb-1">
+              <div class="text-[10px] mb-1" style="color:var(--color-text-muted)">
                 {{ Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) }}%
               </div>
-              <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:#E8EDF5">
+              <div class="progress-bar-track">
                 <div
-                  class="h-full rounded-full"
-                  :style="{ width: Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) + '%', background: '#10B981' }"
+                  class="progress-bar-fill"
+                  :style="{ width: Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) + '%' }"
                 />
               </div>
             </template>
-            <span v-else class="text-slate-400 text-[11px]">—</span>
+            <span v-else class="text-[11px]" style="color:var(--color-text-muted)">—</span>
           </template>
         </Column>
 
@@ -210,7 +209,7 @@
               <button
                 v-if="inv.estado === 'en_curso'"
                 class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                style="background:rgba(5,150,105,0.12);color:#10B981"
+                style="background:var(--color-success-bg);color:var(--color-success)"
                 @click="openCobrarInv(inv)"
               >
                 <span class="material-symbols-outlined text-[14px]">payments</span>
@@ -218,7 +217,7 @@
               </button>
               <button
                 v-if="inv.estado === 'en_curso'"
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                class="icon-btn"
                 title="Editar"
                 @click="openEditInversion(inv)"
               >
@@ -226,17 +225,17 @@
               </button>
               <button
                 v-if="inv.estado === 'en_curso' && !inv.cobros?.length"
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                class="icon-btn-danger"
                 title="Eliminar"
                 @click="confirmDeleteInversion(inv)"
               >
                 <span class="material-symbols-outlined text-[16px]">delete</span>
               </button>
               <template v-if="inv.estado === 'vendida'">
-                <span class="text-xs text-slate-400 mr-1">{{ inv.fecha_venta }}</span>
+                <span class="text-xs mr-1" style="color:var(--color-text-muted)">{{ inv.fecha_venta }}</span>
                 <button
                   class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                  style="background:rgba(217,119,6,0.10);color:#D97706"
+                  style="background:var(--color-alert-bg);color:var(--color-alert)"
                   title="Resetear a En curso"
                   @click="doResetearInversion(inv)"
                 >
@@ -262,28 +261,28 @@
         <!-- Fecha -->
         <Column field="fecha" header="Fecha" sortable style="min-width:110px">
           <template #body="{ data: item }">
-            <span class="text-sm text-slate-600">{{ item.fecha }}</span>
+            <span class="text-sm" style="color:var(--color-text-secondary)">{{ item.fecha }}</span>
           </template>
         </Column>
 
         <!-- Descripción -->
         <Column field="descripcion" header="Descripción" sortable style="min-width:200px">
           <template #body="{ data: item }">
-            <span class="text-sm text-slate-700">{{ item.descripcion }}</span>
+            <span class="text-sm" style="color:var(--color-text-primary)">{{ item.descripcion }}</span>
           </template>
         </Column>
 
         <!-- Cuenta -->
         <Column field="cuenta.nombre" header="Cuenta" sortable style="min-width:140px">
           <template #body="{ data: item }">
-            <span class="text-sm text-slate-600">{{ item.cuenta?.nombre ?? '—' }}</span>
+            <span class="text-sm" style="color:var(--color-text-secondary)">{{ item.cuenta?.nombre ?? '—' }}</span>
           </template>
         </Column>
 
         <!-- Monto -->
         <Column field="monto" header="Monto" sortable style="min-width:120px">
           <template #body="{ data: item }">
-            <span class="font-mono font-semibold" style="color:#10B981">{{ formatCurrency(item.monto) }}</span>
+            <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(item.monto) }}</span>
           </template>
         </Column>
 
@@ -292,14 +291,14 @@
           <template #body="{ data: item }">
             <div class="flex items-center justify-end gap-1">
               <button
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                class="icon-btn"
                 title="Editar"
                 @click="openEditOtro(item)"
               >
                 <span class="material-symbols-outlined text-[16px]">edit</span>
               </button>
               <button
-                class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-red-500/10 hover:text-danger"
+                class="icon-btn-danger"
                 title="Eliminar"
                 @click="confirmDeleteOtro(item)"
               >

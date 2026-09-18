@@ -6,12 +6,12 @@
         <div class="absolute inset-0" style="background: rgba(15,23,42,0.40); backdrop-filter: blur(6px)" />
 
         <!-- Panel -->
-        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background: #FFFFFF; border: 1px solid #E2E8F0">
+        <div class="relative w-full max-w-md rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
           <div class="mb-5 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-slate-900">
+            <h2 class="text-lg font-semibold" style="color:var(--color-text-primary)">
               {{ isEdit ? 'Editar Tarjeta' : 'Nueva Tarjeta' }}
             </h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900" @click="$emit('update:modelValue', false)">
+            <button class="icon-btn" @click="$emit('update:modelValue', false)">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -19,23 +19,23 @@
           <form @submit.prevent="submit" class="space-y-4">
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Nombre de la tarjeta</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Nombre de la tarjeta</label>
               <input v-model.trim="form.nombre" type="text" class="fintech-input" placeholder="Ej: Visa Platino" required />
               <p v-if="errors.nombre" class="mt-1 text-xs text-danger">{{ errors.nombre }}</p>
             </div>
 
             <!-- Banco -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Banco emisor</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Banco emisor</label>
               <input v-model.trim="form.banco" type="text" class="fintech-input" placeholder="Ej: Banco Nacional" required />
               <p v-if="errors.banco" class="mt-1 text-xs text-danger">{{ errors.banco }}</p>
             </div>
 
             <!-- Límite de crédito -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Límite de crédito</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Límite de crédito</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-500">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm" style="color:var(--color-text-muted)">$</span>
                 <input
                   v-model="form.limite_credito"
                   type="number"
@@ -51,20 +51,20 @@
 
             <!-- Cuenta de pago por defecto -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-500">Cuenta de pago (opcional)</label>
+              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Cuenta de pago (opcional)</label>
               <select v-model.number="form.cuenta_pago_id" class="fintech-input w-full">
                 <option :value="null">Sin cuenta predeterminada</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
                   {{ c.nombre }} ({{ c.tipo }})
                 </option>
               </select>
-              <p class="mt-1 text-xs text-slate-400">Se usará por defecto al confirmar el pago de esta tarjeta.</p>
+              <p class="mt-1 text-xs" style="color:var(--color-text-muted)">Se usará por defecto al confirmar el pago de esta tarjeta.</p>
             </div>
 
             <!-- Días -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-500">Día de corte</label>
+                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Día de corte</label>
                 <input
                   v-model.number="form.dia_corte"
                   type="number"
@@ -77,7 +77,7 @@
                 <p v-if="errors.dia_corte" class="mt-1 text-xs text-danger">{{ errors.dia_corte }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-500">Día de pago</label>
+                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Día de pago</label>
                 <input
                   v-model.number="form.dia_pago"
                   type="number"
@@ -98,14 +98,13 @@
 
             <!-- Acciones -->
             <div class="flex gap-3 pt-2">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-50" @click="$emit('update:modelValue', false)">
+              <button type="button" class="btn-ghost flex-1" @click="$emit('update:modelValue', false)">
                 Cancelar
               </button>
               <button
                 type="submit"
                 :disabled="saving"
-                class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
-                style="background: #10B981"
+                class="btn-brand flex-1 disabled:opacity-50"
               >
                 {{ saving ? 'Guardando…' : (isEdit ? 'Actualizar' : 'Crear tarjeta') }}
               </button>

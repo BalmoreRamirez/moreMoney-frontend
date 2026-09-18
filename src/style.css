@@ -3,66 +3,107 @@
 @tailwind utilities;
 
 /* ──────────────────────────────────────────
-   Variables semánticas — tema claro / pastel
+   Variables semánticas — tema claro
+   Palette: #03246B navy | #F8BD26 gold | #F2F4F7 bg
    ────────────────────────────────────────── */
 :root {
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Urbanist', sans-serif;
   --font-mono: 'Roboto Mono', monospace;
 
-  /* Fondo y superficies */
-  --color-primary:      #F0F4FA;   /* fondo de página — azul-gris muy suave */
-  --color-primary-mid:  #FFFFFF;   /* cards — blanco puro */
-  --color-primary-soft: #E8EDF5;   /* navy-50 del config — separadores */
+  /* Brand */
+  --color-brand:         #03246B;
+  --color-brand-hover:   #04307F;
+  --color-brand-light:   #E8EDF8;
+  --color-accent:        #F8BD26;
+  --color-accent-hover:  #E0A81E;
+  --color-accent-bg:     #FFFBEB;
 
-  /* Semántica financiera (colores con buen contraste sobre blanco) */
-  --color-success:      #059669;   /* esmeralda oscuro — texto */
-  --color-success-bg:   #ECFDF5;   /* esmeralda 50 — fondo pastel */
-  --color-alert:        #D97706;   /* ámbar oscuro — texto */
-  --color-alert-bg:     #FFFBEB;   /* ámbar 50 — fondo pastel */
-  --color-danger:       #DC2626;   /* rojo — texto */
-  --color-danger-bg:    #FFF1F1;   /* rojo 50 — fondo pastel */
+  /* Fondo y superficies */
+  --color-primary:       #F2F4F7;
+  --color-primary-mid:   #FFFFFF;
+  --color-primary-soft:  #E8EDF5;
+
+  /* Semántica financiera */
+  --color-success:       #059669;
+  --color-success-bg:    #ECFDF5;
+  --color-alert:         #D97706;
+  --color-alert-bg:      #FFFBEB;
+  --color-danger:        #DC2626;
+  --color-danger-bg:     #FFF1F1;
 
   /* Superficies */
-  --color-surface:      #FFFFFF;
-  --color-surface-mid:  #F8FAFC;   /* inputs / chips */
-  --color-surface-high: #F1F5F9;   /* hover / selected */
-  --color-border:       #E2E8F0;   /* slate-200 */
-  --color-border-soft:  #EEF2F8;   /* borde muy suave */
+  --color-surface:       #FFFFFF;
+  --color-surface-mid:   #F8FAFC;
+  --color-surface-high:  #EEF2F8;
+  --color-border:        #E2E8F0;
+  --color-border-soft:   #EEF2F8;
 
   /* Texto */
-  --color-text-primary:   #0F172A;  /* slate-900 */
-  --color-text-secondary: #475569;  /* slate-600 */
-  --color-text-muted:     #94A3B8;  /* slate-400 */
+  --color-text-primary:    #0A1628;
+  --color-text-secondary:  #475569;
+  --color-text-muted:      #94A3B8;
+
+  /* Sidebar (siempre oscuro) */
+  --sidebar-bg:              #03246B;
+  --sidebar-logo-icon-bg:    rgba(248,189,38,0.18);
+  --sidebar-logo-icon-color: #F8BD26;
+  --sidebar-text:            rgba(255,255,255,0.95);
+  --sidebar-text-muted:      rgba(255,255,255,0.45);
+  --sidebar-active-bg:       rgba(248,189,38,0.16);
+  --sidebar-active-border:   rgba(248,189,38,0.45);
+  --sidebar-active-icon:     #F8BD26;
+  --sidebar-hover-bg:        rgba(255,255,255,0.07);
+  --sidebar-border:          rgba(255,255,255,0.09);
 }
 
 /* ──────────────────────────────────────────
    Tema oscuro
    ────────────────────────────────────────── */
 [data-theme="dark"] {
+  /* Brand */
+  --color-brand:         #4A79E8;
+  --color-brand-hover:   #5A89F8;
+  --color-brand-light:   #0D1A3A;
+  --color-accent:        #F8BD26;
+  --color-accent-hover:  #FECE5A;
+  --color-accent-bg:     #1C1400;
+
   /* Fondo y superficies */
-  --color-primary:      #0D1117;   /* fondo de página — casi negro */
-  --color-primary-mid:  #161B22;   /* cards — gris muy oscuro */
-  --color-primary-soft: #1C2333;   /* separadores */
+  --color-primary:       #0D1117;
+  --color-primary-mid:   #161B22;
+  --color-primary-soft:  #1C2333;
 
   /* Semántica financiera */
-  --color-success:      #34D399;   /* esmeralda vibrante */
-  --color-success-bg:   #064E3B;   /* esmeralda oscuro */
-  --color-alert:        #FBBF24;   /* ámbar */
-  --color-alert-bg:     #451A03;   /* ámbar oscuro */
-  --color-danger:       #F87171;   /* rojo suave */
-  --color-danger-bg:    #450A0A;   /* rojo oscuro */
+  --color-success:       #34D399;
+  --color-success-bg:    #064E3B;
+  --color-alert:         #FBBF24;
+  --color-alert-bg:      #451A03;
+  --color-danger:        #F87171;
+  --color-danger-bg:     #450A0A;
 
   /* Superficies */
-  --color-surface:      #161B22;
-  --color-surface-mid:  #1C2333;
-  --color-surface-high: #21293B;
-  --color-border:       #30363D;
-  --color-border-soft:  #21293B;
+  --color-surface:       #161B22;
+  --color-surface-mid:   #1C2333;
+  --color-surface-high:  #21293B;
+  --color-border:        #30363D;
+  --color-border-soft:   #21293B;
 
   /* Texto */
-  --color-text-primary:   #E6EDF3;
-  --color-text-secondary: #8B949E;
-  --color-text-muted:     #484F58;
+  --color-text-primary:    #E6EDF3;
+  --color-text-secondary:  #8B949E;
+  --color-text-muted:      #484F58;
+
+  /* Sidebar en modo oscuro — navy más profundo */
+  --sidebar-bg:              #01132B;
+  --sidebar-logo-icon-bg:    rgba(248,189,38,0.12);
+  --sidebar-logo-icon-color: #F8BD26;
+  --sidebar-text:            rgba(230,237,243,0.95);
+  --sidebar-text-muted:      rgba(230,237,243,0.38);
+  --sidebar-active-bg:       rgba(248,189,38,0.12);
+  --sidebar-active-border:   rgba(248,189,38,0.35);
+  --sidebar-active-icon:     #F8BD26;
+  --sidebar-hover-bg:        rgba(255,255,255,0.04);
+  --sidebar-border:          rgba(255,255,255,0.05);
 }
 
 /* ──────────────────────────────────────────
@@ -80,6 +121,7 @@ html, body, #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  letter-spacing: 0.01em;
 }
 
 body {
@@ -110,27 +152,80 @@ body {
   .fintech-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    @apply rounded-card shadow-sm;
+    box-shadow: 0 1px 3px rgba(3,36,107,0.05), 0 4px 16px rgba(3,36,107,0.07);
+    @apply rounded-card;
+  }
+  [data-theme="dark"] .fintech-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  /* Botón primario — brand navy */
+  .btn-brand {
+    background: var(--color-brand);
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+    @apply flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all;
+  }
+  .btn-brand:hover {
+    background: var(--color-brand-hover);
+    box-shadow: 0 4px 14px rgba(3,36,107,0.28);
+    transform: translateY(-1px);
+  }
+  .btn-brand:active { transform: translateY(0); }
+
+  /* Botón accent — golden */
+  .btn-accent {
+    background: var(--color-accent);
+    color: #03246B;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    @apply flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm transition-all;
+  }
+  .btn-accent:hover {
+    background: var(--color-accent-hover);
+    box-shadow: 0 4px 14px rgba(248,189,38,0.35);
+    transform: translateY(-1px);
+  }
+
+  /* Botón secundario — ghost */
+  .btn-ghost {
+    background: var(--color-surface-mid);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    @apply flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all;
+  }
+  .btn-ghost:hover {
+    background: var(--color-surface-high);
+    color: var(--color-text-primary);
   }
 
   /* Badges de estado */
   .badge-success {
     background: var(--color-success-bg);
     color: var(--color-success);
-    border: 1px solid #A7F3D0;
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+    border: 1px solid rgba(5,150,105,0.25);
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
   }
   .badge-alert {
     background: var(--color-alert-bg);
     color: var(--color-alert);
-    border: 1px solid #FDE68A;
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+    border: 1px solid rgba(217,119,6,0.25);
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
   }
   .badge-danger {
     background: var(--color-danger-bg);
     color: var(--color-danger);
-    border: 1px solid #FECACA;
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+    border: 1px solid rgba(220,38,38,0.25);
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-brand {
+    background: var(--color-brand-light);
+    color: var(--color-brand);
+    border: 1px solid rgba(3,36,107,0.2);
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
   }
 
   /* Barras de progreso */
@@ -141,6 +236,46 @@ body {
   .progress-bar-fill            { @apply h-full rounded-full transition-all duration-500; background: var(--color-success); }
   .progress-bar-fill--danger    { background: var(--color-danger); }
   .progress-bar-fill--alert     { background: var(--color-alert); }
+  .progress-bar-fill--brand     { background: var(--color-brand); }
+  .progress-bar-fill--accent    { background: var(--color-accent); }
+
+  /* Icon action buttons */
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.75rem;
+    width: 1.75rem;
+    border-radius: 0.5rem;
+    color: var(--color-text-muted);
+    transition: background 0.12s, color 0.12s;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    flex-shrink: 0;
+  }
+  .icon-btn:hover {
+    background: var(--color-surface-high);
+    color: var(--color-text-primary);
+  }
+  .icon-btn-danger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.75rem;
+    width: 1.75rem;
+    border-radius: 0.5rem;
+    color: var(--color-text-muted);
+    transition: background 0.12s, color 0.12s;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    flex-shrink: 0;
+  }
+  .icon-btn-danger:hover {
+    background: rgba(220,38,38,0.08);
+    color: var(--color-danger);
+  }
 
   /* Inputs */
   .fintech-input {
@@ -150,8 +285,8 @@ body {
     @apply w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors;
   }
   .fintech-input:focus {
-    border-color: var(--color-success);
-    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(3,36,107,0.1);
   }
   .fintech-input::placeholder { color: var(--color-text-muted); }
   .fintech-input option       { background: var(--color-surface); color: var(--color-text-primary); }

@@ -8,42 +8,42 @@
       />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">
           {{ editData ? 'Editar préstamo' : 'Nuevo préstamo' }}
         </h2>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Nombre del deudor</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nombre del deudor</label>
             <input v-model="form.deudor_nombre" type="text" placeholder="Ej. Juan Pérez" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Contacto (opcional)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Contacto (opcional)</label>
             <input v-model="form.deudor_contacto" type="text" placeholder="Teléfono o correo" class="fintech-input w-full" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="mb-1.5 block text-xs text-slate-500">Capital ($)</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Capital ($)</label>
               <input v-model.number="form.capital" type="number" min="0.01" step="0.01" placeholder="1000.00" required class="fintech-input w-full" />
             </div>
             <div>
-              <label class="mb-1.5 block text-xs text-slate-500">Interés mensual (%)</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Interés mensual (%)</label>
               <input v-model.number="form.tasa_display" type="number" min="0" max="100" step="0.01" placeholder="5" required class="fintech-input w-full" />
-              <p class="mt-1 text-[10px] text-slate-600">Ej: 5 = 5% por mes</p>
+              <p class="mt-1 text-[10px]" style="color:var(--color-text-secondary)">Ej: 5 = 5% por mes</p>
             </div>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Fecha de inicio</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de inicio</label>
             <input v-model="form.fecha_inicio" type="date" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Cuenta de origen (de donde sale el dinero)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de origen (de donde sale el dinero)</label>
             <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -51,9 +51,9 @@
           </div>
 
           <!-- Resumen interés -->
-          <div v-if="form.capital && form.tasa_display" class="rounded-lg px-4 py-3 text-xs" style="background:rgba(10,25,47,0.04)">
-            <p class="text-slate-600">Interés mensual estimado:
-              <span class="font-mono font-semibold text-slate-600">
+          <div v-if="form.capital && form.tasa_display" class="rounded-lg px-4 py-3 text-xs" style="background:var(--color-surface-mid)">
+            <p style="color:var(--color-text-secondary)">Interés mensual estimado:
+              <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">
                 {{ formatCurrency((form.capital * form.tasa_display / 100)) }}
               </span>
             </p>
@@ -62,10 +62,10 @@
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Guardando…' : editData ? 'Guardar cambios' : 'Registrar préstamo' }}
             </button>
           </div>

@@ -45,8 +45,7 @@
       <div class="pb-2">
         <button
           v-if="activeTab === 'normales'"
-          class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
-          style="background:var(--color-success)"
+          class="btn-brand"
           @click="openCreateNormal"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
@@ -54,8 +53,7 @@
         </button>
         <button
           v-else
-          class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:gap-2 sm:px-4"
-          style="background:var(--color-success)"
+          class="btn-brand"
           @click="openCreateTasaCero"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
@@ -184,7 +182,7 @@
                     <span
                       class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
                       :style="cell.isToday && cell.currentMonth
-                        ? 'background:#10B981;color:#fff'
+                        ? 'background:var(--color-brand);color:#fff'
                         : cell.currentMonth
                           ? 'color:var(--color-text-secondary)'
                           : 'color:var(--color-text-muted)'"

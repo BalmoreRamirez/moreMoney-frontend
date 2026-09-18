@@ -8,7 +8,7 @@
       />
       <div
         class="relative w-full max-w-sm rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
         <div class="flex items-start gap-4">
           <div
@@ -18,23 +18,23 @@
             <span class="material-symbols-outlined text-danger">warning</span>
           </div>
           <div>
-            <h3 class="font-semibold text-slate-900">Eliminar registro</h3>
-            <p class="mt-1 text-sm text-slate-500">
-              ¿Eliminar <strong class="text-slate-900">{{ nombre }}</strong>? Esta acción no se puede deshacer.
+            <h3 class="font-semibold" style="color:var(--color-text-primary)">Eliminar registro</h3>
+            <p class="mt-1 text-sm" style="color:var(--color-text-muted)">
+              ¿Eliminar <strong style="color:var(--color-text-primary)">{{ nombre }}</strong>? Esta acción no se puede deshacer.
             </p>
             <p v-if="error" class="mt-2 text-xs text-danger">{{ error }}</p>
           </div>
         </div>
         <div class="mt-5 flex gap-3">
           <button
-            class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50"
+            class="btn-ghost flex-1"
             @click="$emit('cancel')"
           >
             Cancelar
           </button>
           <button
             class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-            style="background:#DC2626"
+            style="background:var(--color-danger)"
             :disabled="deleting"
             @click="$emit('confirm')"
           >

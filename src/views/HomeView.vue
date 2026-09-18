@@ -15,7 +15,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex justify-center py-16">
-      <span class="material-symbols-outlined animate-spin text-4xl" style="color:rgba(16,185,129,0.4)">progress_activity</span>
+      <span class="material-symbols-outlined animate-spin text-4xl" style="color:var(--color-brand)">progress_activity</span>
     </div>
 
     <template v-else>
@@ -34,7 +34,7 @@
 
           <div class="fintech-card p-4">
             <p class="text-[10px] font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-muted)">Capital en calle</p>
-            <p class="font-mono text-xl font-bold" style="color:#3B82F6">{{ formatCurrency(capitalInvertido) }}</p>
+            <p class="font-mono text-xl font-bold" style="color:var(--color-brand)">{{ formatCurrency(capitalInvertido) }}</p>
             <p class="mt-0.5 text-[11px]" style="color:var(--color-text-muted)">{{ prestamosActivos.length }} activo{{ prestamosActivos.length !== 1 ? 's' : '' }}</p>
           </div>
 

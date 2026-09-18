@@ -21,7 +21,7 @@
         <!-- Logo -->
         <div class="logo-wrap">
           <div class="logo-icon">
-            <span class="material-symbols-outlined" style="font-size:28px;color:#10B981">account_balance</span>
+            <span class="material-symbols-outlined" style="font-size:28px;color:#F8BD26">account_balance</span>
           </div>
           <span class="logo-text">moreMoney</span>
         </div>
@@ -152,7 +152,7 @@ async function handleLogin() {
 .login-root {
   display: flex;
   min-height: 100vh;
-  background: #0A192F;
+  background: #03246B;
 }
 
 /* ── Panel izquierdo ─────────────────────────────────── */
@@ -161,7 +161,7 @@ async function handleLogin() {
   display: none;
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(145deg, #0A192F 0%, #0D2B4A 55%, #0A2236 100%);
+  background: linear-gradient(145deg, #03246B 0%, #04307F 55%, #01132B 100%);
 }
 @media (min-width: 900px) { .left-panel { display: flex; align-items: center; justify-content: center; } }
 
@@ -173,17 +173,17 @@ async function handleLogin() {
 .deco-circle--1 {
   width: 420px; height: 420px;
   top: -100px; right: -80px;
-  background: rgba(16,185,129,0.06);
+  background: rgba(248,189,38,0.07);
 }
 .deco-circle--2 {
   width: 280px; height: 280px;
   bottom: -60px; left: -60px;
-  background: rgba(59,130,246,0.07);
+  background: rgba(255,255,255,0.04);
 }
 .deco-circle--3 {
   width: 180px; height: 180px;
   top: 42%; left: 55%;
-  background: rgba(16,185,129,0.04);
+  background: rgba(248,189,38,0.04);
 }
 
 .float-icon {
@@ -213,8 +213,8 @@ async function handleLogin() {
   justify-content: center;
   width: 44px; height: 44px;
   border-radius: 12px;
-  background: rgba(16,185,129,0.18);
-  border: 1px solid rgba(16,185,129,0.25);
+  background: rgba(248,189,38,0.18);
+  border: 1px solid rgba(248,189,38,0.30);
 }
 .logo-text {
   font-size: 20px;
@@ -250,7 +250,7 @@ async function handleLogin() {
 }
 .feature-icon {
   font-size: 18px;
-  color: #10B981;
+  color: #F8BD26;
   flex-shrink: 0;
 }
 .feature-text {
@@ -265,7 +265,7 @@ async function handleLogin() {
   justify-content: center;
   width: 100%;
   padding: 24px 16px;
-  background: #F8FAFC;
+  background: #F2F4F7;
 }
 @media (min-width: 900px) {
   .right-panel {
@@ -286,13 +286,13 @@ async function handleLogin() {
 .form-title {
   font-size: 28px;
   font-weight: 800;
-  color: #0A192F;
+  color: #03246B;
   letter-spacing: -0.03em;
   margin-bottom: 6px;
 }
 .form-subtitle {
   font-size: 13px;
-  color: #94A3B8;
+  color: #64748B;
 }
 
 /* ── Campos ─────────────────────────────────────────── */
@@ -312,7 +312,7 @@ async function handleLogin() {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #64748B;
+  color: #4B5563;
 }
 
 .input-wrap {
@@ -320,14 +320,14 @@ async function handleLogin() {
   align-items: center;
   gap: 0;
   border-radius: 12px;
-  border: 1.5px solid #E2E8F0;
+  border: 1.5px solid #D0D5DD;
   background: #FFFFFF;
   transition: border-color 0.15s, box-shadow 0.15s;
   overflow: hidden;
 }
 .input-wrap.focused {
-  border-color: rgba(16,185,129,0.6);
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.10);
+  border-color: rgba(3,36,107,0.55);
+  box-shadow: 0 0 0 3px rgba(3,36,107,0.08);
 }
 
 .input-icon {
@@ -382,7 +382,7 @@ async function handleLogin() {
   padding: 14px;
   border-radius: 12px;
   border: none;
-  background: #10B981;
+  background: #03246B;
   color: #FFFFFF;
   font-size: 14px;
   font-weight: 700;
@@ -391,7 +391,7 @@ async function handleLogin() {
   transition: background 0.15s, opacity 0.15s, transform 0.1s;
   margin-top: 4px;
 }
-.submit-btn:hover:not(:disabled) { background: #059669; transform: translateY(-1px); }
+.submit-btn:hover:not(:disabled) { background: #04307F; transform: translateY(-1px); }
 .submit-btn:active:not(:disabled) { transform: translateY(0); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -403,7 +403,7 @@ async function handleLogin() {
   color: #94A3B8;
 }
 .register-link-a {
-  color: #10B981;
+  color: #03246B;
   font-weight: 600;
   text-decoration: none;
   margin-left: 4px;

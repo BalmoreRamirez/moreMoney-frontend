@@ -4,11 +4,11 @@
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
         <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
 
-        <div class="relative w-full max-w-md rounded-2xl shadow-card" style="background:#FFFFFF;border:1px solid #E2E8F0">
+        <div class="relative w-full max-w-md rounded-2xl shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
           <!-- Header -->
           <div class="flex items-center justify-between p-6 pb-4">
-            <h2 class="text-lg font-semibold text-slate-900">{{ ingreso ? 'Editar ingreso' : 'Nuevo ingreso' }}</h2>
-            <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900" @click="close">
+            <h2 class="text-lg font-semibold" style="color:var(--color-text-primary)">{{ ingreso ? 'Editar ingreso' : 'Nuevo ingreso' }}</h2>
+            <button class="icon-btn" @click="close">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -17,7 +17,7 @@
           <form class="px-6 pb-6 space-y-4" @submit.prevent="submit">
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Descripción</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Descripción</label>
               <input
                 v-model="form.descripcion"
                 type="text"
@@ -28,7 +28,7 @@
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Monto ($)</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Monto ($)</label>
               <input
                 v-model.number="form.monto"
                 type="number"
@@ -41,12 +41,12 @@
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Fecha</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Fecha</label>
               <input v-model="form.fecha" type="date" class="fintech-input" required />
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600">Cuenta destino</label>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Cuenta destino</label>
               <select v-model.number="form.cuenta_id" class="fintech-input" required>
                 <option :value="null" disabled>Selecciona una cuenta</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
@@ -55,17 +55,16 @@
               </select>
             </div>
 
-            <p v-if="errorMsg" class="text-sm" style="color:#DC2626">{{ errorMsg }}</p>
+            <p v-if="errorMsg" class="text-sm" style="color:var(--color-danger)">{{ errorMsg }}</p>
 
             <div class="flex gap-3 pt-1">
-              <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+              <button type="button" class="btn-ghost flex-1" @click="close">
                 Cancelar
               </button>
               <button
                 type="submit"
                 :disabled="saving"
-                class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-40"
-                style="background:#10B981"
+                class="btn-brand flex-1 disabled:opacity-40"
               >
                 {{ saving ? 'Guardando…' : (ingreso ? 'Guardar cambios' : 'Registrar ingreso') }}
               </button>

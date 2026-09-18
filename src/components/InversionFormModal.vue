@@ -8,44 +8,44 @@
       />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
-        style="background:#FFFFFF;border:1px solid #E2E8F0"
+        style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
-        <h2 class="text-base font-semibold text-slate-900">{{ editData ? 'Editar inversión' : 'Registrar inversión' }}</h2>
+        <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">{{ editData ? 'Editar inversión' : 'Registrar inversión' }}</h2>
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Nombre / Descripción</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nombre / Descripción</label>
             <input v-model="form.nombre" type="text" placeholder="Ej. Pantalones para reventa" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Costo total ($)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Costo total ($)</label>
             <input v-model.number="form.costo_total" type="number" min="0.01" step="0.01" placeholder="150.00" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">Fecha de compra</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de compra</label>
             <input v-model="form.fecha_compra" type="date" required class="fintech-input w-full" />
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs text-slate-500">
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">
               Precio de venta esperado ($)
-              <span class="ml-1 text-slate-500">(opcional)</span>
+              <span class="ml-1" style="color:var(--color-text-muted)">(opcional)</span>
             </label>
             <input
               v-model.number="form.precio_esperado"
               type="number" min="0.01" step="0.01" placeholder="Ej. 200.00"
               class="fintech-input w-full"
             />
-            <p v-if="gananciaEsperada !== null" class="mt-1.5 text-xs" :style="gananciaEsperada >= 0 ? 'color:#10B981' : 'color:#DC2626'">
+            <p v-if="gananciaEsperada !== null" class="mt-1.5 text-xs" :style="gananciaEsperada >= 0 ? 'color:var(--color-success)' : 'color:var(--color-danger)'">
               Ganancia esperada: {{ formatCurrency(gananciaEsperada) }}
               ({{ gananciaEsperadaPct }}%)
             </p>
           </div>
 
           <div v-if="!editData">
-            <label class="mb-1.5 block text-xs text-slate-500">Cuenta de egreso (donde sale el dinero)</label>
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de egreso (donde sale el dinero)</label>
             <select v-model.number="form.cuenta_egreso_id" required class="fintech-input w-full">
               <option value="" disabled>Selecciona una cuenta</option>
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
@@ -55,10 +55,10 @@
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
 
           <div class="flex gap-3 pt-2">
-            <button type="button" class="flex-1 rounded-xl py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50" @click="close">
+            <button type="button" class="btn-ghost flex-1" @click="close">
               Cancelar
             </button>
-            <button type="submit" :disabled="saving" class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50" style="background:#10B981">
+            <button type="submit" :disabled="saving" class="btn-brand flex-1 disabled:opacity-50">
               {{ saving ? 'Guardando…' : editData ? 'Guardar cambios' : 'Registrar inversión' }}
             </button>
           </div>

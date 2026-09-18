@@ -72,10 +72,10 @@
 
             <!-- Próximo pago badge — alineado al extremo derecho -->
             <div class="ml-auto flex items-center gap-2.5 rounded-lg px-3 py-2 next-pay-badge">
-              <span class="material-symbols-outlined text-[14px]" style="color:#b45309">payment</span>
+              <span class="material-symbols-outlined text-[14px]" style="color:var(--color-alert)">payment</span>
               <div>
-                <p class="kpi-label" style="color:#b45309">Próximo pago · {{ labelProximoPago }}</p>
-                <p class="font-mono text-base font-bold leading-tight" style="color:#92400e">
+                <p class="kpi-label" style="color:var(--color-alert)">Próximo pago · {{ labelProximoPago }}</p>
+                <p class="font-mono text-base font-bold leading-tight" style="color:var(--color-alert)">
                   {{ formatCurrency(totalCorteAPagar + totalCuotasCorte) }}
                 </p>
               </div>
@@ -169,8 +169,8 @@
         <div class="fintech-card overflow-hidden">
           <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--color-border)">
             <div class="flex items-center gap-2">
-              <span class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(59,130,246,0.1)">
-                <span class="material-symbols-outlined text-[15px]" style="color:#3B82F6">schedule</span>
+              <span class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-brand-light)">
+                <span class="material-symbols-outlined text-[15px]" style="color:var(--color-brand)">schedule</span>
               </span>
               <div>
                 <p class="text-sm font-semibold" style="color:var(--color-text-primary)">Corte en proceso</p>
@@ -178,7 +178,7 @@
               </div>
             </div>
             <div class="text-right">
-              <p class="font-mono text-base font-bold" style="color:#3B82F6">{{ formatCurrency(totalCorteEnProceso) }}</p>
+              <p class="font-mono text-base font-bold" style="color:var(--color-brand)">{{ formatCurrency(totalCorteEnProceso) }}</p>
               <p class="text-[10px]" style="color:var(--color-text-muted)">{{ corteEnProceso.length }} compra{{ corteEnProceso.length !== 1 ? 's' : '' }}</p>
             </div>
           </div>
@@ -198,11 +198,11 @@
                 <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
                 <p class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
               </div>
-              <span class="font-mono text-sm font-semibold shrink-0" style="color:#3B82F6">{{ formatCurrency(c.monto) }}</span>
+              <span class="font-mono text-sm font-semibold shrink-0" style="color:var(--color-brand)">{{ formatCurrency(c.monto) }}</span>
             </div>
             <div class="flex items-center justify-between px-5 py-3" style="background:var(--color-surface-mid);border-top:1px solid var(--color-border)">
               <span class="text-xs font-semibold" style="color:var(--color-text-muted)">Acumulado</span>
-              <span class="font-mono font-bold" style="color:#3B82F6">{{ formatCurrency(totalCorteEnProceso) }}</span>
+              <span class="font-mono font-bold" style="color:var(--color-brand)">{{ formatCurrency(totalCorteEnProceso) }}</span>
             </div>
           </div>
         </div>
@@ -346,9 +346,9 @@ const usagePct = computed(() => {
   return Math.min(100, Math.round((saldo_gastado / limite_credito) * 100))
 })
 const usageColor = computed(() => {
-  if (usagePct.value >= 90) return '#DC2626'
-  if (usagePct.value >= 70) return '#F59E0B'
-  return '#10B981'
+  if (usagePct.value >= 90) return 'var(--color-danger)'
+  if (usagePct.value >= 70) return 'var(--color-alert)'
+  return 'var(--color-success)'
 })
 
 // ── Lógica de cortes ──────────────────────────────────────
@@ -470,7 +470,7 @@ function formatDate(d) {
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
-  background: var(--color-success);
+  background: var(--color-brand);
   color: #fff;
   border: none;
 }
@@ -478,8 +478,8 @@ function formatDate(d) {
 
 .add-btn--outline {
   background: transparent;
-  color: var(--color-success);
-  border: 1.5px solid var(--color-success);
+  color: var(--color-brand);
+  border: 1.5px solid var(--color-brand);
 }
-.add-btn--outline:hover { background: var(--color-success-bg); }
+.add-btn--outline:hover { background: var(--color-brand-light); }
 </style>
