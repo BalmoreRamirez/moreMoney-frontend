@@ -109,7 +109,7 @@
       </header>
 
       <!-- Contenido de la ruta activa -->
-      <main class="flex-1 p-4 lg:p-6">
+      <main class="flex-1 p-4 lg:p-6" style="background:var(--page-header-gradient)">
         <router-view />
       </main>
     </div>
