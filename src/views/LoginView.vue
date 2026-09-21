@@ -357,7 +357,7 @@ async function handleLogin() {
   display: flex;
   align-items: center;
 }
-.toggle-pw:hover { color: #94A3B8; }
+.toggle-pw:hover { color: #64748B; }
 
 /* ── Error ──────────────────────────────────────────── */
 .error-msg {
@@ -400,7 +400,7 @@ async function handleLogin() {
   margin-top: 24px;
   text-align: center;
   font-size: 13px;
-  color: #94A3B8;
+  color: #64748B;
 }
 .register-link-a {
   color: #03246B;

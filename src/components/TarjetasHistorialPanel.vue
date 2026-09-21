@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-5">
       <div>
-        <h3 class="text-sm font-semibold text-slate-700">Gasto mensual por tarjeta</h3>
-        <p class="text-[10px] text-slate-500 mt-0.5">Últimos {{ mesesOpcion }} meses</p>
+        <h3 class="text-sm font-semibold" style="color:var(--color-text-primary)">Gasto mensual por tarjeta</h3>
+        <p class="text-[10px] mt-0.5" style="color:var(--color-text-muted)">Últimos {{ mesesOpcion }} meses</p>
       </div>
       <div class="flex gap-1">
         <button
@@ -12,25 +12,25 @@
           :key="m"
           class="rounded-lg px-2.5 py-1 text-[10px] font-semibold transition-colors"
           :style="mesesOpcion === m
-            ? 'background:rgba(45,89,145,0.1);color:#2D5991'
-            : 'color:#64748B'"
+            ? 'background:var(--color-brand-light);color:var(--color-brand)'
+            : 'color:var(--color-text-secondary)'"
           @click="setMeses(m)"
         >{{ m }}m</button>
       </div>
     </div>
 
     <div v-if="loading" class="flex justify-center py-12">
-      <div class="h-5 w-5 animate-spin rounded-full border-2" style="border-color:#2D5991;border-top-color:transparent" />
+      <div class="h-5 w-5 animate-spin rounded-full border-2" style="border-color:var(--color-brand);border-top-color:transparent" />
     </div>
 
     <div v-else-if="!tarjetas.length" class="flex flex-col items-center py-10 text-center">
-      <span class="material-symbols-outlined text-4xl mb-2" style="color:rgba(45,89,145,0.12)">credit_card_off</span>
-      <p class="text-xs text-slate-500">Sin tarjetas registradas</p>
+      <span class="material-symbols-outlined text-4xl mb-2" style="color:var(--color-border)">credit_card_off</span>
+      <p class="text-xs" style="color:var(--color-text-muted)">Sin tarjetas registradas</p>
     </div>
 
     <div v-else-if="!hasData" class="flex flex-col items-center py-10 text-center">
-      <span class="material-symbols-outlined text-4xl mb-2" style="color:rgba(45,89,145,0.12)">show_chart</span>
-      <p class="text-xs text-slate-500">Sin gastos en este periodo</p>
+      <span class="material-symbols-outlined text-4xl mb-2" style="color:var(--color-border)">show_chart</span>
+      <p class="text-xs" style="color:var(--color-text-muted)">Sin gastos en este periodo</p>
     </div>
 
     <template v-else>
@@ -55,44 +55,44 @@
           >
             <div class="flex items-center gap-1.5 mb-1.5">
               <span class="h-2 w-2 rounded-full shrink-0" :style="`background:${COLORS[i % COLORS.length]}`" />
-              <span class="text-[10px] font-semibold text-slate-600 truncate uppercase tracking-wider">{{ t.nombre }}</span>
+              <span class="text-[10px] font-semibold truncate uppercase tracking-wider" style="color:var(--color-text-secondary)">{{ t.nombre }}</span>
             </div>
-            <p class="font-mono text-[13px] font-bold text-slate-800">{{ formatCurrency(totalTarjeta(t)) }}</p>
-            <p class="text-[9px] text-slate-500 mt-0.5">total {{ mesesOpcion }}m</p>
+            <p class="font-mono text-[13px] font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(totalTarjeta(t)) }}</p>
+            <p class="text-[9px] mt-0.5" style="color:var(--color-text-muted)">total {{ mesesOpcion }}m</p>
           </div>
         </div>
       </div>
 
       <!-- Desglose normales vs cuotas (mes actual) -->
-      <div class="mt-4 pt-4 border-t" style="border-color:#E8EDF5">
-        <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-3">
+      <div class="mt-4 pt-4 border-t" style="border-color:var(--color-border)">
+        <p class="text-[10px] font-semibold uppercase tracking-wider mb-3" style="color:var(--color-text-muted)">
           Composición este mes
         </p>
         <div class="space-y-3">
           <div v-for="t in tarjetas" :key="t.id">
             <div class="flex items-center justify-between text-[11px] mb-1">
-              <span class="font-medium text-slate-700 truncate mr-2">{{ t.nombre }}</span>
-              <span class="font-mono font-semibold shrink-0" style="color:#2D5991">
+              <span class="font-medium truncate mr-2" style="color:var(--color-text-secondary)">{{ t.nombre }}</span>
+              <span class="font-mono font-semibold shrink-0" style="color:var(--color-brand)">
                 {{ formatCurrency(mesActualNormales(t) + mesActualCuotas(t)) }}
               </span>
             </div>
-            <div class="h-2 w-full rounded-full overflow-hidden" style="background:#E8EDF5">
+            <div class="h-2 w-full rounded-full overflow-hidden" style="background:var(--color-border)">
               <div class="h-full flex rounded-full overflow-hidden">
                 <div
                   class="h-full"
-                  style="background:#2D5991;transition:width 0.6s ease"
+                  style="background:var(--color-brand);transition:width 0.6s ease"
                   :style="{ width: pctNormales(t) + '%' }"
                 />
                 <div
                   class="h-full"
-                  style="background:#F59E0B;transition:width 0.6s ease"
+                  style="background:var(--color-alert);transition:width 0.6s ease"
                   :style="{ width: pctCuotas(t) + '%' }"
                 />
               </div>
             </div>
-            <div class="flex gap-4 mt-1 text-[9px] text-slate-500">
-              <span><span class="font-semibold" style="color:#2D5991">{{ formatCurrency(mesActualNormales(t)) }}</span> normales</span>
-              <span><span class="font-semibold" style="color:#F59E0B">{{ formatCurrency(mesActualCuotas(t)) }}</span> cuotas</span>
+            <div class="flex gap-4 mt-1 text-[9px]" style="color:var(--color-text-muted)">
+              <span><span class="font-semibold" style="color:var(--color-brand)">{{ formatCurrency(mesActualNormales(t)) }}</span> normales</span>
+              <span><span class="font-semibold" style="color:var(--color-alert)">{{ formatCurrency(mesActualCuotas(t)) }}</span> cuotas</span>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ import { useTheme }         from '../composables/useTheme'
 const { isDark } = useTheme()
 const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
 
-const COLORS = ['#2D5991', '#10B981', '#D97706', '#7C3AED', '#DC2626', '#0891B2']
+const COLORS = ['#03246B', '#10B981', '#D97706', '#7C3AED', '#DC2626', '#0891B2']
 
 const MESES_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 

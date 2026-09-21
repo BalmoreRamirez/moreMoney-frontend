@@ -2,15 +2,15 @@
   <div class="fintech-card p-5">
     <div class="flex items-center justify-between mb-5">
       <div>
-        <h3 class="text-sm font-semibold text-slate-700">Flujo por cuenta</h3>
-        <p class="text-[10px] text-slate-500 mt-0.5">{{ MESES[mesActual - 1] }} {{ anioActual }}</p>
+        <h3 class="text-sm font-semibold" style="color:var(--color-text-primary)">Flujo por cuenta</h3>
+        <p class="text-[10px] mt-0.5" style="color:var(--color-text-muted)">{{ MESES[mesActual - 1] }} {{ anioActual }}</p>
       </div>
-      <div class="flex items-center gap-4 text-[10px] text-slate-500">
+      <div class="flex items-center gap-4 text-[10px]" style="color:var(--color-text-muted)">
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-2 w-2 rounded-full" style="background:#10B981" />Ingresos
+          <span class="inline-block h-2 w-2 rounded-full" style="background:var(--color-success)" />Ingresos
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-2 w-2 rounded-full" style="background:#DC2626" />Egresos
+          <span class="inline-block h-2 w-2 rounded-full" style="background:var(--color-danger)" />Egresos
         </span>
         <span class="flex items-center gap-1.5">
           <span class="inline-block h-2 w-2 rounded-full" style="background:#6366F1" />Saldo
@@ -19,12 +19,12 @@
     </div>
 
     <div v-if="loading" class="flex justify-center py-12">
-      <div class="h-5 w-5 animate-spin rounded-full border-2" style="border-color:#10B981;border-top-color:transparent" />
+      <div class="h-5 w-5 animate-spin rounded-full border-2" style="border-color:var(--color-brand);border-top-color:transparent" />
     </div>
 
     <div v-else-if="!cuentas.length" class="flex flex-col items-center py-10 text-center">
-      <span class="material-symbols-outlined text-4xl mb-2" style="color:rgba(16,185,129,0.15)">account_balance</span>
-      <p class="text-xs text-slate-500">Sin cuentas registradas</p>
+      <span class="material-symbols-outlined text-4xl mb-2" style="color:var(--color-border)">account_balance</span>
+      <p class="text-xs" style="color:var(--color-text-muted)">Sin cuentas registradas</p>
     </div>
 
     <template v-else>

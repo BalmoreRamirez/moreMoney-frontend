@@ -1,6 +1,6 @@
 <template>
   <div v-if="!hasData" class="flex flex-col items-center justify-center py-6 text-center">
-    <span class="material-symbols-outlined text-3xl mb-2" style="color:var(--color-border)">account_balance</span>
+    <span class="material-symbols-outlined text-3xl mb-2" style="color:var(--color-text-muted);opacity:0.3">account_balance</span>
     <p class="text-xs" style="color:var(--color-text-secondary)">Sin cuentas registradas</p>
   </div>
 

@@ -15,7 +15,7 @@
           </div>
 
           <!-- Aviso cuando hay cuotas pagadas -->
-          <div v-if="isEdit && hasPaidCuotas" class="mb-4 flex items-start gap-2 rounded-xl px-4 py-3 text-xs" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:#F59E0B">
+          <div v-if="isEdit && hasPaidCuotas" class="mb-4 flex items-start gap-2 rounded-xl px-4 py-3 text-xs" style="background:var(--color-alert-bg);border:1px solid var(--color-alert);color:var(--color-alert)">
             <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5">lock</span>
             <span>Tiene cuotas pagadas. Solo puedes editar la descripción.</span>
           </div>

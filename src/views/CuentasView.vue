@@ -147,7 +147,7 @@ function iconoBg(tipo) {
   return { banco: 'background:rgba(3,36,107,0.10)', efectivo: 'background:rgba(16,185,129,0.10)', digital: 'background:rgba(99,102,241,0.10)' }[tipo] ?? ''
 }
 function iconoColor(tipo) {
-  return { banco: '#03246B', efectivo: '#10B981', digital: '#6366F1' }[tipo] ?? '#94A3B8'
+  return { banco: '#03246B', efectivo: '#10B981', digital: '#6366F1' }[tipo] ?? '#64748B'
 }
 
 const showTransferModal = ref(false)

@@ -4,16 +4,16 @@
     <!-- ── Header ─────────────────────────────────────────────────────────── -->
     <div class="flex items-center justify-between mb-5">
       <div>
-        <h3 class="text-sm font-semibold text-slate-700">Flujo de caja</h3>
-        <p class="text-[10px] text-slate-500 mt-0.5">{{ PERIODO_LABELS[periodo] }}</p>
+        <h3 class="text-sm font-semibold" style="color:var(--color-text-primary)">Flujo de caja</h3>
+        <p class="text-[10px] mt-0.5" style="color:var(--color-text-muted)">{{ PERIODO_LABELS[periodo] }}</p>
       </div>
-      <div class="flex rounded-lg overflow-hidden" style="border:1px solid #E2E8F0">
+      <div class="flex rounded-lg overflow-hidden" style="border:1px solid var(--color-border)">
         <button
           v-for="p in PERIODOS" :key="p.value"
           class="px-3 py-1.5 text-[10px] font-semibold transition-colors"
           :style="periodo === p.value
-            ? 'background:rgba(45,89,145,0.1);color:#2D5991'
-            : 'color:#64748B'"
+            ? 'background:var(--color-brand-light);color:var(--color-brand)'
+            : 'color:var(--color-text-secondary)'"
           @click="periodo = p.value"
         >{{ p.label }}</button>
       </div>
@@ -22,7 +22,7 @@
     <!-- ── Loading ─────────────────────────────────────────────────────────── -->
     <div v-if="loading" class="flex justify-center py-12">
       <div class="h-6 w-6 animate-spin rounded-full border-2"
-           style="border-color:#2D5991;border-top-color:transparent" />
+           style="border-color:var(--color-brand);border-top-color:transparent" />
     </div>
 
     <template v-else-if="allLabels.length">
@@ -43,16 +43,16 @@
 
           <!-- Tarjetas -->
           <div class="rounded-2xl p-4"
-               style="background:rgba(45,89,145,0.10);border:1px solid rgba(45,89,145,0.18)">
+               style="background:var(--color-brand-light);border:1px solid var(--color-border)">
             <div class="flex items-center gap-2 mb-3">
-              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#2D5991" />
-              <span class="text-[10px] font-semibold text-slate-600 uppercase tracking-wider">Tarjetas</span>
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:var(--color-brand)" />
+              <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Tarjetas</span>
             </div>
-            <p class="font-mono text-[15px] font-bold text-slate-800 leading-tight">
+            <p class="font-mono text-[15px] font-bold leading-tight" style="color:var(--color-text-primary)">
               {{ formatCurrency(totalTarjetas) }}
             </p>
             <p class="text-[10px] mt-1.5 font-semibold"
-               :style="{ color: pctTarjetas <= 0 ? '#10B981' : '#EF4444' }">
+               :style="{ color: pctTarjetas <= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
               {{ pctTarjetas > 0 ? '+' : '' }}{{ pctTarjetas.toFixed(1) }}%
               {{ pctTarjetas <= 0 ? '↓' : '↑' }}
             </p>
@@ -60,16 +60,16 @@
 
           <!-- Cuentas -->
           <div class="rounded-2xl p-4"
-               style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
+               style="background:var(--color-success-bg);border:1px solid var(--color-border)">
             <div class="flex items-center gap-2 mb-3">
-              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#10B981" />
-              <span class="text-[10px] font-semibold text-slate-600 uppercase tracking-wider">Cuentas</span>
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:var(--color-success)" />
+              <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Cuentas</span>
             </div>
-            <p class="font-mono text-[15px] font-bold text-slate-800 leading-tight">
+            <p class="font-mono text-[15px] font-bold leading-tight" style="color:var(--color-text-primary)">
               {{ formatCurrency(totalCuentas) }}
             </p>
             <p class="text-[10px] mt-1.5 font-semibold"
-               :style="{ color: pctCuentas >= 0 ? '#10B981' : '#EF4444' }">
+               :style="{ color: pctCuentas >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
               {{ pctCuentas > 0 ? '+' : '' }}{{ pctCuentas.toFixed(1) }}%
               {{ pctCuentas >= 0 ? '↑' : '↓' }}
             </p>
@@ -82,8 +82,8 @@
     <!-- Empty state -->
     <div v-else class="flex flex-col items-center py-10 text-center">
       <span class="material-symbols-outlined text-4xl mb-2"
-            style="color:rgba(45,89,145,0.2)">show_chart</span>
-      <p class="text-xs text-slate-500">Sin datos en este periodo</p>
+            style="color:var(--color-border)">show_chart</span>
+      <p class="text-xs" style="color:var(--color-text-muted)">Sin datos en este periodo</p>
     </div>
 
   </div>
@@ -203,7 +203,7 @@ const chartOptions = computed(() => ({
   },
   theme: { mode: apexTheme.value },
 
-  colors: ['#2D5991', '#10B981'],
+  colors: ['#03246B', '#10B981'],
 
   stroke: {
     curve: 'smooth',
@@ -233,7 +233,7 @@ const chartOptions = computed(() => ({
     axisBorder: { show: false },
     axisTicks:  { show: false },
     crosshairs: {
-      stroke: { color: 'rgba(45,89,145,0.3)', dashArray: 4 },
+      stroke: { color: 'rgba(3,36,107,0.3)', dashArray: 4 },
     },
   },
 
@@ -268,17 +268,17 @@ const chartOptions = computed(() => ({
       const label = w.globals.categoryLabels[dataPointIndex]
       const tarj  = series[0][dataPointIndex] || 0
       const cuen  = series[1][dataPointIndex] || 0
-      return `<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;padding:10px 13px;font-size:11px;min-width:170px">
-        <div style="color:#64748B;margin-bottom:7px;font-weight:600;font-size:10px">${label}</div>
+      return `<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;padding:10px 13px;font-size:11px;min-width:170px">
+        <div style="color:var(--color-text-muted);margin-bottom:7px;font-weight:600;font-size:10px">${label}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-          <span style="width:8px;height:8px;border-radius:50%;background:#2D5991;flex-shrink:0"></span>
-          <span style="color:#2D5991;flex:1">Tarjetas</span>
-          <span style="color:#0F172A;font-family:monospace">${formatCurrency(tarj)}</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:#03246B;flex-shrink:0"></span>
+          <span style="color:var(--color-brand);flex:1">Tarjetas</span>
+          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(tarj)}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0"></span>
-          <span style="color:#10b981;flex:1">Cuentas</span>
-          <span style="color:#0F172A;font-family:monospace">${formatCurrency(cuen)}</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--color-success);flex-shrink:0"></span>
+          <span style="color:var(--color-success);flex:1">Cuentas</span>
+          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(cuen)}</span>
         </div>
       </div>`
     },
