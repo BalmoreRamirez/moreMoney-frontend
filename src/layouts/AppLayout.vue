@@ -12,51 +12,95 @@
 
     <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 left-0 z-30 flex w-60 flex-col transition-transform duration-300 lg:translate-x-0"
-      :class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
+      class="fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 lg:translate-x-0"
+      :class="[
+        menuOpen ? 'translate-x-0' : '-translate-x-full',
+        sidebarCollapsed ? 'lg:w-14' : 'lg:w-60',
+        'w-60'
+      ]"
       style="background:var(--sidebar-bg)"
     >
-      <!-- Logo -->
-      <div class="flex h-16 items-center gap-3 px-5" style="border-bottom:1px solid var(--sidebar-border)">
+      <!-- Logo + toggle desktop -->
+      <div
+        class="flex h-16 items-center flex-shrink-0 transition-all duration-300"
+        :class="sidebarCollapsed ? 'lg:justify-center lg:px-0' : 'gap-3 px-4'"
+        style="border-bottom:1px solid var(--sidebar-border)"
+      >
+        <!-- Logo icon: oculto en desktop colapsado -->
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0"
+          class="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0 transition-all duration-300"
+          :class="sidebarCollapsed ? 'lg:hidden' : ''"
           style="background:var(--sidebar-logo-icon-bg)"
         >
           <span class="material-symbols-outlined text-[18px]" style="color:var(--sidebar-logo-icon-color)">account_balance</span>
         </div>
-        <span class="text-base font-bold tracking-tight" style="color:var(--sidebar-text)">moreMoney</span>
+        <!-- Texto: oculto en desktop colapsado -->
+        <span
+          class="text-base font-bold tracking-tight overflow-hidden whitespace-nowrap transition-all duration-300 flex-1"
+          :class="sidebarCollapsed ? 'lg:hidden' : ''"
+          style="color:var(--sidebar-text)"
+        >moreMoney</span>
+        <!-- Botón toggle — solo desktop -->
+        <button
+          class="sidebar-collapse-btn hidden lg:flex flex-shrink-0"
+          :title="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
+          @click="toggleSidebar"
+        >
+          <span class="material-symbols-outlined text-[20px]">
+            {{ sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}
+          </span>
+        </button>
       </div>
 
       <!-- Navegación -->
-      <nav class="flex flex-1 flex-col gap-0.5 px-3 py-4 overflow-y-auto">
+      <nav class="flex flex-1 flex-col gap-0.5 px-2 py-4 overflow-y-auto overflow-x-hidden">
         <span
-          class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest"
+          class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest overflow-hidden whitespace-nowrap transition-all duration-300"
+          :class="sidebarCollapsed ? 'lg:opacity-0 lg:h-0 lg:mb-0' : 'lg:opacity-100'"
           style="color:var(--sidebar-text-muted)"
         >General</span>
         <router-link
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="nav-link group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150"
-          :class="isActive(item.to) ? 'nav-link--active' : 'nav-link--idle'"
+          class="nav-link group flex items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-150"
+          :class="[
+            isActive(item.to) ? 'nav-link--active' : 'nav-link--idle',
+            sidebarCollapsed ? 'lg:justify-center lg:px-0 lg:gap-0' : 'px-3 gap-3'
+          ]"
+          :title="sidebarCollapsed ? item.label : ''"
           @click="menuOpen = false"
         >
           <span
-            class="material-symbols-outlined text-[20px] transition-colors duration-150"
+            class="material-symbols-outlined text-[20px] flex-shrink-0 transition-colors duration-150"
             :class="isActive(item.to) ? 'nav-icon--active' : 'nav-icon--idle'"
           >{{ item.icon }}</span>
-          <span>{{ item.label }}</span>
+          <span
+            class="overflow-hidden whitespace-nowrap transition-all duration-300"
+            :class="sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto lg:opacity-100'"
+          >{{ item.label }}</span>
         </router-link>
       </nav>
 
       <!-- Footer sidebar -->
-      <div class="px-4 py-4" style="border-top:1px solid var(--sidebar-border)">
-        <p class="text-[11px]" style="color:var(--sidebar-text-muted)">moreMoney © {{ currentYear }}</p>
+      <div
+        class="px-4 py-4 overflow-hidden transition-all duration-300"
+        :class="sidebarCollapsed ? 'lg:px-2' : ''"
+        style="border-top:1px solid var(--sidebar-border)"
+      >
+        <p
+          class="text-[11px] whitespace-nowrap overflow-hidden transition-all duration-300"
+          :class="sidebarCollapsed ? 'lg:opacity-0' : 'lg:opacity-100'"
+          style="color:var(--sidebar-text-muted)"
+        >moreMoney © {{ currentYear }}</p>
       </div>
     </aside>
 
     <!-- Área de contenido -->
-    <div class="flex min-w-0 flex-1 flex-col lg:pl-60">
+    <div
+      class="flex min-w-0 flex-1 flex-col transition-all duration-300"
+      :class="sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-60'"
+    >
       <!-- Top bar -->
       <header
         class="sticky top-0 z-20 flex h-16 items-center justify-between px-4 lg:px-6"
@@ -127,6 +171,12 @@ const router    = useRouter()
 const authStore = useAuthStore()
 const menuOpen  = ref(false)
 const { isDark, toggle } = useTheme()
+
+const sidebarCollapsed = ref(localStorage.getItem('sidebar-collapsed') === 'true')
+function toggleSidebar() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  localStorage.setItem('sidebar-collapsed', sidebarCollapsed.value)
+}
 
 function handleLogout() {
   authStore.logout()
@@ -220,4 +270,24 @@ const todayLabel = computed(() =>
 
 .overlay-enter-active, .overlay-leave-active { transition: opacity 0.25s ease; }
 .overlay-enter-from,   .overlay-leave-to     { opacity: 0; }
+
+/* Botón colapsar sidebar */
+.sidebar-collapse-btn {
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--sidebar-border);
+  color: var(--sidebar-text);
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.sidebar-collapse-btn:hover {
+  opacity: 1;
+  background: var(--sidebar-hover-bg);
+}
 </style>
