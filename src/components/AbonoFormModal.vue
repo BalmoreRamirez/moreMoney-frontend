@@ -1,11 +1,11 @@
 <template>
   <Teleport to="body">
-    <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        class="absolute inset-0"
-        style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
-        @click="close"
-      />
+    <Transition name="modal">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
+        <div
+          class="absolute inset-0"
+          style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
+        />
       <div
         class="relative w-full max-w-sm rounded-2xl p-6 shadow-card"
         style="background:var(--color-surface);border:1px solid var(--color-border)"
@@ -44,19 +44,30 @@
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </Transition>
   </Teleport>
 </template>
 
+<style scoped>
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to       { opacity: 0; }
+</style>
+
 <script setup>
 import { ref, watch } from 'vue'
-import { formatCurrency } from '../utils/currency'
+import { formatCurrency }    from '../utils/currency'
+import { usePrestamosStore } from '../stores/prestamos'
+import { useToast }          from '../composables/useToast'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   prestamo:   { type: Object, default: null },
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
+
+const prestamosStore = usePrestamosStore()
+const toast          = useToast()
 
 const form     = ref({ monto: '', fecha_pago: '', nota: '' })
 const saving   = ref(false)
@@ -75,11 +86,14 @@ async function submit() {
   saving.value   = true
   errorMsg.value = ''
   try {
-    emit('saved', { ...form.value })
+    await prestamosStore.registrarAbono(props.prestamo.id, { ...form.value })
+    toast.success('Abono registrado')
+    emit('saved')
     close()
   } catch (e) {
-    errorMsg.value = e.response?.data?.error || 'Error al registrar abono'
-    saving.value   = false
+    errorMsg.value = e?.response?.data?.error || e.message || 'Error al registrar abono'
+  } finally {
+    saving.value = false
   }
 }
 </script>

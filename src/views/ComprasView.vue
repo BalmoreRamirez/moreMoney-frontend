@@ -493,9 +493,11 @@ import AppDataTable            from '../components/AppDataTable.vue'
 import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
 import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
 import ConfirmDeleteModal      from '../components/ConfirmDeleteModal.vue'
+import { useToast } from '../composables/useToast'
 
 const comprasStore  = useComprasStore()
 const tarjetasStore = useTarjetasStore()
+const toast         = useToast()
 
 const activeTab     = ref('normales')
 const filtroTarjeta = ref('')
@@ -663,13 +665,10 @@ function openEditNormal(c)    { editNormalTarget.value = c;    showNormalModal.v
 function openCreateTasaCero() { editTasaCeroTarget.value = null; showTasaCeroModal.value = true }
 function openEditTasaCero(c)  { editTasaCeroTarget.value = c;    showTasaCeroModal.value = true }
 
-async function onSaveNormal(payload) {
-  try {
-    if (editNormalTarget.value) await comprasStore.updateNormal(editNormalTarget.value.id, payload)
-    else await comprasStore.createNormal(payload)
-    recargarTodo()
-    tarjetasStore.fetchTarjetas()
-  } catch (e) { console.error(e) }
+function onSaveNormal() {
+  // El modal hizo el API call y mostró el toast; refrescamos la vista
+  recargarTodo()
+  tarjetasStore.fetchTarjetas()
 }
 
 async function onSaveTasaCero(payload) {
@@ -678,7 +677,8 @@ async function onSaveTasaCero(payload) {
     else await comprasStore.createTasaCero(payload)
     recargarTodo()
     tarjetasStore.fetchTarjetas()
-  } catch (e) { console.error(e) }
+    toast.success(editTasaCeroTarget.value ? 'Compra tasa cero actualizada' : 'Compra tasa cero registrada')
+  } catch (e) { toast.fromError(e, 'No se pudo guardar la compra tasa cero') }
 }
 
 // ── Eliminar ─────────────────────────────────────────────────────
@@ -700,6 +700,7 @@ async function doDeleteNormal() {
     ])
     selectedDay.value = null
     deleteNormalTarget.value = null
+    toast.success('Compra eliminada')
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'
   } finally { deleting.value = false }
@@ -714,6 +715,7 @@ async function doDeleteTasaCero() {
       tarjetasStore.fetchTarjetas(),
     ])
     deleteTasaCeroTarget.value = null
+    toast.success('Compra tasa cero eliminada')
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'
   } finally { deleting.value = false }

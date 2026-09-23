@@ -76,7 +76,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch }         from 'vue'
+import { useComprasStore }   from '../stores/compras'
+import { useToast }          from '../composables/useToast'
 
 const props = defineProps({
   modelValue:       Boolean,
@@ -89,10 +91,15 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 const today = new Date().toISOString().split('T')[0]
 const EMPTY = { tarjeta_id: '', nombre: '', monto: '', fecha_compra: today, estado: 'pendiente' }
 
+const comprasStore = useComprasStore()
+const toast        = useToast()
+
 const form        = ref({ ...EMPTY })
 const errors      = ref({})
 const serverError = ref('')
 const saving      = ref(false)
+
+watch(form, () => { errors.value = {} }, { deep: true })
 
 watch(() => props.modelValue, (open) => {
   if (open) {
@@ -127,13 +134,20 @@ function validate() {
 
 async function submit() {
   if (!validate()) return
-  saving.value = true
+  saving.value      = true
   serverError.value = ''
   try {
-    emit('saved', { ...form.value })
+    if (props.editData) {
+      await comprasStore.updateNormal(props.editData.id, form.value)
+      toast.success('Compra actualizada')
+    } else {
+      await comprasStore.createNormal(form.value)
+      toast.success('Compra registrada')
+    }
+    emit('saved')
     close()
   } catch (err) {
-    serverError.value = err.message || 'Error al guardar'
+    serverError.value = err?.response?.data?.error || err.message || 'Error al guardar'
   } finally {
     saving.value = false
   }

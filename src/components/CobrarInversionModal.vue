@@ -1,11 +1,11 @@
 <template>
   <Teleport to="body">
-    <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        class="absolute inset-0"
-        style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
-        @click="close"
-      />
+    <Transition name="modal">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.window.esc="close">
+        <div
+          class="absolute inset-0"
+          style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
+        />
       <div
         class="relative w-full max-w-md rounded-2xl p-6 shadow-card"
         style="background:var(--color-surface);border:1px solid var(--color-border)"
@@ -97,7 +97,8 @@
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </Transition>
   </Teleport>
 </template>
 
@@ -173,3 +174,8 @@ async function submit() {
   }
 }
 </script>
+
+<style scoped>
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to       { opacity: 0; }
+</style>

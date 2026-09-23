@@ -93,6 +93,7 @@ import { ref, computed, watch } from 'vue'
 import { useEgresosStore }  from '../stores/egresos'
 import { useCuentasStore }  from '../stores/cuentas'
 import { formatCurrency }   from '../utils/currency'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -102,6 +103,7 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 
 const egresosStore = useEgresosStore()
 const cuentasStore = useCuentasStore()
+const toast        = useToast()
 const cuentas      = computed(() => cuentasStore.cuentas)
 
 const today = new Date().toISOString().split('T')[0]
@@ -144,8 +146,10 @@ async function submit() {
   try {
     if (props.egreso) {
       await egresosStore.updateEgreso(props.egreso.id, form.value)
+      toast.success('Egreso actualizado')
     } else {
       await egresosStore.createEgreso(form.value)
+      toast.success('Egreso registrado')
     }
     emit('saved')
     close()

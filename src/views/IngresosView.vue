@@ -364,9 +364,11 @@ import InversionFormModal   from '../components/InversionFormModal.vue'
 import CobrarInversionModal from '../components/CobrarInversionModal.vue'
 import IngresoFormModal     from '../components/IngresoFormModal.vue'
 import ConfirmDeleteModal   from '../components/ConfirmDeleteModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store        = useIngresosStore()
 const cuentasStore = useCuentasStore()
+const toast        = useToast()
 
 const TABS = [
   { key: 'sueldos',     label: 'Sueldos',     icon: 'payments' },
@@ -432,8 +434,9 @@ async function onSueldoSaved(payload) {
   try {
     if (payload.id) await store.updateSueldo(payload.id, payload)
     else            await store.createSueldo(payload)
+    toast.success(payload.id ? 'Sueldo actualizado' : 'Sueldo registrado')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo guardar el sueldo')
   }
 }
 
@@ -447,8 +450,9 @@ async function onCobrar(payload) {
   if (!cobrarTarget.value) return
   try {
     await store.cobrarSueldo(cobrarTarget.value.id, payload)
+    toast.success('Sueldo marcado como cobrado')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo registrar el cobro')
   }
 }
 
@@ -463,8 +467,9 @@ async function onInversionSaved(payload) {
   try {
     if (editInversion.value) await store.updateInversion(editInversion.value.id, payload)
     else                     await store.createInversion(payload)
+    toast.success(editInversion.value ? 'Inversión actualizada' : 'Inversión registrada')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo guardar la inversión')
   }
 }
 
@@ -486,8 +491,9 @@ async function onCobrarInv(payload) {
   if (!cobrarInvTarget.value) return
   try {
     await store.registrarCobro(cobrarInvTarget.value.id, payload)
+    toast.success('Cobro de inversión registrado')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo registrar el cobro')
   }
 }
 
@@ -507,6 +513,8 @@ async function doDelete() {
     if (deleteType.value === 'sueldo')    await store.deleteSueldo(deleteTarget.value.id)
     if (deleteType.value === 'inversion') await store.deleteInversion(deleteTarget.value.id)
     if (deleteType.value === 'otro')      await store.deleteOtro(deleteTarget.value.id)
+    const labels = { sueldo: 'Sueldo', inversion: 'Inversión', otro: 'Ingreso' }
+    toast.success(`${labels[deleteType.value] || 'Registro'} eliminado`)
     deleteTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'
@@ -526,8 +534,9 @@ async function onOtroSaved(payload) {
   try {
     if (editOtro.value) await store.updateOtro(editOtro.value.id, payload)
     else                await store.createOtro(payload)
+    toast.success(editOtro.value ? 'Ingreso actualizado' : 'Ingreso registrado')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo guardar el ingreso')
   }
 }
 </script>

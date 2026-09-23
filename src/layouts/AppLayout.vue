@@ -143,7 +143,7 @@
             <button
               class="logout-btn flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all"
               title="Cerrar sesión"
-              @click="handleLogout"
+              @click="showLogoutConfirm = true"
             >
               <span class="material-symbols-outlined text-[15px]">logout</span>
               <span class="hidden sm:inline">Salir</span>
@@ -158,6 +158,38 @@
       </main>
     </div>
   </div>
+
+  <ToastContainer />
+
+  <!-- Confirm logout -->
+  <Teleport to="body">
+    <Transition name="overlay">
+      <div v-if="showLogoutConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="showLogoutConfirm = false" @keydown.window.esc="showLogoutConfirm = false">
+        <div class="absolute inset-0" style="background:rgba(15,23,42,0.5);backdrop-filter:blur(6px)" />
+        <div class="relative w-full max-w-xs rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
+          <div class="flex items-start gap-4">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style="background:var(--color-danger-bg)">
+              <span class="material-symbols-outlined text-[22px]" style="color:var(--color-danger)">logout</span>
+            </div>
+            <div>
+              <h3 class="font-semibold" style="color:var(--color-text-primary)">¿Cerrar sesión?</h3>
+              <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Se cerrará tu sesión actual.</p>
+            </div>
+          </div>
+          <div class="mt-5 flex gap-3">
+            <button class="btn-ghost flex-1" @click="showLogoutConfirm = false">Cancelar</button>
+            <button
+              class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white"
+              style="background:var(--color-danger)"
+              @click="handleLogout"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
@@ -165,6 +197,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useTheme } from '../composables/useTheme'
+import ToastContainer from '../components/ToastContainer.vue'
 
 const route     = useRoute()
 const router    = useRouter()
@@ -172,13 +205,16 @@ const authStore = useAuthStore()
 const menuOpen  = ref(false)
 const { isDark, toggle } = useTheme()
 
-const sidebarCollapsed = ref(localStorage.getItem('sidebar-collapsed') === 'true')
+const sidebarCollapsed    = ref(localStorage.getItem('sidebar-collapsed') === 'true')
+const showLogoutConfirm   = ref(false)
+
 function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
   localStorage.setItem('sidebar-collapsed', sidebarCollapsed.value)
 }
 
 function handleLogout() {
+  showLogoutConfirm.value = false
   authStore.logout()
   router.push('/login')
 }

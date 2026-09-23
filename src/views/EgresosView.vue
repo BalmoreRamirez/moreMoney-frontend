@@ -112,9 +112,11 @@ import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
 import AppDataTable        from '../components/AppDataTable.vue'
 import EgresoFormModal     from '../components/EgresoFormModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store        = useEgresosStore()
 const cuentasStore = useCuentasStore()
+const toast        = useToast()
 
 const showForm       = ref(false)
 const egresoEditar   = ref(null)
@@ -162,6 +164,7 @@ async function eliminar() {
   deleting.value = true
   try {
     await store.deleteEgreso(egresoEliminar.value.id)
+    toast.success('Egreso eliminado')
     egresoEliminar.value = null
   } finally {
     deleting.value = false

@@ -234,10 +234,12 @@ import { useRoute, useRouter }  from 'vue-router'
 import { usePrestamosStore }    from '../stores/prestamos'
 import { formatCurrency }       from '../utils/currency'
 import AbonoFormModal           from '../components/AbonoFormModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store  = usePrestamosStore()
 const route  = useRoute()
 const router = useRouter()
+const toast  = useToast()
 
 onMounted(() => store.fetchPrestamo(route.params.id))
 
@@ -252,8 +254,8 @@ const progresoPct = computed(() => {
 // Abono
 const showAbonoModal = ref(false)
 
-async function onAbono(payload) {
-  await store.registrarAbono(route.params.id, payload)
+function onAbono() {
+  // El modal hizo el API call, actualizó el store y mostró el toast
 }
 
 // Editar abono
@@ -296,6 +298,7 @@ async function confirmarEliminar() {
   errorEliminar.value = ''
   try {
     await store.deleteAbono(route.params.id, abonoAEliminar.value.id)
+    toast.success('Abono eliminado')
     abonoAEliminar.value = null
   } catch (e) {
     errorEliminar.value = e?.response?.data?.error || 'Error al eliminar el abono'

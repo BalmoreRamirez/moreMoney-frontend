@@ -19,7 +19,7 @@
 
     <!-- Estado de carga -->
     <div v-if="store.loading" class="mt-10 flex justify-center">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-success border-t-transparent" />
+      <span class="material-symbols-outlined animate-spin text-4xl" style="color:var(--color-brand)">progress_activity</span>
     </div>
 
     <!-- Error -->
@@ -35,10 +35,15 @@
         v-for="t in store.tarjetas"
         :key="t.id"
         class="fintech-card group relative flex flex-col items-center px-4 py-5 text-center cursor-pointer card-item"
+        tabindex="0"
+        role="button"
+        :aria-label="`Ver detalle de ${t.nombre}`"
         @click="goToDetalle(t.id)"
+        @keydown.enter.prevent="goToDetalle(t.id)"
+        @keydown.space.prevent="goToDetalle(t.id)"
       >
-        <!-- Acciones hover -->
-        <div class="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <!-- Acciones: visibles en móvil, hover en desktop -->
+        <div class="absolute right-2 top-2 flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
           <button
             class="action-btn"
             title="Editar"
@@ -195,9 +200,11 @@ import { useRouter } from 'vue-router'
 import { useTarjetasStore } from '../stores/tarjetas'
 import TarjetaFormModal from '../components/TarjetaFormModal.vue'
 import { formatCurrency } from '../utils/currency'
+import { useToast } from '../composables/useToast'
 
 const store  = useTarjetasStore()
 const router = useRouter()
+const toast  = useToast()
 
 onMounted(() => store.fetchTarjetas())
 
@@ -234,13 +241,8 @@ const editTarget = ref(null)
 function openCreate() { editTarget.value = null; showModal.value = true }
 function openEdit(t)  { editTarget.value = t;    showModal.value = true }
 
-async function onSaved(payload) {
-  try {
-    if (payload.id) await store.updateTarjeta(payload.id, payload)
-    else            await store.createTarjeta(payload)
-  } catch (e) {
-    console.error(e)
-  }
+function onSaved() {
+  // El modal ya realizó el API call, actualizó el store y mostró el toast
 }
 
 // Eliminar
@@ -254,6 +256,7 @@ async function doDelete() {
   deleteError.value = ''
   try {
     await store.deleteTarjeta(deleteTarget.value.id)
+    toast.success('Tarjeta eliminada')
     deleteTarget.value = null
   } catch (e) {
     deleteError.value = e.response?.data?.error || 'No se pudo eliminar la tarjeta'

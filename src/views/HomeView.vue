@@ -18,6 +18,16 @@
       <span class="material-symbols-outlined animate-spin text-4xl" style="color:var(--color-brand)">progress_activity</span>
     </div>
 
+    <!-- Error de carga -->
+    <div v-else-if="loadError" class="mt-6 flex flex-col items-center gap-4 py-16 text-center">
+      <span class="material-symbols-outlined text-5xl" style="color:var(--color-danger)">cloud_off</span>
+      <p class="text-sm" style="color:var(--color-text-secondary)">{{ loadError }}</p>
+      <button class="btn-brand" @click="recargar">
+        <span class="material-symbols-outlined text-[18px]">refresh</span>
+        Reintentar
+      </button>
+    </div>
+
     <template v-else>
 
       <!-- ══════════════════════════════════════════════════════
@@ -89,9 +99,13 @@
             </div>
           </div>
         </div>
-        <div v-else class="mt-3 fintech-card flex items-center justify-center gap-2 py-6 text-sm" style="color:var(--color-text-muted)">
-          <span class="material-symbols-outlined text-[18px]">info</span>
-          Sin préstamos activos
+        <div v-else class="mt-3 fintech-card flex flex-col items-center justify-center gap-3 py-8 text-center">
+          <span class="material-symbols-outlined text-3xl" style="color:var(--color-text-muted)">handshake</span>
+          <p class="text-sm" style="color:var(--color-text-muted)">Sin préstamos activos</p>
+          <router-link to="/prestamos" class="btn-brand text-xs px-3 py-1.5">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Registrar préstamo
+          </router-link>
         </div>
       </div>
 
@@ -184,9 +198,13 @@
           </router-link>
         </div>
 
-        <div v-else class="fintech-card flex items-center justify-center gap-2 py-6 text-sm" style="color:var(--color-text-muted)">
-          <span class="material-symbols-outlined text-[18px]">info</span>
-          Sin tarjetas registradas
+        <div v-else class="fintech-card flex flex-col items-center justify-center gap-3 py-8 text-center">
+          <span class="material-symbols-outlined text-3xl" style="color:var(--color-text-muted)">credit_card_off</span>
+          <p class="text-sm" style="color:var(--color-text-muted)">Sin tarjetas registradas</p>
+          <router-link to="/tarjetas" class="btn-brand text-xs px-3 py-1.5">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Agregar tarjeta
+          </router-link>
         </div>
       </div>
 
@@ -210,16 +228,26 @@ const now        = new Date()
 const mesActual  = now.getMonth() + 1
 const anioActual = now.getFullYear()
 
-const loading = ref(true)
+const loading   = ref(true)
+const loadError = ref('')
 
-onMounted(async () => {
-  await Promise.all([
-    prestamosStore.fetchPrestamos({}, true),
-    cuentasStore.fetchStats(anioActual, mesActual),
-    tarjetasStore.fetchTarjetas(1, true),
-  ])
-  loading.value = false
-})
+async function recargar() {
+  loading.value   = true
+  loadError.value = ''
+  try {
+    await Promise.all([
+      prestamosStore.fetchPrestamos({}, true),
+      cuentasStore.fetchStats(anioActual, mesActual),
+      tarjetasStore.fetchTarjetas(1, true),
+    ])
+  } catch {
+    loadError.value = 'No se pudieron cargar los datos. Verifica tu conexión e intenta de nuevo.'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(recargar)
 
 // ── Créditos ──────────────────────────────────────────────
 const prestamosActivos = computed(() =>

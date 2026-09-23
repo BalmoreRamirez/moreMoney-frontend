@@ -132,9 +132,11 @@ import AppDataTable       from '../components/AppDataTable.vue'
 import CuentaFormModal    from '../components/CuentaFormModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 import TransferenciaModal from '../components/TransferenciaModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store  = useCuentasStore()
 const router = useRouter()
+const toast  = useToast()
 
 onMounted(() => store.fetchCuentas(true))
 
@@ -160,8 +162,9 @@ async function onSaved(payload) {
   try {
     if (payload.id) await store.updateCuenta(payload.id, payload)
     else            await store.createCuenta(payload)
+    toast.success(payload.id ? 'Cuenta actualizada' : 'Cuenta creada')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo guardar la cuenta')
   }
 }
 
@@ -174,6 +177,7 @@ async function doDelete() {
   deleting.value = true
   try {
     await store.deleteCuenta(deleteTarget.value.id)
+    toast.success('Cuenta eliminada')
     deleteTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar la cuenta'

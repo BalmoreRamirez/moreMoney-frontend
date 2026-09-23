@@ -12,8 +12,58 @@
       </button>
     </div>
 
+    <!-- KPIs -->
+    <div v-if="!store.loading && store.creditos.length" class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <!-- Capital recibido -->
+      <div class="fintech-card px-5 py-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-brand-light)">
+            <span class="material-symbols-outlined text-[15px]" style="color:var(--color-brand)">credit_score</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">Capital recibido</span>
+        </div>
+        <p class="font-mono text-xl font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(kpi.capital) }}</p>
+        <p class="mt-0.5 text-[11px]" style="color:var(--color-text-muted)">{{ store.creditos.length }} crédito{{ store.creditos.length !== 1 ? 's' : '' }}</p>
+      </div>
+
+      <!-- Ya pagado -->
+      <div class="fintech-card px-5 py-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-success-bg)">
+            <span class="material-symbols-outlined text-[15px]" style="color:var(--color-success)">check_circle</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">Ya pagado</span>
+        </div>
+        <p class="font-mono text-xl font-bold" style="color:var(--color-success)">{{ formatCurrency(kpi.pagado) }}</p>
+        <div class="progress-bar-track mt-1.5">
+          <div class="progress-bar-fill" :style="{ width: kpi.pct + '%' }" />
+        </div>
+        <p class="mt-1 text-[11px]" style="color:var(--color-text-muted)">{{ kpi.pct }}% del total adeudado</p>
+      </div>
+
+      <!-- Por pagar -->
+      <div class="fintech-card px-5 py-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div
+            class="flex h-7 w-7 items-center justify-center rounded-lg"
+            :style="kpi.restante > 0 ? 'background:var(--color-danger-bg)' : 'background:var(--color-success-bg)'"
+          >
+            <span
+              class="material-symbols-outlined text-[15px]"
+              :style="kpi.restante > 0 ? 'color:var(--color-danger)' : 'color:var(--color-success)'"
+            >{{ kpi.restante > 0 ? 'pending' : 'task_alt' }}</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">Por pagar</span>
+        </div>
+        <p class="font-mono text-xl font-bold" :style="{ color: kpi.restante > 0 ? 'var(--color-danger)' : 'var(--color-success)' }">
+          {{ formatCurrency(kpi.restante) }}
+        </p>
+        <p class="mt-0.5 text-[11px]" style="color:var(--color-text-muted)">{{ kpi.activos }} activo{{ kpi.activos !== 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+
     <!-- Filtros -->
-    <div class="mt-6 flex flex-wrap gap-2">
+    <div class="mt-5 flex flex-wrap gap-2">
       <button
         v-for="f in FILTROS"
         :key="f.value"
@@ -63,7 +113,7 @@
         <template #body="{ data: c }">
           <Tag
             :value="c.estado === 'activo' ? 'Activo' : 'Pagado'"
-            :severity="c.estado === 'activo' ? 'info' : 'success'"
+            :severity="c.estado === 'activo' ? 'success' : 'secondary'"
           />
         </template>
       </Column>
@@ -151,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted }   from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter }        from 'vue-router'
 import { useCreditosStore } from '../stores/creditos'
 import { useCuentasStore }  from '../stores/cuentas'
@@ -159,10 +209,12 @@ import { formatCurrency }   from '../utils/currency'
 import AppDataTable         from '../components/AppDataTable.vue'
 import CreditoFormModal     from '../components/CreditoFormModal.vue'
 import ConfirmDeleteModal   from '../components/ConfirmDeleteModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store        = useCreditosStore()
 const cuentasStore = useCuentasStore()
 const router       = useRouter()
+const toast        = useToast()
 
 const FILTROS = [
   { value: '',       label: 'Todos' },
@@ -170,9 +222,20 @@ const FILTROS = [
   { value: 'pagado', label: 'Pagados' },
 ]
 
-const filtro = ref('')
+const filtro = ref('activo')
 
-onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchCreditos()]))
+const kpi = computed(() => {
+  const list     = store.creditos
+  const capital  = list.reduce((s, c) => s + parseFloat(c.capital       || 0), 0)
+  const pagado   = list.reduce((s, c) => s + parseFloat(c.total_pagado  || 0), 0)
+  const total    = list.reduce((s, c) => s + parseFloat(c.capital || 0) + parseFloat(c.total_interes || 0), 0)
+  const restante = list.reduce((s, c) => s + Math.max(0, parseFloat(c.saldo_pendiente || 0)), 0)
+  const activos  = list.filter(c => c.estado === 'activo').length
+  const pct      = total > 0 ? Math.round((pagado / total) * 100) : 0
+  return { capital, pagado, restante, activos, pct }
+})
+
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchCreditos({ estado: 'activo' })]))
 
 function setFiltro(val) {
   filtro.value = val
@@ -189,8 +252,10 @@ function progresoPct(c) {
 
 const showFormModal = ref(false)
 async function onCrear(payload) {
-  try { await store.createCredito(payload) }
-  catch (e) { console.error(e) }
+  try {
+    await store.createCredito(payload)
+    toast.success('Crédito registrado')
+  } catch (e) { toast.fromError(e, 'No se pudo registrar el crédito') }
 }
 
 const deleteTarget   = ref(null)
@@ -203,6 +268,7 @@ async function doDelete() {
   deleting.value = true
   try {
     await store.deleteCredito(deleteTarget.value.id)
+    toast.success('Crédito eliminado')
     deleteTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'

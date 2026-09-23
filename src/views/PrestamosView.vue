@@ -114,7 +114,7 @@
         <template #body="{ data: p }">
           <Tag
             :value="p.estado === 'activo' ? 'Activo' : 'Pagado'"
-            :severity="p.estado === 'activo' ? 'warn' : 'success'"
+            :severity="p.estado === 'activo' ? 'success' : 'secondary'"
           />
         </template>
       </Column>
@@ -215,10 +215,12 @@ import { formatCurrency }    from '../utils/currency'
 import AppDataTable       from '../components/AppDataTable.vue'
 import PrestamoFormModal  from '../components/PrestamoFormModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store        = usePrestamosStore()
 const cuentasStore = useCuentasStore()
 const router       = useRouter()
+const toast        = useToast()
 
 const FILTROS = [
   { value: 'activo', label: 'Activos' },
@@ -272,7 +274,8 @@ async function onSaved(payload) {
   try {
     if (editTarget2.value) await store.updatePrestamo(editTarget2.value.id, payload)
     else                   await store.createPrestamo(payload)
-  } catch (e) { console.error(e) }
+    toast.success(editTarget2.value ? 'Préstamo actualizado' : 'Préstamo registrado')
+  } catch (e) { toast.fromError(e, 'No se pudo guardar el préstamo') }
 }
 
 // Eliminar
@@ -286,6 +289,7 @@ async function doDelete() {
   deleting.value = true
   try {
     await store.deletePrestamo(deleteTarget.value.id)
+    toast.success('Préstamo eliminado')
     deleteTarget.value = null
   } catch (e) {
     deleteErrorMsg.value = e.response?.data?.error || 'No se pudo eliminar'

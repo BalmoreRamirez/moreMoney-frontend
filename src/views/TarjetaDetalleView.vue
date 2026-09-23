@@ -287,11 +287,13 @@ import { useComprasStore }  from '../stores/compras'
 import { formatCurrency } from '../utils/currency'
 import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
 import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
+import { useToast } from '../composables/useToast'
 
 const route        = useRoute()
 const router       = useRouter()
 const store        = useTarjetasStore()
 const comprasStore = useComprasStore()
+const toast        = useToast()
 
 const tarjetaId = computed(() => Number(route.params.id))
 
@@ -308,18 +310,17 @@ const tarjetaComoArray = computed(() =>
 function openNormal()   { showNormal.value   = true }
 function openTasaCero() { showTasaCero.value = true }
 
-async function onNormalSaved(payload) {
-  try {
-    await comprasStore.createNormal(payload)
-    await store.fetchTarjeta(route.params.id)
-  } catch (e) { console.error(e) }
+async function onNormalSaved() {
+  // El modal hizo el API call y mostró el toast; refrescamos el detalle
+  await store.fetchTarjeta(route.params.id)
 }
 
 async function onTasaCeroSaved(payload) {
   try {
     await comprasStore.createTasaCero(payload)
     await store.fetchTarjeta(route.params.id)
-  } catch (e) { console.error(e) }
+    toast.success('Compra tasa cero registrada')
+  } catch (e) { toast.fromError(e, 'No se pudo registrar la compra') }
 }
 
 const data = computed(() => store.tarjeta)

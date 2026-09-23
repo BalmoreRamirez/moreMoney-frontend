@@ -118,7 +118,9 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { useCuentasStore } from '../stores/cuentas'
+import { useCuentasStore }   from '../stores/cuentas'
+import { useTarjetasStore }  from '../stores/tarjetas'
+import { useToast }          from '../composables/useToast'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -128,8 +130,10 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 
 const isEdit = computed(() => !!props.tarjetaEdit)
 
-const cuentasStore = useCuentasStore()
-const cuentas = computed(() => cuentasStore.cuentas)
+const cuentasStore  = useCuentasStore()
+const tarjetasStore = useTarjetasStore()
+const toast         = useToast()
+const cuentas       = computed(() => cuentasStore.cuentas)
 
 const EMPTY = { nombre: '', banco: '', limite_credito: '', dia_corte: '', dia_pago: '', cuenta_pago_id: null }
 const form        = ref({ ...EMPTY })
@@ -151,6 +155,8 @@ watch(() => props.modelValue, async (open) => {
   }
 })
 
+watch(form, () => { errors.value = {} }, { deep: true })
+
 function validate() {
   const e = {}
   if (!form.value.nombre) e.nombre = 'El nombre es requerido'
@@ -168,10 +174,17 @@ async function submit() {
   saving.value      = true
   serverError.value = ''
   try {
-    emit('saved', { ...form.value, id: props.tarjetaEdit?.id })
+    if (props.tarjetaEdit) {
+      await tarjetasStore.updateTarjeta(props.tarjetaEdit.id, form.value)
+      toast.success('Tarjeta actualizada')
+    } else {
+      await tarjetasStore.createTarjeta(form.value)
+      toast.success('Tarjeta creada')
+    }
+    emit('saved')
     emit('update:modelValue', false)
   } catch (err) {
-    serverError.value = err.message || 'Error al guardar'
+    serverError.value = err?.response?.data?.error || err.message || 'Error al guardar'
   } finally {
     saving.value = false
   }

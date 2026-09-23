@@ -154,11 +154,13 @@ import { useCreditosStore }        from '../stores/creditos'
 import { useCuentasStore }         from '../stores/cuentas'
 import { formatCurrency }          from '../utils/currency'
 import PagarCuotaCreditoModal      from '../components/PagarCuotaCreditoModal.vue'
+import { useToast } from '../composables/useToast'
 
 const store        = useCreditosStore()
 const cuentasStore = useCuentasStore()
 const route        = useRoute()
 const router       = useRouter()
+const toast        = useToast()
 
 onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchCredito(route.params.id)]))
 
@@ -193,8 +195,9 @@ function openPagar(cuota) {
 async function onPagarCuota(payload) {
   try {
     await store.pagarCuota(route.params.id, cuotaSeleccionada.value.id, payload)
+    toast.success('Cuota pagada')
   } catch (e) {
-    console.error(e)
+    toast.fromError(e, 'No se pudo registrar el pago')
   }
 }
 </script>
