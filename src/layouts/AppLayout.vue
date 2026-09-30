@@ -161,6 +161,29 @@
 
   <ToastContainer />
 
+  <!-- Inactivity warning banner -->
+  <Teleport to="body">
+    <Transition name="overlay">
+      <div
+        v-if="inactivityWarning"
+        class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex items-center gap-3 rounded-2xl px-5 py-3 shadow-card"
+        style="background:var(--color-alert-bg);border:1px solid rgba(245,158,11,0.35);min-width:280px"
+      >
+        <span class="material-symbols-outlined text-[20px]" style="color:var(--color-alert)">timer</span>
+        <p class="flex-1 text-sm font-medium" style="color:var(--color-alert)">
+          Tu sesión cerrará en 1 minuto por inactividad
+        </p>
+        <button
+          class="rounded-lg px-3 py-1 text-xs font-semibold"
+          style="background:var(--color-alert);color:#fff"
+          @click="keepSession"
+        >
+          Mantener
+        </button>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- Confirm logout -->
   <Teleport to="body">
     <Transition name="overlay">
@@ -197,6 +220,8 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useTheme } from '../composables/useTheme'
+import { useInactivityTimeout } from '../composables/useInactivityTimeout'
+import { useToast } from '../composables/useToast'
 import ToastContainer from '../components/ToastContainer.vue'
 
 const route     = useRoute()
@@ -207,6 +232,21 @@ const { isDark, toggle } = useTheme()
 
 const sidebarCollapsed    = ref(localStorage.getItem('sidebar-collapsed') === 'true')
 const showLogoutConfirm   = ref(false)
+const toast               = useToast()
+
+const { isWarning: inactivityWarning } = useInactivityTimeout({
+  onWarning: () => { /* banner ya reactivo via isWarning */ },
+  onTimeout: () => {
+    authStore.logout()
+    router.push('/login')
+    toast.warning('Sesión cerrada por inactividad')
+  },
+})
+
+function keepSession() {
+  // cualquier interacción ya reinicia los timers; solo ocultamos el banner
+  inactivityWarning.value = false
+}
 
 function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
