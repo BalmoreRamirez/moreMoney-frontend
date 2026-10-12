@@ -129,11 +129,19 @@
             <div
               v-for="c in corteAPagar"
               :key="c.id"
-              class="purchase-row flex items-center justify-between px-5 py-3 gap-3"
+              class="purchase-row group flex items-center justify-between px-5 py-3 gap-3"
             >
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
                 <p class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
+              </div>
+              <div class="row-actions">
+                <button class="row-btn" @click.stop="startEditNormal(c)" title="Editar">
+                  <span class="material-symbols-outlined text-[14px]">edit</span>
+                </button>
+                <button class="row-btn row-btn--danger" @click.stop="askDelete('normal', c)" title="Eliminar">
+                  <span class="material-symbols-outlined text-[14px]">delete</span>
+                </button>
               </div>
               <span class="font-mono text-sm font-semibold shrink-0" style="color:var(--color-alert)">{{ formatCurrency(c.monto) }}</span>
             </div>
@@ -192,11 +200,19 @@
             <div
               v-for="c in corteEnProceso"
               :key="c.id"
-              class="purchase-row flex items-center justify-between px-5 py-3 gap-3"
+              class="purchase-row group flex items-center justify-between px-5 py-3 gap-3"
             >
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
                 <p class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
+              </div>
+              <div class="row-actions">
+                <button class="row-btn" @click.stop="startEditNormal(c)" title="Editar">
+                  <span class="material-symbols-outlined text-[14px]">edit</span>
+                </button>
+                <button class="row-btn row-btn--danger" @click.stop="askDelete('normal', c)" title="Eliminar">
+                  <span class="material-symbols-outlined text-[14px]">delete</span>
+                </button>
               </div>
               <span class="font-mono text-sm font-semibold shrink-0" style="color:var(--color-brand)">{{ formatCurrency(c.monto) }}</span>
             </div>
@@ -229,18 +245,31 @@
         <div v-else class="space-y-3">
           <div v-for="c in data.compras_tasa_cero" :key="c.id" class="fintech-card p-4">
             <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0">
+              <div class="min-w-0 flex-1">
                 <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ c.nombre }}</p>
                 <p class="mt-0.5 text-xs" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
               </div>
-              <div class="text-right shrink-0">
-                <p class="font-mono text-base font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto_total) }}</p>
-                <span class="text-[11px] rounded-full px-2 py-0.5"
-                  :style="c.estado === 'activa'
-                    ? 'background:rgba(16,185,129,0.12);color:var(--color-success)'
-                    : 'background:rgba(100,116,139,0.1);color:var(--color-text-muted)'">
-                  {{ c.estado }}
-                </span>
+              <div class="flex items-start gap-2 shrink-0">
+                <!-- Action buttons -->
+                <div class="flex gap-1 pt-0.5">
+                  <button class="row-btn" @click="startEditTasaCero(c)" title="Editar">
+                    <span class="material-symbols-outlined text-[14px]">edit</span>
+                  </button>
+                  <button class="row-btn row-btn--danger" @click="askDelete('tasa-cero', c)"
+                    :disabled="cuotasPagadas(c) > 0"
+                    :title="cuotasPagadas(c) > 0 ? 'No se puede eliminar: tiene cuotas pagadas' : 'Eliminar'">
+                    <span class="material-symbols-outlined text-[14px]">delete</span>
+                  </button>
+                </div>
+                <div class="text-right">
+                  <p class="font-mono text-base font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto_total) }}</p>
+                  <span class="text-[11px] rounded-full px-2 py-0.5"
+                    :style="c.estado === 'activa'
+                      ? 'background:rgba(16,185,129,0.12);color:var(--color-success)'
+                      : 'background:rgba(100,116,139,0.1);color:var(--color-text-muted)'">
+                    {{ c.estado }}
+                  </span>
+                </div>
               </div>
             </div>
             <div class="mt-4">
@@ -276,6 +305,52 @@
       @saved="onTasaCeroSaved"
     />
 
+    <!-- Modales de edición -->
+    <CompraNormalFormModal
+      v-model="showEditNormal"
+      :tarjetas="tarjetaComoArray"
+      :default-tarjeta-id="tarjetaId"
+      :edit-data="editNormal"
+      @saved="onNormalSaved"
+    />
+    <CompraTasaCeroFormModal
+      v-model="showEditTasaCero"
+      :tarjetas="tarjetaComoArray"
+      :default-tarjeta-id="tarjetaId"
+      :edit-data="editTasaCero"
+      @saved="onEditTasaCeroSaved"
+    />
+
+    <!-- Modal de confirmación de borrado -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showDeleteConfirm"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          @mousedown.self="showDeleteConfirm = false"
+          @keydown.window.esc="showDeleteConfirm = false">
+          <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
+          <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
+            <div class="mb-1 flex items-center gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background:rgba(220,38,38,0.1)">
+                <span class="material-symbols-outlined text-[20px]" style="color:var(--color-danger)">delete</span>
+              </span>
+              <h3 class="text-base font-semibold" style="color:var(--color-text-primary)">Eliminar compra</h3>
+            </div>
+            <p class="mt-3 mb-5 text-sm" style="color:var(--color-text-muted)">
+              ¿Eliminar <strong style="color:var(--color-text-primary)">{{ deleteTarget?.item?.nombre }}</strong>?
+              Esta acción no se puede deshacer.
+            </p>
+            <div class="flex gap-3">
+              <button class="btn-ghost flex-1" @click="showDeleteConfirm = false">Cancelar</button>
+              <button class="btn-danger flex-1" :disabled="deleting" @click="executeDelete">
+                {{ deleting ? 'Eliminando…' : 'Eliminar' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
   </section>
 </template>
 
@@ -309,6 +384,44 @@ const tarjetaComoArray = computed(() =>
 
 function openNormal()   { showNormal.value   = true }
 function openTasaCero() { showTasaCero.value = true }
+
+// ── Edit / Delete ─────────────────────────────────────
+const editNormal        = ref(null)
+const showEditNormal    = ref(false)
+const editTasaCero      = ref(null)
+const showEditTasaCero  = ref(false)
+const deleteTarget      = ref(null)
+const showDeleteConfirm = ref(false)
+const deleting          = ref(false)
+
+function startEditNormal(c)   { editNormal.value  = c; showEditNormal.value   = true }
+function startEditTasaCero(c) { editTasaCero.value = c; showEditTasaCero.value = true }
+function askDelete(type, item) { deleteTarget.value = { type, item }; showDeleteConfirm.value = true }
+
+async function onEditTasaCeroSaved(payload) {
+  try {
+    await comprasStore.updateTasaCero(editTasaCero.value.id, payload)
+    toast.success('Compra tasa cero actualizada')
+    showEditTasaCero.value = false
+    editTasaCero.value = null
+    await store.fetchTarjeta(route.params.id)
+  } catch (e) { toast.fromError(e, 'No se pudo actualizar la compra') }
+}
+
+async function executeDelete() {
+  if (!deleteTarget.value) return
+  deleting.value = true
+  try {
+    const { type, item } = deleteTarget.value
+    if (type === 'normal') await comprasStore.deleteNormal(item.id)
+    else                   await comprasStore.deleteTasaCero(item.id)
+    toast.success('Compra eliminada')
+    showDeleteConfirm.value = false
+    deleteTarget.value = null
+    await store.fetchTarjeta(route.params.id)
+  } catch (e) { toast.fromError(e, 'No se pudo eliminar') }
+  finally { deleting.value = false }
+}
 
 async function onNormalSaved() {
   // El modal hizo el API call y mostró el toast; refrescamos el detalle
@@ -483,4 +596,56 @@ function formatDate(d) {
   border: 1.5px solid var(--color-brand);
 }
 .add-btn--outline:hover { background: var(--color-brand-light); }
+
+/* ── Row action buttons ────────────────────────────── */
+.row-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 1;
+  flex-shrink: 0;
+}
+@media (min-width: 1024px) {
+  .row-actions { opacity: 0; transition: opacity 0.15s; }
+  .group:hover .row-actions { opacity: 1; }
+}
+
+.row-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  background: var(--color-surface-mid);
+  color: var(--color-text-muted);
+}
+.row-btn:hover { background: var(--color-brand-light); color: var(--color-brand); }
+.row-btn--danger:hover { background: rgba(220,38,38,0.1); color: var(--color-danger); }
+.row-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+/* ── Danger button ─────────────────────────────────── */
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  background: var(--color-danger);
+  color: #fff;
+  border: none;
+}
+.btn-danger:hover { opacity: 0.88; }
+.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Modal transition ──────────────────────────────── */
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to       { opacity: 0; }
 </style>
