@@ -54,32 +54,43 @@
 
       <!-- Navegación -->
       <nav class="flex flex-1 flex-col gap-0.5 px-2 py-4 overflow-y-auto overflow-x-hidden">
-        <span
-          class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest overflow-hidden whitespace-nowrap transition-all duration-300"
-          :class="sidebarCollapsed ? 'lg:opacity-0 lg:h-0 lg:mb-0' : 'lg:opacity-100'"
-          style="color:var(--sidebar-text-muted)"
-        >General</span>
-        <router-link
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          class="nav-link group flex items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-150"
-          :class="[
-            isActive(item.to) ? 'nav-link--active' : 'nav-link--idle',
-            sidebarCollapsed ? 'lg:justify-center lg:px-0 lg:gap-0' : 'px-3 gap-3'
-          ]"
-          :title="sidebarCollapsed ? item.label : ''"
-          @click="menuOpen = false"
-        >
+        <template v-for="(group, gIdx) in navGroups" :key="group.label">
+          <!-- Separador entre grupos -->
+          <div
+            v-if="gIdx > 0"
+            class="transition-all duration-300"
+            :class="sidebarCollapsed ? 'my-1 mx-1 border-t' : 'h-3'"
+            style="border-color:var(--sidebar-border)"
+          />
+          <!-- Etiqueta de grupo -->
           <span
-            class="material-symbols-outlined text-[20px] flex-shrink-0 transition-colors duration-150"
-            :class="isActive(item.to) ? 'nav-icon--active' : 'nav-icon--idle'"
-          >{{ item.icon }}</span>
-          <span
-            class="overflow-hidden whitespace-nowrap transition-all duration-300"
-            :class="sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto lg:opacity-100'"
-          >{{ item.label }}</span>
-        </router-link>
+            class="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest overflow-hidden whitespace-nowrap transition-all duration-300"
+            :class="sidebarCollapsed ? 'lg:opacity-0 lg:h-0 lg:mb-0' : 'lg:opacity-100'"
+            style="color:var(--sidebar-text-muted)"
+          >{{ group.label }}</span>
+          <!-- Ítems del grupo -->
+          <router-link
+            v-for="item in group.items"
+            :key="item.to"
+            :to="item.to"
+            class="nav-link group flex items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-150"
+            :class="[
+              isActive(item.to) ? 'nav-link--active' : 'nav-link--idle',
+              sidebarCollapsed ? 'lg:justify-center lg:px-0 lg:gap-0' : 'px-3 gap-3'
+            ]"
+            :title="sidebarCollapsed ? item.label : ''"
+            @click="menuOpen = false"
+          >
+            <span
+              class="material-symbols-outlined text-[20px] flex-shrink-0 transition-colors duration-150"
+              :class="isActive(item.to) ? 'nav-icon--active' : 'nav-icon--idle'"
+            >{{ item.icon }}</span>
+            <span
+              class="overflow-hidden whitespace-nowrap transition-all duration-300"
+              :class="sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto lg:opacity-100'"
+            >{{ item.label }}</span>
+          </router-link>
+        </template>
       </nav>
 
       <!-- Footer sidebar -->
@@ -259,24 +270,41 @@ function handleLogout() {
   router.push('/login')
 }
 
-const navItems = [
-  { to: '/',           icon: 'dashboard',             label: 'Dashboard' },
-  { to: '/tarjetas',   icon: 'credit_card',            label: 'Tarjetas' },
-  { to: '/compras',    icon: 'shopping_bag',           label: 'Compras' },
-  { to: '/calendario', icon: 'calendar_month',         label: 'Calendario' },
-  { to: '/cuentas',    icon: 'account_balance_wallet', label: 'Cuentas' },
-  { to: '/ingresos',   icon: 'payments',               label: 'Ingresos' },
-  { to: '/egresos',    icon: 'money_off',              label: 'Egresos' },
-  { to: '/prestamos',  icon: 'handshake',              label: 'Préstamos' },
-  { to: '/creditos',   icon: 'credit_score',           label: 'Créditos' },
+const navGroups = [
+  {
+    label: 'General',
+    items: [
+      { to: '/', icon: 'dashboard', label: 'Dashboard' },
+    ],
+  },
+  {
+    label: 'Tarjetas',
+    items: [
+      { to: '/tarjetas',   icon: 'credit_card',    label: 'Tarjetas' },
+      { to: '/compras',    icon: 'shopping_bag',   label: 'Compras' },
+      { to: '/calendario', icon: 'calendar_month', label: 'Calendario' },
+    ],
+  },
+  {
+    label: 'Finanzas',
+    items: [
+      { to: '/cuentas',   icon: 'account_balance_wallet', label: 'Cuentas' },
+      { to: '/ingresos',  icon: 'payments',               label: 'Ingresos' },
+      { to: '/egresos',   icon: 'money_off',              label: 'Egresos' },
+      { to: '/prestamos', icon: 'handshake',              label: 'Préstamos' },
+      { to: '/creditos',  icon: 'credit_score',           label: 'Créditos' },
+    ],
+  },
 ]
+
+const allNavItems = navGroups.flatMap(g => g.items)
 
 function isActive(to) {
   if (to === '/') return route.path === '/'
   return route.path.startsWith(to)
 }
 
-const currentNav  = computed(() => navItems.find((n) => isActive(n.to)))
+const currentNav  = computed(() => allNavItems.find((n) => isActive(n.to)))
 const currentYear = new Date().getFullYear()
 
 const todayLabel = computed(() =>
