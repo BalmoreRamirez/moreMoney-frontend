@@ -14,7 +14,6 @@
 
     <!-- KPIs -->
     <div v-if="!store.loading && store.prestamos.length" class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-      <!-- Capital prestado -->
       <div class="fintech-card px-5 py-4">
         <div class="flex items-center gap-2 mb-2">
           <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
@@ -26,7 +25,6 @@
         <p class="mt-0.5 text-[11px]" style="color:var(--color-text-muted)">{{ store.prestamos.length }} préstamo{{ store.prestamos.length !== 1 ? 's' : '' }}</p>
       </div>
 
-      <!-- Recuperado -->
       <div class="fintech-card px-5 py-4">
         <div class="flex items-center gap-2 mb-2">
           <div class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-success-bg)">
@@ -41,7 +39,6 @@
         <p class="mt-1 text-[11px]" style="color:var(--color-text-muted)">{{ kpi.pct }}% del total adeudado</p>
       </div>
 
-      <!-- Por cobrar -->
       <div class="fintech-card px-5 py-4">
         <div class="flex items-center gap-2 mb-2">
           <div
@@ -62,7 +59,7 @@
       </div>
     </div>
 
-    <!-- Filtros -->
+    <!-- Filtros: Activos | Pagados | Todos | Calendario -->
     <div class="mt-5 flex flex-wrap gap-2">
       <button
         v-for="f in FILTROS"
@@ -82,115 +79,211 @@
       {{ store.error }}
     </div>
 
-    <!-- Tabla -->
-    <AppDataTable
-      v-else
-      class="mt-6"
-      :data="store.prestamos"
-      :loading="store.loading"
-      empty-text="Sin préstamos registrados"
-      empty-icon="handshake"
-    >
-      <!-- Deudor -->
-      <Column field="deudor_nombre" header="Deudor" sortable style="min-width:180px">
-        <template #body="{ data: p }">
-          <div
-            class="flex items-center gap-3 cursor-pointer"
-            @click="goToDetalle(p.id)"
-          >
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
-              <span class="material-symbols-outlined text-[16px]" style="color:var(--color-alert)">person</span>
+    <!-- ── VISTA: LISTA ──────────────────────────────────────── -->
+    <template v-else-if="filtro !== 'calendario'">
+      <AppDataTable
+        class="mt-6"
+        :data="store.prestamos"
+        :loading="store.loading"
+        empty-text="Sin préstamos registrados"
+        empty-icon="handshake"
+      >
+        <Column field="deudor_nombre" header="Deudor" sortable style="min-width:180px">
+          <template #body="{ data: p }">
+            <div class="flex items-center gap-3 cursor-pointer" @click="goToDetalle(p.id)">
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
+                <span class="material-symbols-outlined text-[16px]" style="color:var(--color-alert)">person</span>
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ p.deudor_nombre }}</p>
+                <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.deudor_contacto || '—' }}</p>
+              </div>
             </div>
-            <div class="min-w-0">
-              <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ p.deudor_nombre }}</p>
-              <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.deudor_contacto || '—' }}</p>
+          </template>
+        </Column>
+
+        <Column field="estado" header="Estado" sortable style="min-width:100px">
+          <template #body="{ data: p }">
+            <Tag :value="p.estado === 'activo' ? 'Activo' : 'Pagado'" :severity="p.estado === 'activo' ? 'success' : 'secondary'" />
+          </template>
+        </Column>
+
+        <Column field="capital" header="Capital" sortable style="min-width:120px">
+          <template #body="{ data: p }">
+            <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(p.capital) }}</span>
+          </template>
+        </Column>
+
+        <Column field="interes_generado" header="Interés" sortable style="min-width:130px">
+          <template #body="{ data: p }">
+            <div>
+              <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(p.interes_generado) }}</span>
+              <p class="text-[10px]" style="color:var(--color-text-muted)">{{ pctTasa(p.tasa_interes_mensual) }}%/mes</p>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="total_pagado" header="Pagado" sortable style="min-width:120px">
+          <template #body="{ data: p }">
+            <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(p.total_pagado) }}</span>
+          </template>
+        </Column>
+
+        <Column field="saldo_pendiente" header="Pendiente" sortable style="min-width:120px">
+          <template #body="{ data: p }">
+            <span class="font-mono font-semibold" :style="{ color: p.saldo_pendiente <= 0 ? 'var(--color-success)' : 'var(--color-alert)' }">
+              {{ formatCurrency(Math.max(0, p.saldo_pendiente)) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column header="Progreso" style="min-width:140px">
+          <template #body="{ data: p }">
+            <div>
+              <div class="flex justify-between text-[10px] mb-1" style="color:var(--color-text-muted)">
+                <span>{{ progresoPct(p) }}%</span>
+                <span>{{ formatCurrency(p.total_pagado) }} / {{ formatCurrency(p.total_deuda) }}</span>
+              </div>
+              <div class="progress-bar-track">
+                <div
+                  class="progress-bar-fill transition-all"
+                  :class="p.saldo_pendiente <= 0 ? '' : 'progress-bar-fill--accent'"
+                  :style="{ width: progresoPct(p) + '%' }"
+                />
+              </div>
+            </div>
+          </template>
+        </Column>
+
+        <Column header="" style="min-width:100px;width:100px">
+          <template #body="{ data: p }">
+            <div class="flex items-center justify-end gap-1">
+              <button class="icon-btn" title="Ver detalle" @click="goToDetalle(p.id)">
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+              </button>
+              <template v-if="p.estado === 'activo' && !p.pagos?.length">
+                <button class="icon-btn" title="Editar" @click="openEdit(p)">
+                  <span class="material-symbols-outlined text-[16px]">edit</span>
+                </button>
+                <button class="icon-btn-danger" title="Eliminar" @click="confirmDelete(p)">
+                  <span class="material-symbols-outlined text-[16px]">delete</span>
+                </button>
+              </template>
+            </div>
+          </template>
+        </Column>
+      </AppDataTable>
+    </template>
+
+    <!-- ── VISTA: CALENDARIO ────────────────────────────────── -->
+    <template v-else-if="filtro === 'calendario'">
+      <div class="mt-4">
+
+        <!-- Sin datos -->
+        <div v-if="loansWithRange.length === 0 && !store.loading"
+          class="fintech-card flex flex-col items-center gap-3 py-14 text-center">
+          <span class="material-symbols-outlined text-4xl" style="color:var(--color-text-muted)">calendar_month</span>
+          <p class="text-sm font-medium" style="color:var(--color-text-secondary)">Sin préstamos con duración configurada</p>
+          <p class="text-xs" style="color:var(--color-text-muted)">
+            Agrega días de duración al crear o editar un préstamo para verlos aquí.
+          </p>
+        </div>
+
+        <template v-else>
+          <!-- Leyenda de colores -->
+          <div class="mb-4 flex flex-wrap gap-3">
+            <div
+              v-for="loan in loansWithRange"
+              :key="loan.id"
+              class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer transition-opacity"
+              :style="`background:${loan.color}18;border:1px solid ${loan.color}40`"
+              @click="goToDetalle(loan.id)"
+            >
+              <span class="h-2.5 w-2.5 rounded-full flex-shrink-0" :style="`background:${loan.color}`" />
+              <span style="color:var(--color-text-primary)">{{ loan.deudor_nombre }}</span>
+              <span style="color:var(--color-text-muted)">· {{ loan.dias_duracion }} días</span>
             </div>
           </div>
-        </template>
-      </Column>
 
-      <!-- Estado -->
-      <Column field="estado" header="Estado" sortable style="min-width:100px">
-        <template #body="{ data: p }">
-          <Tag
-            :value="p.estado === 'activo' ? 'Activo' : 'Pagado'"
-            :severity="p.estado === 'activo' ? 'success' : 'secondary'"
-          />
-        </template>
-      </Column>
-
-      <!-- Capital -->
-      <Column field="capital" header="Capital" sortable style="min-width:120px">
-        <template #body="{ data: p }">
-          <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(p.capital) }}</span>
-        </template>
-      </Column>
-
-      <!-- Interés -->
-      <Column field="interes_generado" header="Interés" sortable style="min-width:130px">
-        <template #body="{ data: p }">
-          <div>
-            <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(p.interes_generado) }}</span>
-            <p class="text-[10px]" style="color:var(--color-text-muted)">{{ pctTasa(p.tasa_interes_mensual) }}%/mes</p>
-          </div>
-        </template>
-      </Column>
-
-      <!-- Total pagado -->
-      <Column field="total_pagado" header="Pagado" sortable style="min-width:120px">
-        <template #body="{ data: p }">
-          <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(p.total_pagado) }}</span>
-        </template>
-      </Column>
-
-      <!-- Saldo pendiente -->
-      <Column field="saldo_pendiente" header="Pendiente" sortable style="min-width:120px">
-        <template #body="{ data: p }">
-          <span
-            class="font-mono font-semibold"
-            :style="{ color: p.saldo_pendiente <= 0 ? 'var(--color-success)' : 'var(--color-alert)' }"
-          >{{ formatCurrency(Math.max(0, p.saldo_pendiente)) }}</span>
-        </template>
-      </Column>
-
-      <!-- Progreso -->
-      <Column header="Progreso" style="min-width:140px">
-        <template #body="{ data: p }">
-          <div>
-            <div class="flex justify-between text-[10px] mb-1" style="color:var(--color-text-muted)">
-              <span>{{ progresoPct(p) }}%</span>
-              <span>{{ formatCurrency(p.total_pagado) }} / {{ formatCurrency(p.total_deuda) }}</span>
+          <!-- Tarjeta del calendario -->
+          <div class="fintech-card overflow-hidden">
+            <!-- Navegación de mes -->
+            <div class="flex items-center justify-between px-5 py-4" style="border-bottom:1px solid var(--color-border)">
+              <button class="icon-btn" @click="prevMonth">
+                <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+              </button>
+              <div class="flex items-center gap-3">
+                <h3 class="text-sm font-bold capitalize" style="color:var(--color-text-primary)">{{ monthLabel }}</h3>
+                <button
+                  class="rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors"
+                  style="background:var(--color-surface-mid);color:var(--color-text-muted)"
+                  @click="goToToday"
+                >
+                  Hoy
+                </button>
+              </div>
+              <button class="icon-btn" @click="nextMonth">
+                <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+              </button>
             </div>
-            <div class="progress-bar-track">
+
+            <!-- Cabeceras de día de la semana -->
+            <div class="grid grid-cols-7 px-3 pt-3 pb-1" style="border-bottom:1px solid var(--color-border-soft)">
               <div
-                class="progress-bar-fill transition-all"
-                :class="p.saldo_pendiente <= 0 ? '' : 'progress-bar-fill--accent'"
-                :style="{ width: progresoPct(p) + '%' }"
-              />
+                v-for="d in DOW_LABELS"
+                :key="d"
+                class="text-center text-[11px] font-semibold pb-2"
+                style="color:var(--color-text-muted)"
+              >{{ d }}</div>
+            </div>
+
+            <!-- Celdas de días -->
+            <div class="grid grid-cols-7 gap-px p-3" style="background:var(--color-border-soft)">
+              <div
+                v-for="(cell, idx) in calendarCells"
+                :key="idx"
+                class="min-h-[56px] rounded-lg p-1.5"
+                style="background:var(--color-surface)"
+              >
+                <template v-if="cell">
+                  <!-- Número del día -->
+                  <div class="mb-1 flex items-center justify-center">
+                    <span
+                      class="flex h-6 w-6 items-center justify-center rounded-full text-[13px] font-semibold"
+                      :style="cell.isToday
+                        ? 'background:var(--color-brand);color:#fff'
+                        : 'color:var(--color-text-secondary)'"
+                    >{{ cell.day }}</span>
+                  </div>
+
+                  <!-- Barras de préstamos -->
+                  <div class="space-y-0.5">
+                    <div
+                      v-for="loan in cell.loans"
+                      :key="loan.id"
+                      class="loan-bar"
+                      :class="{
+                        'loan-bar--start': loan.isStart,
+                        'loan-bar--end':   loan.isEnd,
+                        'loan-bar--mid':   !loan.isStart && !loan.isEnd,
+                      }"
+                      :style="`background:${loan.color}`"
+                      :title="`${loan.nombre}${loan.isStart ? ' · Inicio' : loan.isEnd ? ' · Vence' : ''}`"
+                    >
+                      <span
+                        v-if="loan.isStart"
+                        class="truncate px-1"
+                        style="font-size:9px;font-weight:700;line-height:1;color:#374151"
+                      >{{ loan.nombre }}</span>
+                    </div>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
         </template>
-      </Column>
-
-      <!-- Acciones -->
-      <Column header="" style="min-width:100px;width:100px">
-        <template #body="{ data: p }">
-          <div class="flex items-center justify-end gap-1">
-            <button class="icon-btn" title="Ver detalle" @click="goToDetalle(p.id)">
-              <span class="material-symbols-outlined text-[16px]">open_in_new</span>
-            </button>
-            <template v-if="p.estado === 'activo' && !p.pagos?.length">
-              <button class="icon-btn" title="Editar" @click="openEdit(p)">
-                <span class="material-symbols-outlined text-[16px]">edit</span>
-              </button>
-              <button class="icon-btn-danger" title="Eliminar" @click="confirmDelete(p)">
-                <span class="material-symbols-outlined text-[16px]">delete</span>
-              </button>
-            </template>
-          </div>
-        </template>
-      </Column>
-    </AppDataTable>
+      </div>
+    </template>
 
     <!-- Modales -->
     <PrestamoFormModal v-model="showFormModal" :edit-data="editTarget2" @saved="onSaved" />
@@ -223,9 +316,10 @@ const router       = useRouter()
 const toast        = useToast()
 
 const FILTROS = [
-  { value: 'activo', label: 'Activos' },
-  { value: 'pagado', label: 'Pagados' },
-  { value: '',       label: 'Todos'   },
+  { value: 'activo',     label: 'Activos' },
+  { value: 'pagado',     label: 'Pagados' },
+  { value: '',           label: 'Todos' },
+  { value: 'calendario', label: 'Calendario' },
 ]
 
 const filtro = ref('activo')
@@ -245,11 +339,14 @@ onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos({
 
 function setFiltro(val) {
   filtro.value = val
-  store.fetchPrestamos(val ? { estado: val } : {})
+  if (val === 'calendario') {
+    store.fetchPrestamos({ estado: 'activo' }, true)
+  } else {
+    store.fetchPrestamos(val ? { estado: val } : {})
+  }
 }
 
 function goToDetalle(id) { router.push(`/prestamos/${id}`) }
-
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 
 function progresoPct(p) {
@@ -257,18 +354,88 @@ function progresoPct(p) {
   return Math.min(100, Math.round((p.total_pagado / p.total_deuda) * 100))
 }
 
-// Crear / Editar
+// ── Calendario ────────────────────────────────────────────
+const LOAN_COLORS = [
+  '#93C5FD', // azul pastel
+  '#86EFAC', // verde pastel
+  '#FCD34D', // amarillo pastel
+  '#C4B5FD', // violeta pastel
+  '#FCA5A5', // rojo pastel
+  '#F9A8D4', // rosa pastel
+  '#5EEAD4', // teal pastel
+  '#FDBA74', // naranja pastel
+]
+
+const DOW_LABELS = ['L','M','X','J','V','S','D']
+
+const today = new Date(); today.setHours(0, 0, 0, 0)
+const calYear  = ref(today.getFullYear())
+const calMonth = ref(today.getMonth())
+
+const MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+const monthLabel = computed(() => `${MONTHS_ES[calMonth.value]} ${calYear.value}`)
+
+function prevMonth() {
+  if (calMonth.value === 0) { calYear.value--; calMonth.value = 11 }
+  else calMonth.value--
+}
+function nextMonth() {
+  if (calMonth.value === 11) { calYear.value++; calMonth.value = 0 }
+  else calMonth.value++
+}
+function goToToday() { calYear.value = today.getFullYear(); calMonth.value = today.getMonth() }
+
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+}
+
+const loansWithRange = computed(() =>
+  store.prestamos
+    .filter(p => p.fecha_inicio && p.dias_duracion)
+    .map((p, i) => {
+      const start = new Date(p.fecha_inicio + 'T00:00:00')
+      const end   = new Date(start)
+      end.setDate(end.getDate() + p.dias_duracion - 1)
+      return { ...p, color: LOAN_COLORS[i % LOAN_COLORS.length], rangeStart: start, rangeEnd: end }
+    })
+)
+
+const calendarCells = computed(() => {
+  const year  = calYear.value
+  const month = calMonth.value
+
+  let dow = new Date(year, month, 1).getDay()
+  dow = (dow + 6) % 7
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const cells = []
+
+  for (let i = 0; i < dow; i++) cells.push(null)
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d)
+    const loans = loansWithRange.value
+      .filter(p => date >= p.rangeStart && date <= p.rangeEnd)
+      .map(p => ({
+        id:      p.id,
+        nombre:  p.deudor_nombre,
+        color:   p.color,
+        isStart: isSameDay(date, p.rangeStart),
+        isEnd:   isSameDay(date, p.rangeEnd),
+      }))
+    cells.push({ day: d, isToday: isSameDay(date, today), loans })
+  }
+
+  return cells
+})
+
+// ── Crear / Editar ────────────────────────────────────────
 const showFormModal = ref(false)
 const editTarget2   = ref(null)
 
-function openEdit(p) {
-  editTarget2.value  = p
-  showFormModal.value = true
-}
+function openEdit(p) { editTarget2.value = p; showFormModal.value = true }
 
-watch(showFormModal, (open) => {
-  if (!open) editTarget2.value = null
-})
+watch(showFormModal, (open) => { if (!open) editTarget2.value = null })
 
 async function onSaved(payload) {
   try {
@@ -278,7 +445,7 @@ async function onSaved(payload) {
   } catch (e) { toast.fromError(e, 'No se pudo guardar el préstamo') }
 }
 
-// Eliminar
+// ── Eliminar ──────────────────────────────────────────────
 const deleteTarget   = ref(null)
 const deleteErrorMsg = ref('')
 const deleting       = ref(false)
@@ -298,3 +465,29 @@ async function doDelete() {
   }
 }
 </script>
+
+<style scoped>
+/* ── Barras de préstamos en el calendario ──────────────── */
+.loan-bar {
+  height: 14px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  opacity: 0.88;
+  transition: opacity 0.15s;
+}
+.loan-bar:hover { opacity: 1; }
+
+.loan-bar--start {
+  border-radius: 4px 2px 2px 4px;
+  margin-left: 1px;
+}
+.loan-bar--end {
+  border-radius: 2px 4px 4px 2px;
+  margin-right: 1px;
+}
+.loan-bar--mid {
+  border-radius: 0;
+}
+</style>

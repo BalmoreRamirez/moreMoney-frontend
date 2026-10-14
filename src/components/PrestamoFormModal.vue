@@ -37,9 +37,22 @@
             </div>
           </div>
 
-          <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de inicio</label>
-            <input v-model="form.fecha_inicio" type="date" required class="fintech-input w-full" />
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de inicio</label>
+              <input v-model="form.fecha_inicio" type="date" required class="fintech-input w-full" />
+            </div>
+            <div>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Duración (días, opcional)</label>
+              <input v-model.number="form.dias_duracion" type="number" min="1" step="1" placeholder="Ej: 30" class="fintech-input w-full" />
+            </div>
+          </div>
+
+          <!-- Fecha fin preview -->
+          <div v-if="fechaFin" class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs" style="background:var(--color-surface-mid)">
+            <span class="material-symbols-outlined text-[15px]" style="color:var(--color-brand)">event</span>
+            <span style="color:var(--color-text-muted)">Fecha de vencimiento estimada:</span>
+            <span class="font-semibold font-mono" style="color:var(--color-text-primary)">{{ fechaFin }}</span>
           </div>
 
           <div>
@@ -96,7 +109,15 @@ const form = ref({
   capital:         '',
   tasa_display:    '',
   fecha_inicio:    new Date().toISOString().split('T')[0],
+  dias_duracion:   '',
   cuenta_id:       '',
+})
+
+const fechaFin = computed(() => {
+  if (!form.value.fecha_inicio || !form.value.dias_duracion) return null
+  const d = new Date(form.value.fecha_inicio + 'T00:00:00')
+  d.setDate(d.getDate() + parseInt(form.value.dias_duracion) - 1)
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 })
 const saving   = ref(false)
 const errorMsg = ref('')
@@ -112,10 +133,11 @@ watch(() => props.modelValue, (open) => {
       capital:         parseFloat(props.editData.capital),
       tasa_display:    parseFloat((parseFloat(props.editData.tasa_interes_mensual) * 100).toFixed(4)),
       fecha_inicio:    props.editData.fecha_inicio,
+      dias_duracion:   props.editData.dias_duracion ?? '',
       cuenta_id:       props.editData.cuenta_id,
     }
   } else {
-    form.value = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: new Date().toISOString().split('T')[0], cuenta_id: '' }
+    form.value = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: new Date().toISOString().split('T')[0], dias_duracion: '', cuenta_id: '' }
   }
 })
 
@@ -131,6 +153,7 @@ async function submit() {
       capital:              form.value.capital,
       tasa_interes_mensual: parseFloat((form.value.tasa_display / 100).toFixed(6)),
       fecha_inicio:         form.value.fecha_inicio,
+      dias_duracion:        form.value.dias_duracion ? parseInt(form.value.dias_duracion) : null,
       cuenta_id:            form.value.cuenta_id,
     }
     emit('saved', payload)

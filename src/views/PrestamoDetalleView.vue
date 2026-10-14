@@ -38,10 +38,7 @@
         </div>
 
         <div class="flex flex-wrap gap-2" v-if="store.prestamo.estado === 'activo'">
-          <button
-            class="btn-brand"
-            @click="showAbonoModal = true"
-          >
+          <button class="btn-brand" @click="showAbonoModal = true">
             <span class="material-symbols-outlined text-[18px]">payments</span>
             <span class="hidden sm:inline">Registrar abono</span>
           </button>
@@ -74,68 +71,69 @@
       </div>
 
       <!-- Barra de progreso -->
-      <div class="mt-4 fintech-card p-5">
-        <div class="flex justify-between text-xs mb-2" style="color:var(--color-text-muted)">
-          <span>Progreso de recuperación</span>
-          <span>{{ progresoPct }}% — {{ formatCurrency(store.prestamo.total_pagado) }} de {{ formatCurrency(store.prestamo.total_deuda) }}</span>
-        </div>
-        <div class="progress-bar-track">
-          <div
-            class="progress-bar-fill transition-all duration-500"
-            :class="store.prestamo.saldo_pendiente <= 0 ? '' : 'progress-bar-fill--accent'"
-            :style="{ width: progresoPct + '%' }"
-          />
-        </div>
-        <p v-if="store.prestamo.ganancia > 0" class="mt-2 text-xs" style="color:var(--color-text-muted)">
-          Ganancia generada hasta hoy:
-          <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(store.prestamo.ganancia) }}</span>
-        </p>
-      </div>
-
-      <!-- Historial de abonos -->
-      <div class="mt-6">
-        <h2 class="mb-3 text-sm font-semibold" style="color:var(--color-text-secondary)">Historial de abonos</h2>
-
-        <div v-if="!store.prestamo.pagos?.length" class="fintech-card flex flex-col items-center py-10 text-center">
-          <span class="material-symbols-outlined text-4xl" style="color:var(--color-brand-light)">receipt_long</span>
-          <p class="mt-2 text-sm" style="color:var(--color-text-muted)">Sin abonos registrados</p>
+        <div class="mt-4 fintech-card p-5">
+          <div class="flex justify-between text-xs mb-2" style="color:var(--color-text-muted)">
+            <span>Progreso de recuperación</span>
+            <span>{{ progresoPct }}% — {{ formatCurrency(store.prestamo.total_pagado) }} de {{ formatCurrency(store.prestamo.total_deuda) }}</span>
+          </div>
+          <div class="progress-bar-track">
+            <div
+              class="progress-bar-fill transition-all duration-500"
+              :class="store.prestamo.saldo_pendiente <= 0 ? '' : 'progress-bar-fill--accent'"
+              :style="{ width: progresoPct + '%' }"
+            />
+          </div>
+          <p v-if="store.prestamo.ganancia > 0" class="mt-2 text-xs" style="color:var(--color-text-muted)">
+            Ganancia generada hasta hoy:
+            <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(store.prestamo.ganancia) }}</span>
+          </p>
         </div>
 
-        <div v-else class="fintech-card overflow-x-auto">
-          <table class="min-w-[460px] w-full text-sm">
-            <thead>
-              <tr style="border-bottom:1px solid var(--color-border)">
-                <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Fecha</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Monto</th>
-                <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Nota</th>
-                <th class="px-4 py-3 w-20" />
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="pago in store.prestamo.pagos"
-                :key="pago.id"
-                class="transition-colors"
-                style="border-bottom:1px solid var(--color-border)"
-              >
-                <td class="px-4 py-3" style="color:var(--color-text-secondary)">{{ pago.fecha_pago }}</td>
-                <td class="px-4 py-3 text-right font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(pago.monto) }}</td>
-                <td class="px-4 py-3" style="color:var(--color-text-muted)">{{ pago.nota || '—' }}</td>
-                <td class="px-4 py-3 text-right">
-                  <div class="flex items-center justify-end gap-1">
-                    <button class="icon-btn" title="Editar abono" @click="abrirEditar(pago)">
-                      <span class="material-symbols-outlined text-[18px]">edit</span>
-                    </button>
-                    <button class="icon-btn-danger" title="Eliminar abono" @click="pedirConfirmacion(pago)">
-                      <span class="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Historial de abonos -->
+        <div class="mt-6">
+          <h2 class="mb-3 text-sm font-semibold" style="color:var(--color-text-secondary)">Historial de abonos</h2>
+
+          <div v-if="!store.prestamo.pagos?.length" class="fintech-card flex flex-col items-center py-10 text-center">
+            <span class="material-symbols-outlined text-4xl" style="color:var(--color-brand-light)">receipt_long</span>
+            <p class="mt-2 text-sm" style="color:var(--color-text-muted)">Sin abonos registrados</p>
+          </div>
+
+          <div v-else class="fintech-card overflow-x-auto">
+            <table class="min-w-[460px] w-full text-sm">
+              <thead>
+                <tr style="border-bottom:1px solid var(--color-border)">
+                  <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Fecha</th>
+                  <th class="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Monto</th>
+                  <th class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Nota</th>
+                  <th class="px-4 py-3 w-20" />
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="pago in store.prestamo.pagos"
+                  :key="pago.id"
+                  class="transition-colors"
+                  style="border-bottom:1px solid var(--color-border)"
+                >
+                  <td class="px-4 py-3" style="color:var(--color-text-secondary)">{{ pago.fecha_pago }}</td>
+                  <td class="px-4 py-3 text-right font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(pago.monto) }}</td>
+                  <td class="px-4 py-3" style="color:var(--color-text-muted)">{{ pago.nota || '—' }}</td>
+                  <td class="px-4 py-3 text-right">
+                    <div class="flex items-center justify-end gap-1">
+                      <button class="icon-btn" title="Editar abono" @click="abrirEditar(pago)">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button class="icon-btn-danger" title="Eliminar abono" @click="pedirConfirmacion(pago)">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+
     </template>
 
     <!-- ═══ MODALES ═══════════════════════════════════════════════════════════ -->
@@ -241,8 +239,6 @@ const route  = useRoute()
 const router = useRouter()
 const toast  = useToast()
 
-onMounted(() => store.fetchPrestamo(route.params.id))
-
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 
 const progresoPct = computed(() => {
@@ -251,12 +247,13 @@ const progresoPct = computed(() => {
   return Math.min(100, Math.round((p.total_pagado / p.total_deuda) * 100))
 })
 
-// Abono
+// ── Carga ──────────────────────────────────────────────────
+onMounted(() => store.fetchPrestamo(route.params.id))
+
+// ── Abono ─────────────────────────────────────────────────
 const showAbonoModal = ref(false)
 
-function onAbono() {
-  // El modal hizo el API call, actualizó el store y mostró el toast
-}
+function onAbono() {}
 
 // Editar abono
 const abonoEditando = ref(null)
@@ -307,3 +304,8 @@ async function confirmarEliminar() {
   }
 }
 </script>
+
+<style scoped>
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to       { opacity: 0; }
+</style>
