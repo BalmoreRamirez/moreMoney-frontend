@@ -26,24 +26,32 @@
 
             <!-- Compras normales -->
             <div>
-              <p class="mb-2 text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Compras normales pendientes</p>
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Compras normales del ciclo</p>
               <div v-if="store.detalle.compras_normales.length === 0"
                    class="rounded-xl px-4 py-3 text-sm"
                    style="background:var(--color-surface-mid);color:var(--color-text-secondary)">
-                Sin compras normales pendientes
+                Sin compras normales en este ciclo
               </div>
               <div v-else class="rounded-xl overflow-hidden" style="border:1px solid var(--color-border)">
                 <div
                   v-for="c in store.detalle.compras_normales"
                   :key="c.id"
                   class="flex items-center justify-between px-4 py-2.5 text-sm"
-                  style="border-bottom:1px solid var(--color-border)"
+                  :style="{ borderBottom: '1px solid var(--color-border)', opacity: c.estado === 'pagada' ? 0.6 : 1 }"
                 >
-                  <div>
+                  <div class="flex-1 min-w-0">
                     <p style="color:var(--color-text-primary)">{{ c.nombre }}</p>
                     <p class="text-xs" style="color:var(--color-text-muted)">{{ formatDate(c.fecha_compra) }}</p>
                   </div>
-                  <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto) }}</span>
+                  <div class="flex items-center gap-3 ml-3 shrink-0">
+                    <span
+                      class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                      :style="c.estado === 'pagada'
+                        ? 'background:rgba(16,185,129,0.15);color:#10B981'
+                        : 'background:rgba(245,158,11,0.15);color:#F59E0B'"
+                    >{{ c.estado }}</span>
+                    <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto) }}</span>
+                  </div>
                 </div>
                 <div class="flex items-center justify-between px-4 py-2.5" style="background:var(--color-surface-mid)">
                   <span class="text-xs" style="color:var(--color-text-muted)">Subtotal normales</span>
