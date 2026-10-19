@@ -6,10 +6,21 @@
         <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Préstamos</h1>
         <p class="mt-1 text-sm" style="color:var(--color-text-muted)">Créditos otorgados a terceros con interés simple.</p>
       </div>
-      <button class="btn-brand" @click="showFormModal = true">
-        <span class="material-symbols-outlined text-[18px]">add</span>
-        <span class="hidden sm:inline">Nuevo préstamo</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="filtro === 'activo' && store.prestamos.length"
+          class="btn-ghost"
+          title="Exportar préstamos activos a PDF"
+          @click="exportPDF"
+        >
+          <span class="material-symbols-outlined text-[17px]">picture_as_pdf</span>
+          <span class="hidden sm:inline">Exportar PDF</span>
+        </button>
+        <button class="btn-brand" @click="showFormModal = true">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span class="hidden sm:inline">Nuevo préstamo</span>
+        </button>
+      </div>
     </div>
 
     <!-- KPIs -->
@@ -309,6 +320,7 @@ import AppDataTable       from '../components/AppDataTable.vue'
 import PrestamoFormModal  from '../components/PrestamoFormModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 import { useToast } from '../composables/useToast'
+import { exportarPrestamosActivosPDF } from '../composables/usePdfExport'
 
 const store        = usePrestamosStore()
 const cuentasStore = useCuentasStore()
@@ -463,6 +475,11 @@ async function doDelete() {
   } finally {
     deleting.value = false
   }
+}
+
+// ── Exportar PDF ──────────────────────────────────────────
+function exportPDF() {
+  exportarPrestamosActivosPDF(store.prestamos)
 }
 </script>
 
