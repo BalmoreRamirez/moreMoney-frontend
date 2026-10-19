@@ -18,6 +18,16 @@
             {{ t.nombre }} — {{ t.banco }}
           </option>
         </select>
+
+        <button
+          v-if="comprasStore.normales.length || comprasStore.tasaCero.length"
+          class="btn-ghost"
+          title="Exportar compras a PDF"
+          @click="exportPDF"
+        >
+          <span class="material-symbols-outlined text-[17px]">picture_as_pdf</span>
+          <span class="hidden sm:inline">Exportar PDF</span>
+        </button>
       </div>
     </div>
 
@@ -494,6 +504,7 @@ import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
 import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
 import ConfirmDeleteModal      from '../components/ConfirmDeleteModal.vue'
 import { useToast } from '../composables/useToast'
+import { exportarComprasPDF } from '../composables/usePdfExport'
 
 const comprasStore  = useComprasStore()
 const tarjetasStore = useTarjetasStore()
@@ -738,6 +749,11 @@ function cuotasBlocks(c) {
 function formatDate(d) {
   if (!d) return '—'
   return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+// ── Exportar PDF ──────────────────────────────────────────
+function exportPDF() {
+  exportarComprasPDF(comprasStore.normales, comprasStore.tasaCero)
 }
 </script>
 

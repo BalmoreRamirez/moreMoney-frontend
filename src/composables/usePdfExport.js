@@ -2,6 +2,13 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { formatCurrency } from '../utils/currency'
 
+// ── Shared helper used by both export functions ─────────────────────────────
+function _fmtDate(dateStr) {
+  if (!dateStr) return '—'
+  const d = new Date(dateStr + 'T00:00:00')
+  return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`
+}
+
 // ── Constantes ─────────────────────────────────────────────────────────────
 const MONTHS_ES = [
   'enero','febrero','marzo','abril','mayo','junio',
@@ -428,4 +435,355 @@ export function exportarPrestamosActivosPDF(prestamos) {
   const mes  = MONTHS_ES[hoy.getMonth()]
   const anio = hoy.getFullYear()
   doc.save(`prestamos-activos-${mes}-${anio}.pdf`)
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EXPORT: COMPRAS DE TARJETAS (Normales + Tasa Cero) — Orden cronológico
+// ════════════════════════════════════════════════════════════════════════════
+
+export function exportarComprasPDF(normales, tasaCero) {
+  if (!normales.length && !tasaCero.length) return
+
+  const doc      = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+  const W        = doc.internal.pageSize.getWidth()
+  const hoy      = new Date()
+  const fechaStr = `${hoy.getDate().toString().padStart(2,'0')} de ${MONTHS_ES[hoy.getMonth()]} de ${hoy.getFullYear()}`
+
+  // Ordena ambas listas cronológicamente (ASC)
+  const normalesSorted   = [...normales].sort((a, b) => (a.fecha_compra < b.fecha_compra ? -1 : 1))
+  const tasaCeroSorted   = [...tasaCero].sort((a, b) => (a.fecha_compra < b.fecha_compra ? -1 : 1))
+
+  // ── Helpers locales ──────────────────────────────────────────────────────
+  function cuotasPagadas(c) { return (c.cuotas || []).filter(q => q.estado === 'pagada').length }
+  function cuotaMonto(c)    { return c.total_cuotas > 0 ? (parseFloat(c.monto_total) / c.total_cuotas) : 0 }
+  function cuotasPct(c)     { return c.total_cuotas > 0 ? Math.round((cuotasPagadas(c) / c.total_cuotas) * 100) : 0 }
+
+  // Cabecera reutilizable
+  function header() {
+    doc.setFillColor(...PALETTE.brand)
+    doc.rect(0, 0, W, 18, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(12)
+    doc.setTextColor(...PALETTE.white)
+    doc.text('moreMoney · Reporte de Compras de Tarjetas', 12, 8)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(7.5)
+    doc.setTextColor(180, 190, 210)
+    doc.text(`Generado: ${fechaStr}`, 12, 14)
+    doc.text('Control Financiero Personal', W - 12, 14, { align: 'right' })
+  }
+
+  function footer() {
+    // Se sobreescribirá al final con el total de páginas real
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  PÁGINA 1 — RESUMEN GLOBAL
+  // ══════════════════════════════════════════════════════════════════════════
+  header()
+
+  // KPIs globales
+  const nPendiente = normalesSorted.filter(c => c.estado === 'pendiente')
+  const nPagada    = normalesSorted.filter(c => c.estado === 'pagada')
+  const tcActiva   = tasaCeroSorted.filter(c => c.estado === 'activa')
+  const tcFin      = tasaCeroSorted.filter(c => c.estado === 'finalizada')
+
+  const sumNP  = nPendiente.reduce((s, c) => s + parseFloat(c.monto || 0), 0)
+  const sumNPg = nPagada.reduce((s, c)    => s + parseFloat(c.monto || 0), 0)
+  const sumTCA = tcActiva.reduce((s, c)   => s + parseFloat(c.monto_total || 0), 0)
+  const sumTCF = tcFin.reduce((s, c)      => s + parseFloat(c.monto_total || 0), 0)
+
+  const gKpis = [
+    { label: `Normales pendientes (${nPendiente.length})`,  value: formatCurrency(sumNP),  color: PALETTE.alert },
+    { label: `Normales pagadas (${nPagada.length})`,        value: formatCurrency(sumNPg), color: PALETTE.success },
+    { label: `Tasa cero activas (${tcActiva.length})`,      value: formatCurrency(sumTCA), color: PALETTE.brand },
+    { label: `Tasa cero finalizadas (${tcFin.length})`,     value: formatCurrency(sumTCF), color: PALETTE.muted },
+  ]
+
+  const kpiH   = 14
+  const kpiGap = 3
+  const kpiW   = (W - 24 - kpiGap * 3) / 4
+
+  gKpis.forEach((k, i) => {
+    const x = 12 + i * (kpiW + kpiGap)
+    doc.setFillColor(...PALETTE.kpiBg)
+    doc.roundedRect(x, 22, kpiW, kpiH, 2, 2, 'F')
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(6)
+    doc.setTextColor(...PALETTE.muted)
+    doc.text(k.label.toUpperCase(), x + 3, 22 + 4.5)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8.5)
+    doc.setTextColor(...k.color)
+    doc.text(k.value, x + 3, 22 + 10.5)
+  })
+
+  // Resumen por tarjeta
+  const tarjetaMap = {}
+  for (const c of normalesSorted) {
+    const key = `${c.tarjeta?.id}`
+    if (!tarjetaMap[key]) tarjetaMap[key] = { nombre: c.tarjeta?.nombre || '—', banco: c.tarjeta?.banco || '—', nPend: 0, nPendM: 0, nPag: 0, nPagM: 0, tcAct: 0, tcActM: 0, tcFin: 0, tcFinM: 0 }
+    if (c.estado === 'pendiente') { tarjetaMap[key].nPend++; tarjetaMap[key].nPendM += parseFloat(c.monto || 0) }
+    else { tarjetaMap[key].nPag++; tarjetaMap[key].nPagM += parseFloat(c.monto || 0) }
+  }
+  for (const c of tasaCeroSorted) {
+    const key = `${c.tarjeta?.id}`
+    if (!tarjetaMap[key]) tarjetaMap[key] = { nombre: c.tarjeta?.nombre || '—', banco: c.tarjeta?.banco || '—', nPend: 0, nPendM: 0, nPag: 0, nPagM: 0, tcAct: 0, tcActM: 0, tcFin: 0, tcFinM: 0 }
+    if (c.estado === 'activa') { tarjetaMap[key].tcAct++; tarjetaMap[key].tcActM += parseFloat(c.monto_total || 0) }
+    else { tarjetaMap[key].tcFin++; tarjetaMap[key].tcFinM += parseFloat(c.monto_total || 0) }
+  }
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(9)
+  doc.setTextColor(...PALETTE.brand)
+  doc.text('Resumen por tarjeta', 12, 42)
+
+  const resHead = [['Tarjeta', 'Banco', 'Normales pend.', 'Monto pend.', 'Normales pag.', 'Monto pag.', 'TC activas', 'Monto TC activo', 'TC finalizadas', 'Monto TC fin.']]
+  const resBody = Object.values(tarjetaMap).map(t => [
+    t.nombre,
+    t.banco,
+    t.nPend,
+    { content: formatCurrency(t.nPendM), styles: { halign:'right', textColor: t.nPend > 0 ? PALETTE.alert : PALETTE.muted, fontStyle: t.nPend > 0 ? 'bold' : 'normal' } },
+    t.nPag,
+    { content: formatCurrency(t.nPagM), styles: { halign:'right', textColor: PALETTE.success, fontStyle: t.nPag > 0 ? 'bold' : 'normal' } },
+    t.tcAct,
+    { content: formatCurrency(t.tcActM), styles: { halign:'right', textColor: PALETTE.brand, fontStyle: t.tcAct > 0 ? 'bold' : 'normal' } },
+    t.tcFin,
+    { content: formatCurrency(t.tcFinM), styles: { halign:'right', textColor: PALETTE.muted } },
+  ])
+
+  autoTable(doc, {
+    startY: 44,
+    head: resHead,
+    body: resBody,
+    theme: 'grid',
+    styles: { font:'helvetica', fontSize:7.5, cellPadding:{top:2.5,right:3,bottom:2.5,left:3}, textColor:[30,35,45], lineColor:[220,225,232], lineWidth:0.2 },
+    headStyles: { fillColor: PALETTE.brand, textColor: PALETTE.white, fontStyle:'bold', fontSize:7, halign:'center' },
+    columnStyles: {
+      0: { cellWidth:32 }, 1: { cellWidth:28 },
+      2: { cellWidth:16, halign:'center' }, 3: { cellWidth:26, halign:'right' },
+      4: { cellWidth:16, halign:'center' }, 5: { cellWidth:26, halign:'right' },
+      6: { cellWidth:14, halign:'center' }, 7: { cellWidth:26, halign:'right' },
+      8: { cellWidth:16, halign:'center' }, 9: { cellWidth:26, halign:'right' },
+    },
+    alternateRowStyles: { fillColor: PALETTE.rowAlt },
+    didDrawPage: () => {},
+  })
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  SECCIÓN: COMPRAS NORMALES — cronológico
+  // ══════════════════════════════════════════════════════════════════════════
+  if (normalesSorted.length > 0) {
+    doc.addPage()
+    header()
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(11)
+    doc.setTextColor(...PALETTE.brand)
+    doc.text('Compras Normales — Orden Cronológico', 12, 26)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(...PALETTE.muted)
+    doc.text(`${normalesSorted.length} registro${normalesSorted.length !== 1 ? 's' : ''} · Pendiente: ${formatCurrency(sumNP)} · Pagado: ${formatCurrency(sumNPg)}`, 12, 31)
+
+    const nHead = [['#', 'Fecha compra', 'Tarjeta', 'Banco', 'Descripción', 'Estado', 'Monto']]
+    const nBody = normalesSorted.map((c, i) => [
+      i + 1,
+      _fmtDate(c.fecha_compra),
+      c.tarjeta?.nombre || '—',
+      c.tarjeta?.banco  || '—',
+      c.nombre,
+      {
+        content: c.estado === 'pendiente' ? 'Pendiente' : 'Pagada',
+        styles: {
+          fontStyle: 'bold',
+          textColor: c.estado === 'pendiente' ? PALETTE.alert : PALETTE.success,
+          halign: 'center',
+        },
+      },
+      { content: formatCurrency(c.monto), styles: { halign:'right', fontStyle:'bold' } },
+    ])
+
+    // Fila de totales
+    nBody.push([
+      { content: `TOTAL (${normalesSorted.length})`, colSpan: 5, styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand } },
+      { content: `Pend: ${nPendiente.length}  Pag: ${nPagada.length}`, styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.muted, halign:'center', fontSize:6.5 } },
+      { content: formatCurrency(sumNP + sumNPg), styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand, halign:'right' } },
+    ])
+
+    autoTable(doc, {
+      startY: 34,
+      head: nHead,
+      body: nBody,
+      theme: 'grid',
+      styles: { font:'helvetica', fontSize:8, cellPadding:{top:2.5,right:3,bottom:2.5,left:3}, textColor:[30,35,45], lineColor:[220,225,232], lineWidth:0.2 },
+      headStyles: { fillColor: PALETTE.brand, textColor: PALETTE.white, fontStyle:'bold', fontSize:7.5, halign:'center' },
+      columnStyles: {
+        0: { cellWidth:8,  halign:'center' },
+        1: { cellWidth:22, halign:'center' },
+        2: { cellWidth:32 },
+        3: { cellWidth:28 },
+        4: { cellWidth:'auto' },
+        5: { cellWidth:22, halign:'center' },
+        6: { cellWidth:28, halign:'right' },
+      },
+      alternateRowStyles: { fillColor: PALETTE.rowAlt },
+      didAddPage: () => { header() },
+    })
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  SECCIÓN: COMPRAS TASA CERO — cronológico con detalle de cuotas
+  // ══════════════════════════════════════════════════════════════════════════
+  if (tasaCeroSorted.length > 0) {
+    doc.addPage()
+    header()
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(11)
+    doc.setTextColor(...PALETTE.brand)
+    doc.text('Compras Tasa Cero — Orden Cronológico con Detalle de Cuotas', 12, 26)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(...PALETTE.muted)
+    doc.text(`${tasaCeroSorted.length} compra${tasaCeroSorted.length !== 1 ? 's' : ''} · Activas: ${tcActiva.length} (${formatCurrency(sumTCA)}) · Finalizadas: ${tcFin.length} (${formatCurrency(sumTCF)})`, 12, 31)
+
+    let startY = 34
+
+    tasaCeroSorted.forEach((c, idx) => {
+      const pagadas  = cuotasPagadas(c)
+      const pct      = cuotasPct(c)
+      const cuotaFija = cuotaMonto(c)
+      const pendientes = (c.cuotas || []).filter(q => q.estado === 'pendiente')
+      const pagadasList = (c.cuotas || []).filter(q => q.estado === 'pagada')
+      const montoRestante = pendientes.reduce((s, q) => s + parseFloat(q.monto_cuota || 0), 0)
+
+      // ── Encabezado de la compra ──
+      // Si no hay espacio para el encabezado (mínimo 40mm), nueva página
+      const H = doc.internal.pageSize.getHeight()
+      if (startY + 40 > H - 15) {
+        doc.addPage()
+        header()
+        startY = 24
+      }
+
+      // Fondo del encabezado de compra
+      doc.setFillColor(...PALETTE.brand)
+      doc.roundedRect(12, startY, W - 24, 10, 2, 2, 'F')
+
+      // Número y nombre
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9)
+      doc.setTextColor(...PALETTE.white)
+      doc.text(`${idx + 1}.  ${c.nombre}`, 17, startY + 6.5)
+
+      // Estado badge
+      const estadoColor = c.estado === 'activa' ? [16, 185, 129] : [107, 114, 128]
+      doc.setFillColor(...estadoColor)
+      const bW = 22
+      doc.roundedRect(W - 12 - bW - 2, startY + 1.5, bW, 7, 1.5, 1.5, 'F')
+      doc.setFontSize(7)
+      doc.text(c.estado === 'activa' ? 'ACTIVA' : 'FINALIZADA', W - 12 - bW / 2 - 2, startY + 6.5, { align: 'center' })
+
+      startY += 12
+
+      // ── KPIs de la compra (fila compacta) ──
+      const compraKpis = [
+        { label: 'Tarjeta',        value: `${c.tarjeta?.nombre || '—'} · ${c.tarjeta?.banco || '—'}` },
+        { label: 'Fecha compra',   value: _fmtDate(c.fecha_compra) },
+        { label: 'Monto total',    value: formatCurrency(c.monto_total) },
+        { label: 'Cuota fija',     value: `${formatCurrency(cuotaFija)}/mes` },
+        { label: 'Cuotas',         value: `${pagadas} de ${c.total_cuotas} pagadas (${pct}%)` },
+        { label: 'Por pagar',      value: formatCurrency(montoRestante) },
+      ]
+
+      const ckW   = (W - 24 - 2.5 * 5) / 6
+      const ckH   = 12
+
+      compraKpis.forEach((k, i) => {
+        const x = 12 + i * (ckW + 2.5)
+        doc.setFillColor(...PALETTE.kpiBg)
+        doc.roundedRect(x, startY, ckW, ckH, 1.5, 1.5, 'F')
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(5.5)
+        doc.setTextColor(...PALETTE.muted)
+        doc.text(k.label.toUpperCase(), x + 2.5, startY + 4)
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(7)
+        doc.setTextColor(...PALETTE.brand)
+        doc.text(k.value, x + 2.5, startY + 9.5)
+      })
+
+      startY += ckH + 3
+
+      // ── Tabla de cuotas ──
+      const cuotasHead = [['# Cuota', 'Fecha estimada', 'Fecha pago real', 'Estado', 'Monto cuota']]
+      const cuotas     = [...(c.cuotas || [])].sort((a, b) => a.numero_cuota - b.numero_cuota)
+      const cuotasBody = cuotas.map(q => [
+        { content: `Cuota ${q.numero_cuota}`, styles: { halign:'center' } },
+        { content: _fmtDate(q.fecha_estimada_pago), styles: { halign:'center' } },
+        { content: q.fecha_pago ? _fmtDate(q.fecha_pago) : '—', styles: { halign:'center', textColor: q.fecha_pago ? PALETTE.success : PALETTE.muted } },
+        {
+          content: q.estado === 'pagada' ? 'Pagada' : 'Pendiente',
+          styles: {
+            fontStyle: 'bold',
+            textColor: q.estado === 'pagada' ? PALETTE.success : PALETTE.alert,
+            halign: 'center',
+          },
+        },
+        { content: formatCurrency(q.monto_cuota), styles: { halign:'right', fontStyle:'bold' } },
+      ])
+
+      // Fila de resumen al pie
+      cuotasBody.push([
+        { content: `${cuotas.length} cuotas en total`, colSpan: 3, styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand } },
+        { content: `Pag: ${pagadas}  Pend: ${cuotas.length - pagadas}`, styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.muted, halign:'center', fontSize:6.5 } },
+        { content: formatCurrency(c.monto_total), styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand, halign:'right' } },
+      ])
+
+      autoTable(doc, {
+        startY,
+        head: cuotasHead,
+        body: cuotasBody,
+        theme: 'grid',
+        styles: { font:'helvetica', fontSize:7.5, cellPadding:{top:2,right:3,bottom:2,left:3}, textColor:[30,35,45], lineColor:[220,225,232], lineWidth:0.2 },
+        headStyles: { fillColor:[40,60,90], textColor: PALETTE.white, fontStyle:'bold', fontSize:7, halign:'center' },
+        columnStyles: {
+          0: { cellWidth:22, halign:'center' },
+          1: { cellWidth:28, halign:'center' },
+          2: { cellWidth:28, halign:'center' },
+          3: { cellWidth:22, halign:'center' },
+          4: { cellWidth:30, halign:'right' },
+        },
+        alternateRowStyles: { fillColor: PALETTE.rowAlt },
+        didAddPage: () => { header() },
+      })
+
+      startY = doc.lastAutoTable.finalY + 8
+
+      // Separador entre compras (si no es la última)
+      if (idx < tasaCeroSorted.length - 1 && startY + 5 < H - 15) {
+        doc.setDrawColor(...PALETTE.brand)
+        doc.setLineWidth(0.3)
+        doc.line(12, startY - 3, W - 12, startY - 3)
+      }
+    })
+  }
+
+  // ── Números de página correctos en todas las páginas ──────────────────────
+  const totalPages = doc.internal.getNumberOfPages()
+  const PH = doc.internal.pageSize.getHeight()
+  for (let pg = 1; pg <= totalPages; pg++) {
+    doc.setPage(pg)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(7)
+    doc.setTextColor(...PALETTE.muted)
+    doc.text(`Página ${pg} de ${totalPages}`, W / 2, PH - 5, { align: 'center' })
+  }
+
+  const mes  = MONTHS_ES[hoy.getMonth()]
+  const anio = hoy.getFullYear()
+  doc.save(`compras-tarjetas-${mes}-${anio}.pdf`)
 }
