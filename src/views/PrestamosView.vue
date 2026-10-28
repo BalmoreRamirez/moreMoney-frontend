@@ -129,7 +129,7 @@
           <template #body="{ data: p }">
             <div>
               <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(p.interes_generado) }}</span>
-              <p class="text-[10px]" style="color:var(--color-text-muted)">{{ pctTasa(p.tasa_interes_mensual) }}%/mes</p>
+              <p class="text-[10px]" style="color:var(--color-text-muted)">{{ pctTasa(p.tasa_interes_mensual) }}% total</p>
             </div>
           </template>
         </Column>
@@ -172,11 +172,11 @@
               <button class="icon-btn" title="Ver detalle" @click="goToDetalle(p.id)">
                 <span class="material-symbols-outlined text-[16px]">open_in_new</span>
               </button>
-              <template v-if="p.estado === 'activo' && !p.pagos?.length">
+              <template v-if="p.estado === 'activo'">
                 <button class="icon-btn" title="Editar" @click="openEdit(p)">
                   <span class="material-symbols-outlined text-[16px]">edit</span>
                 </button>
-                <button class="icon-btn-danger" title="Eliminar" @click="confirmDelete(p)">
+                <button v-if="!p.pagos?.length" class="icon-btn-danger" title="Eliminar" @click="confirmDelete(p)">
                   <span class="material-symbols-outlined text-[16px]">delete</span>
                 </button>
               </template>

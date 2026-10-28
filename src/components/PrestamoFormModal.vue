@@ -31,9 +31,9 @@
               <input v-model.number="form.capital" type="number" min="0.01" step="0.01" placeholder="1000.00" required class="fintech-input w-full" />
             </div>
             <div>
-              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Interés mensual (%)</label>
+              <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Interés total (%)</label>
               <input v-model.number="form.tasa_display" type="number" min="0" max="100" step="0.01" placeholder="5" required class="fintech-input w-full" />
-              <p class="mt-1 text-[10px]" style="color:var(--color-text-secondary)">Ej: 5 = 5% por mes</p>
+              <p class="mt-1 text-[10px]" style="color:var(--color-text-secondary)">Ej: 5 = 5% una sola vez sobre el capital</p>
             </div>
           </div>
 
@@ -65,7 +65,7 @@
 
           <!-- Resumen interés -->
           <div v-if="form.capital && form.tasa_display" class="rounded-lg px-4 py-3 text-xs" style="background:var(--color-surface-mid)">
-            <p style="color:var(--color-text-secondary)">Interés mensual estimado:
+            <p style="color:var(--color-text-secondary)">Interés total estimado:
               <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">
                 {{ formatCurrency((form.capital * form.tasa_display / 100)) }}
               </span>

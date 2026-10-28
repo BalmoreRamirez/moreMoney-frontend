@@ -80,7 +80,7 @@
             <div class="min-w-0 flex-1">
               <p class="text-sm font-medium truncate" style="color:var(--color-text-primary)">{{ p.deudor_nombre }}</p>
               <p class="text-[11px]" style="color:var(--color-text-muted)">
-                Capital {{ formatCurrency(p.capital) }} · {{ (parseFloat(p.tasa_interes_mensual) * 100).toFixed(0) }}%/mes
+                Capital {{ formatCurrency(p.capital) }} · {{ (parseFloat(p.tasa_interes_mensual) * 100).toFixed(0) }}% de interés total
               </p>
             </div>
             <div class="flex items-center gap-5 shrink-0 text-right">

@@ -31,8 +31,7 @@
             </span>
           </div>
           <p class="mt-1 text-sm" style="color:var(--color-text-muted)">
-            {{ pctTasa(store.prestamo.tasa_interes_mensual) }}% interés mensual ·
-            {{ store.prestamo.meses_transcurridos }} mes{{ store.prestamo.meses_transcurridos !== 1 ? 'es' : '' }} ·
+            {{ pctTasa(store.prestamo.tasa_interes_mensual) }}% de interés total ·
             Cuenta: {{ store.prestamo.cuenta?.nombre }}
           </p>
         </div>

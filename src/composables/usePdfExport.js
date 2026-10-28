@@ -40,7 +40,7 @@ function calcMeses(fechaInicio) {
   const hoy    = new Date()
   let meses = (hoy.getFullYear() - inicio.getFullYear()) * 12 + (hoy.getMonth() - inicio.getMonth())
   if (hoy.getDate() < inicio.getDate()) meses--
-  return Math.max(1, meses)
+  return Math.max(0, meses)
 }
 
 function pctTasa(t) {
@@ -155,7 +155,7 @@ export function exportarPrestamosActivosPDF(prestamos) {
 
   // Tabla resumen
   const summaryHead = [[
-    '#', 'Deudor', 'Contacto', 'Inicio', 'Meses', 'Tasa/mes',
+    '#', 'Deudor', 'Contacto', 'Inicio', 'Antigüedad (meses)', 'Interés total (%)',
     'Capital', 'Interés gen.', 'Total deuda', 'Pagado', 'Pendiente', 'Progreso',
   ]]
 
@@ -273,8 +273,8 @@ export function exportarPrestamosActivosPDF(prestamos) {
     // ── KPIs del préstamo ──
     const prestamoKpis = [
       { label: 'Capital prestado',  value: formatCurrency(p.capital),                        color: PALETTE.brand },
-      { label: 'Tasa mensual',      value: `${pctTasa(p.tasa_interes_mensual)}%`,             color: PALETTE.muted },
-      { label: 'Meses transcurridos', value: `${meses} mes${meses !== 1 ? 'es' : ''}`,       color: PALETTE.muted },
+      { label: 'Interés total (%)', value: `${pctTasa(p.tasa_interes_mensual)}%`,             color: PALETTE.muted },
+      { label: 'Antigüedad',        value: `${meses} mes${meses !== 1 ? 'es' : ''}`,         color: PALETTE.muted },
       { label: 'Interés generado',  value: formatCurrency(p.interes_generado),                color: PALETTE.muted },
       { label: 'Total adeudado',    value: formatCurrency(p.total_deuda),                     color: PALETTE.brand },
       { label: 'Total pagado',      value: formatCurrency(p.total_pagado),                    color: PALETTE.success },
