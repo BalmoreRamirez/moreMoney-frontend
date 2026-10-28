@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.window.esc="close">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.esc="close">
         <div
           class="absolute inset-0"
           style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
@@ -70,6 +70,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
@@ -83,7 +84,7 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
 
-const today    = new Date().toISOString().split('T')[0]
+const today    = todayDateInput()
 const form     = ref({ nombre: '', costo_total: '', precio_esperado: '', fecha_compra: today, cuenta_egreso_id: '' })
 const saving   = ref(false)
 const errorMsg = ref('')
@@ -114,7 +115,7 @@ watch(() => props.modelValue, (open) => {
       cuenta_egreso_id: '',
     }
   } else {
-    form.value = { nombre: '', costo_total: '', precio_esperado: '', fecha_compra: new Date().toISOString().split('T')[0], cuenta_egreso_id: '' }
+    form.value = { nombre: '', costo_total: '', precio_esperado: '', fecha_compra: todayDateInput(), cuenta_egreso_id: '' }
   }
 })
 

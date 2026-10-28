@@ -201,6 +201,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCuentasStore }      from '../stores/cuentas'
@@ -222,7 +223,7 @@ const fechaHasta  = ref('')
 const tipoOpts    = [{ value: '', label: 'Todos' }, { value: 'ingreso', label: 'Ingresos' }, { value: 'egreso', label: 'Egresos' }]
 
 onMounted(async () => {
-  await cuentasStore.fetchCuentas(true)
+  await cuentasStore.fetchCuentas()
   recargar()
 })
 
@@ -249,6 +250,8 @@ const REFERENCIA_LABELS = {
   pago_prestamo:    'Abono recibido',
   ganancia_prestamo:'Ganancia préstamo',
   inversion:        'Inversión',
+  prestamo_archivado: 'Préstamo archivado',
+  inversion_archivada: 'Inversión archivada',
   manual:           'Manual',
 }
 function labelReferencia(tipo) { return REFERENCIA_LABELS[tipo] ?? tipo }
@@ -261,7 +264,7 @@ function iconoColor(tipo) { return { banco: '#03246B', efectivo: '#10B981', digi
 const showMovModal = ref(false)
 const savingMov   = ref(false)
 const movError    = ref('')
-const movForm     = ref({ tipo: 'ingreso', monto: null, descripcion: '', fecha: new Date().toISOString().split('T')[0] })
+const movForm     = ref({ tipo: 'ingreso', monto: null, descripcion: '', fecha: todayDateInput() })
 
 async function guardarMovimiento() {
   savingMov.value = true
@@ -269,7 +272,7 @@ async function guardarMovimiento() {
   try {
     await txStore.createManual(cuentaId.value, movForm.value)
     showMovModal.value = false
-    movForm.value = { tipo: 'ingreso', monto: null, descripcion: '', fecha: new Date().toISOString().split('T')[0] }
+    movForm.value = { tipo: 'ingreso', monto: null, descripcion: '', fecha: todayDateInput() }
     await cuentasStore.fetchCuentas()
     recargar()
   } catch (e) {

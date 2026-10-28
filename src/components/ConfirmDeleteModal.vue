@@ -22,6 +22,7 @@
             <p class="mt-1 text-sm" style="color:var(--color-text-muted)">
               ¿Eliminar <strong style="color:var(--color-text-primary)">{{ nombre }}</strong>? Esta acción no se puede deshacer.
             </p>
+            <p v-if="warning" class="mt-2 text-xs" style="color:var(--color-alert)">{{ warning }}</p>
             <p v-if="error" class="mt-2 text-xs text-danger">{{ error }}</p>
           </div>
         </div>
@@ -49,6 +50,7 @@
 <script setup>
 defineProps({
   nombre:   { type: String, default: '' },
+  warning:  { type: String, default: '' },
   error:    { type: String, default: '' },
   deleting: { type: Boolean, default: false },
 })

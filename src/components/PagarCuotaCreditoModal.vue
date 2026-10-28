@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.window.esc="close">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.esc="close">
         <div
           class="absolute inset-0"
           style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
@@ -63,6 +63,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, watch } from 'vue'
 import { computed }   from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
@@ -86,7 +87,7 @@ watch(() => props.modelValue, (open) => {
   if (!open) return
   saving.value   = false
   errorMsg.value = ''
-  form.value     = { cuenta_pago_id: '', fecha_pago: new Date().toISOString().split('T')[0] }
+  form.value     = { cuenta_pago_id: '', fecha_pago: todayDateInput() }
 })
 
 function close() { emit('update:modelValue', false) }

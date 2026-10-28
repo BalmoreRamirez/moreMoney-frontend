@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.window.esc="close">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.esc="close">
         <div
           class="absolute inset-0"
           style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
@@ -90,6 +90,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency } from '../utils/currency'
@@ -108,7 +109,7 @@ const form = ref({
   deudor_contacto: '',
   capital:         '',
   tasa_display:    '',
-  fecha_inicio:    new Date().toISOString().split('T')[0],
+  fecha_inicio:    todayDateInput(),
   dias_duracion:   '',
   cuenta_id:       '',
 })
@@ -137,7 +138,7 @@ watch(() => props.modelValue, (open) => {
       cuenta_id:       props.editData.cuenta_id,
     }
   } else {
-    form.value = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: new Date().toISOString().split('T')[0], dias_duracion: '', cuenta_id: '' }
+    form.value = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: todayDateInput(), dias_duracion: '', cuenta_id: '' }
   }
 })
 

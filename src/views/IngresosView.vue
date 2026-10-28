@@ -232,7 +232,7 @@
                 <span class="material-symbols-outlined text-[16px]">delete</span>
               </button>
               <template v-if="inv.estado === 'vendida'">
-                <span class="text-xs mr-1" style="color:var(--color-text-muted)">{{ inv.fecha_venta }}</span>
+                <span class="text-xs mr-1" style="color:var(--color-text-muted)">{{ fechaVenta(inv) }}</span>
                 <button
                   class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
                   style="background:var(--color-alert-bg);color:var(--color-alert)"
@@ -344,6 +344,7 @@
     <ConfirmDeleteModal
       v-if="deleteTarget"
       :nombre="deleteTarget.nombre"
+      :warning="deleteType === 'inversion' ? 'El egreso de la inversión se conservará en los movimientos de la cuenta; eliminar la ficha no devuelve el dinero.' : ''"
       :error="deleteErrorMsg"
       :deleting="deleting"
       @confirm="doDelete"
@@ -421,6 +422,11 @@ function ultimoCobro(sueldo) {
 function formatDate(d) {
   if (!d) return '—'
   return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function fechaVenta(inversion) {
+  const cobros = inversion.cobros || []
+  return inversion.fecha_venta || cobros.at(-1)?.fecha_cobro || '—'
 }
 
 // ─── SUELDOS ────────────────────────────────────────────────────────────────

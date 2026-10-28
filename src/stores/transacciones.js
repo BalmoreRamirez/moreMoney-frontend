@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../utils/api'
+import { useCuentasStore } from './cuentas'
 
 export const useTransaccionesStore = defineStore('transacciones', () => {
   const transacciones = ref([])
@@ -28,11 +29,13 @@ export const useTransaccionesStore = defineStore('transacciones', () => {
 
   async function createManual(cuentaId, payload) {
     const { data } = await api.post(`/cuentas/${cuentaId}/transacciones`, payload)
+    await useCuentasStore().fetchCuentas()
     return data
   }
 
   async function deleteTransaccion(id) {
     await api.delete(`/cuentas/transacciones/${id}`)
+    await useCuentasStore().fetchCuentas()
   }
 
   return {

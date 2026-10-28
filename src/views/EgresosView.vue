@@ -106,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useEgresosStore } from '../stores/egresos'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'

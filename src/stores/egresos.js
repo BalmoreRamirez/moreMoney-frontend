@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../utils/api'
+import { useCuentasStore } from './cuentas'
 
 export const useEgresosStore = defineStore('egresos', () => {
   const egresos = ref([])
@@ -22,19 +23,19 @@ export const useEgresosStore = defineStore('egresos', () => {
 
   async function createEgreso(payload) {
     const { data } = await api.post('/egresos', payload)
-    await fetchEgresos()
+    await Promise.all([fetchEgresos(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function updateEgreso(id, payload) {
     const { data } = await api.put(`/egresos/${id}`, payload)
-    await fetchEgresos()
+    await Promise.all([fetchEgresos(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function deleteEgreso(id) {
     await api.delete(`/egresos/${id}`)
-    await fetchEgresos()
+    await Promise.all([fetchEgresos(), useCuentasStore().fetchCuentas()])
   }
 
   return { egresos, loading, error, fetchEgresos, createEgreso, updateEgreso, deleteEgreso }

@@ -89,6 +89,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useEgresosStore }  from '../stores/egresos'
 import { useCuentasStore }  from '../stores/cuentas'
@@ -106,7 +107,7 @@ const cuentasStore = useCuentasStore()
 const toast        = useToast()
 const cuentas      = computed(() => cuentasStore.cuentas)
 
-const today = new Date().toISOString().split('T')[0]
+const today = todayDateInput()
 
 const defaultForm = () => ({
   descripcion: '',

@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../utils/api'
+import { useCuentasStore } from './cuentas'
 
 export const useIngresosStore = defineStore('ingresos', () => {
   const sueldos    = ref([])
@@ -42,7 +43,7 @@ export const useIngresosStore = defineStore('ingresos', () => {
 
   async function cobrarSueldo(id, payload) {
     const { data } = await api.post(`/ingresos/sueldos/${id}/cobrar`, payload)
-    await fetchSueldos()
+    await Promise.all([fetchSueldos(), useCuentasStore().fetchCuentas()])
     return data
   }
 
@@ -65,19 +66,19 @@ export const useIngresosStore = defineStore('ingresos', () => {
 
   async function createOtro(payload) {
     const { data } = await api.post('/ingresos/otros', payload)
-    await fetchOtros()
+    await Promise.all([fetchOtros(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function updateOtro(id, payload) {
     const { data } = await api.put(`/ingresos/otros/${id}`, payload)
-    await fetchOtros()
+    await Promise.all([fetchOtros(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function deleteOtro(id) {
     await api.delete(`/ingresos/otros/${id}`)
-    await fetchOtros()
+    await Promise.all([fetchOtros(), useCuentasStore().fetchCuentas()])
   }
 
   // ─── INVERSIONES ─────────────────────────────────────────────────────────────
@@ -97,7 +98,7 @@ export const useIngresosStore = defineStore('ingresos', () => {
 
   async function createInversion(payload) {
     const { data } = await api.post('/ingresos/inversiones', payload)
-    await fetchInversiones()
+    await Promise.all([fetchInversiones(), useCuentasStore().fetchCuentas()])
     return data
   }
 
@@ -109,13 +110,13 @@ export const useIngresosStore = defineStore('ingresos', () => {
 
   async function resetearInversion(id) {
     const { data } = await api.post(`/ingresos/inversiones/${id}/resetear`)
-    await fetchInversiones()
+    await Promise.all([fetchInversiones(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function registrarCobro(id, payload) {
     const { data } = await api.post(`/ingresos/inversiones/${id}/cobrar`, payload)
-    await fetchInversiones()
+    await Promise.all([fetchInversiones(), useCuentasStore().fetchCuentas()])
     return data
   }
 

@@ -76,6 +76,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, watch }         from 'vue'
 import { useComprasStore }   from '../stores/compras'
 import { useToast }          from '../composables/useToast'
@@ -88,7 +89,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
-const today = new Date().toISOString().split('T')[0]
+const today = todayDateInput()
 const EMPTY = { tarjeta_id: '', nombre: '', monto: '', fecha_compra: today, estado: 'pendiente' }
 
 const comprasStore = useComprasStore()

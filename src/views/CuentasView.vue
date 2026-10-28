@@ -138,7 +138,7 @@ const store  = useCuentasStore()
 const router = useRouter()
 const toast  = useToast()
 
-onMounted(() => store.fetchCuentas(true))
+onMounted(() => store.fetchCuentas())
 
 function goToDetalle(id) { router.push(`/cuentas/${id}`) }
 

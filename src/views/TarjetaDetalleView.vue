@@ -327,7 +327,7 @@
         <div v-if="showDeleteConfirm"
           class="fixed inset-0 z-50 flex items-center justify-center p-4"
           @mousedown.self="showDeleteConfirm = false"
-          @keydown.window.esc="showDeleteConfirm = false">
+          @keydown.esc="showDeleteConfirm = false">
           <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
           <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
             <div class="mb-1 flex items-center gap-3">

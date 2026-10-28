@@ -626,10 +626,6 @@ function clearDay() {
   selectedDay.value = null
 }
 
-function selectDay(cell) {
-  selectedDay.value = selectedDay.value === cell.dateStr ? null : cell.dateStr
-}
-
 const monthSummary = computed(() => {
   const prefix = `${calYear.value}-${String(calMonth.value + 1).padStart(2, '0')}`
   let total = 0, pendiente = 0, pagada = 0

@@ -1,8 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../utils/api'
-
-const TTL = 30_000
+import { useCuentasStore } from './cuentas'
 
 export const useCreditosStore = defineStore('creditos', () => {
   const creditos = ref([])
@@ -10,20 +9,12 @@ export const useCreditosStore = defineStore('creditos', () => {
   const loading  = ref(false)
   const error    = ref(null)
 
-  let _lastFetch  = 0
-  let _lastParams = null
-
-  async function fetchCreditos(params = {}, force = false) {
-    const paramsKey = JSON.stringify(params)
-    const fresh = !force && Date.now() - _lastFetch < TTL && creditos.value.length && _lastParams === paramsKey
-    if (fresh) return
+  async function fetchCreditos(params = {}) {
     loading.value = true
     error.value   = null
     try {
       const { data } = await api.get('/creditos', { params })
       creditos.value = data.data
-      _lastFetch     = Date.now()
-      _lastParams    = paramsKey
     } catch (e) {
       error.value = e.response?.data?.error || 'Error al cargar créditos'
     } finally {
@@ -46,21 +37,19 @@ export const useCreditosStore = defineStore('creditos', () => {
 
   async function createCredito(payload) {
     const { data } = await api.post('/creditos', payload)
-    _lastFetch = 0
-    await fetchCreditos({}, true)
+    await Promise.all([fetchCreditos(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function deleteCredito(id) {
     await api.delete(`/creditos/${id}`)
-    _lastFetch = 0
-    await fetchCreditos({}, true)
+    await Promise.all([fetchCreditos(), useCuentasStore().fetchCuentas()])
   }
 
   async function pagarCuota(creditoId, cuotaId, payload) {
     const { data } = await api.post(`/creditos/${creditoId}/cuotas/${cuotaId}/pagar`, payload)
     credito.value = data
-    _lastFetch    = 0
+    await useCuentasStore().fetchCuentas()
     return data
   }
 

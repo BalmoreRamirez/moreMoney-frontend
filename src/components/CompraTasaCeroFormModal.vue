@@ -108,6 +108,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { formatCurrency } from '../utils/currency'
 
@@ -119,7 +120,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
-const today = new Date().toISOString().split('T')[0]
+const today = todayDateInput()
 const EMPTY = { tarjeta_id: '', nombre: '', monto_total: '', total_cuotas: '', fecha_compra: today }
 
 const form        = ref({ ...EMPTY })

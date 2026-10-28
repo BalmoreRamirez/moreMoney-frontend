@@ -473,10 +473,6 @@ export function exportarComprasPDF(normales, tasaCero) {
     doc.text('Control Financiero Personal', W - 12, 14, { align: 'right' })
   }
 
-  function footer() {
-    // Se sobreescribirá al final con el total de páginas real
-  }
-
   // ══════════════════════════════════════════════════════════════════════════
   //  PÁGINA 1 — RESUMEN GLOBAL
   // ══════════════════════════════════════════════════════════════════════════
@@ -657,7 +653,6 @@ export function exportarComprasPDF(normales, tasaCero) {
       const pct      = cuotasPct(c)
       const cuotaFija = cuotaMonto(c)
       const pendientes = (c.cuotas || []).filter(q => q.estado === 'pendiente')
-      const pagadasList = (c.cuotas || []).filter(q => q.estado === 'pagada')
       const montoRestante = pendientes.reduce((s, q) => s + parseFloat(q.monto_cuota || 0), 0)
 
       // ── Encabezado de la compra ──

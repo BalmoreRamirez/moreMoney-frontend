@@ -77,6 +77,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
@@ -93,7 +94,7 @@ const cuentas      = computed(() => cuentasStore.cuentas)
 const defaultForm = () => ({
   descripcion: '',
   monto:       null,
-  fecha:       new Date().toISOString().split('T')[0],
+  fecha:       todayDateInput(),
   cuenta_id:   null,
 })
 

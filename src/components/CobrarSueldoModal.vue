@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.window.esc="close">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.esc="close">
         <div
           class="absolute inset-0"
           style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
@@ -50,6 +50,7 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, watch } from 'vue'
 
 const props = defineProps({
@@ -61,7 +62,7 @@ const emit = defineEmits(['update:modelValue', 'confirmed'])
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 const today = new Date()
-const form     = ref({ mes: today.getMonth() + 1, anio: today.getFullYear(), fecha_cobro: today.toISOString().split('T')[0] })
+const form     = ref({ mes: today.getMonth() + 1, anio: today.getFullYear(), fecha_cobro: todayDateInput(today) })
 const saving   = ref(false)
 const errorMsg = ref('')
 
@@ -70,7 +71,7 @@ watch(() => props.modelValue, (open) => {
   errorMsg.value  = ''
   saving.value    = false
   const d         = new Date()
-  form.value      = { mes: d.getMonth() + 1, anio: d.getFullYear(), fecha_cobro: d.toISOString().split('T')[0] }
+  form.value      = { mes: d.getMonth() + 1, anio: d.getFullYear(), fecha_cobro: todayDateInput(d) }
 })
 
 function close() { emit('update:modelValue', false) }

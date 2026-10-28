@@ -236,9 +236,9 @@ async function recargar() {
   loadError.value = ''
   try {
     await Promise.all([
-      prestamosStore.fetchPrestamos({}, true),
+      prestamosStore.fetchPrestamos({}),
       cuentasStore.fetchStats(anioActual, mesActual),
-      tarjetasStore.fetchTarjetas(1, true),
+      tarjetasStore.fetchTarjetas(1),
     ])
   } catch {
     loadError.value = 'No se pudieron cargar los datos. Verifica tu conexión e intenta de nuevo.'

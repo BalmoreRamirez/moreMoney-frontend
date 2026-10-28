@@ -63,7 +63,7 @@
                style="background:var(--color-success-bg);border:1px solid var(--color-border)">
             <div class="flex items-center gap-2 mb-3">
               <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:var(--color-success)" />
-              <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Cuentas</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Cuentas · neto</span>
             </div>
             <p class="font-mono text-[15px] font-bold leading-tight" style="color:var(--color-text-primary)">
               {{ formatCurrency(totalCuentas) }}
@@ -142,7 +142,7 @@ const tarjetasMap = computed(() => {
 
 const cuentasMap = computed(() => {
   const m = {}
-  reportesStore.flujo.serie.forEach(r => { m[r.label] = r.ingresos })
+  reportesStore.flujo.serie.forEach(r => { m[r.label] = r.ingresos - r.egresos })
   return m
 })
 
@@ -188,8 +188,12 @@ const chartSeries = computed(() => [
     data: allLabels.value.map(l => +(tarjetasMap.value[l] || 0).toFixed(2)),
   },
   {
-    name: 'Cuentas',
-    data: allLabels.value.map(l => +(cuentasMap.value[l]  || 0).toFixed(2)),
+    name: 'Ingresos en cuentas',
+    data: allLabels.value.map(l => +(reportesStore.flujo.serie.find(r => r.label === l)?.ingresos || 0).toFixed(2)),
+  },
+  {
+    name: 'Egresos en cuentas',
+    data: allLabels.value.map(l => +(reportesStore.flujo.serie.find(r => r.label === l)?.egresos || 0).toFixed(2)),
   },
 ])
 
@@ -203,7 +207,7 @@ const chartOptions = computed(() => ({
   },
   theme: { mode: apexTheme.value },
 
-  colors: ['#03246B', '#10B981'],
+  colors: ['#03246B', '#10B981', '#DC2626'],
 
   stroke: {
     curve: 'smooth',
@@ -267,7 +271,8 @@ const chartOptions = computed(() => ({
     custom: ({ series, dataPointIndex, w }) => {
       const label = w.globals.categoryLabels[dataPointIndex]
       const tarj  = series[0][dataPointIndex] || 0
-      const cuen  = series[1][dataPointIndex] || 0
+      const ingresos = series[1][dataPointIndex] || 0
+      const egresos = series[2][dataPointIndex] || 0
       return `<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;padding:10px 13px;font-size:11px;min-width:170px">
         <div style="color:var(--color-text-muted);margin-bottom:7px;font-weight:600;font-size:10px">${label}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
@@ -275,10 +280,15 @@ const chartOptions = computed(() => ({
           <span style="color:var(--color-brand);flex:1">Tarjetas</span>
           <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(tarj)}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <span style="width:8px;height:8px;border-radius:50%;background:var(--color-success);flex-shrink:0"></span>
-          <span style="color:var(--color-success);flex:1">Cuentas</span>
-          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(cuen)}</span>
+          <span style="color:var(--color-success);flex:1">Ingresos</span>
+          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(ingresos)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#DC2626;flex-shrink:0"></span>
+          <span style="color:#DC2626;flex:1">Egresos</span>
+          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(egresos)}</span>
         </div>
       </div>`
     },

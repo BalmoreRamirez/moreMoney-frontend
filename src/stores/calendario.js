@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '../utils/api'
+import { useCuentasStore } from './cuentas'
 
 export const useCalendarioStore = defineStore('calendario', {
   state: () => ({
@@ -52,6 +53,7 @@ export const useCalendarioStore = defineStore('calendario', {
         const { data } = await api.post('/calendario/pago/confirmar', {
           tarjeta_id, year: this.year, month: this.month, cuenta_id,
         })
+        await useCuentasStore().fetchCuentas()
         return data
       } finally {
         this.confirming = false

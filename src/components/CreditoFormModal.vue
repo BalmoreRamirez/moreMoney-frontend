@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.window.esc="close">
+      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close" @keydown.esc="close">
         <div
           class="absolute inset-0"
           style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)"
@@ -70,15 +70,15 @@
             <p class="font-semibold mb-2" style="color:var(--color-text-secondary)">Resumen estimado</p>
             <div class="flex justify-between" style="color:var(--color-text-secondary)">
               <span>Cuota mensual</span>
-              <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(resumen.cuota) }}</span>
+              <span class="font-mono" style="color:var(--color-text-secondary)">{{ formatCurrency(resumen.installment) }}</span>
             </div>
             <div class="flex justify-between" style="color:var(--color-text-secondary)">
               <span>Total intereses</span>
-              <span class="font-mono" style="color:var(--color-alert)">{{ formatCurrency(resumen.totalInteres) }}</span>
+              <span class="font-mono" style="color:var(--color-alert)">{{ formatCurrency(resumen.totalInterest) }}</span>
             </div>
             <div class="flex justify-between" style="color:var(--color-text-secondary)">
               <span>Total a pagar</span>
-              <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(resumen.totalPagar) }}</span>
+              <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(resumen.totalPayment) }}</span>
             </div>
           </div>
 
@@ -100,9 +100,11 @@
 </template>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
+import { calculateCreditSchedule } from '../utils/creditSchedule'
 
 const props = defineProps({ modelValue: { type: Boolean, default: false } })
 const emit  = defineEmits(['update:modelValue', 'saved'])
@@ -110,7 +112,7 @@ const emit  = defineEmits(['update:modelValue', 'saved'])
 const cuentasStore = useCuentasStore()
 const cuentas      = computed(() => cuentasStore.cuentas)
 
-const today = new Date().toISOString().split('T')[0]
+const today = todayDateInput()
 const form  = ref({
   nombre:       '',
   capital:      '',
@@ -132,23 +134,12 @@ watch(() => props.modelValue, (open) => {
 })
 
 const resumen = computed(() => {
-  const cap = parseFloat(form.value.capital)
-  const r   = parseFloat(form.value.tasa_display) / 100
-  const n   = parseInt(form.value.num_cuotas)
-  if (!cap || !n || isNaN(r)) return null
-
-  let cuota, totalInteres
-  if (form.value.tipo_interes === 'simple') {
-    cuota        = parseFloat((cap / n + cap * r).toFixed(2))
-    totalInteres = parseFloat((cap * r * n).toFixed(2))
-  } else {
-    cuota = r === 0
-      ? parseFloat((cap / n).toFixed(2))
-      : parseFloat((cap * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1)).toFixed(2))
-    totalInteres = parseFloat((cuota * n - cap).toFixed(2))
-  }
-
-  return { cuota, totalInteres, totalPagar: parseFloat((cap + totalInteres).toFixed(2)) }
+  return calculateCreditSchedule({
+    capital: parseFloat(form.value.capital),
+    monthlyRate: parseFloat(form.value.tasa_display) / 100,
+    installments: parseInt(form.value.num_cuotas),
+    interestType: form.value.tipo_interes,
+  })
 })
 
 function close() { emit('update:modelValue', false) }

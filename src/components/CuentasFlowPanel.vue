@@ -48,7 +48,7 @@ import { useTheme }        from '../composables/useTheme'
 const { isDark } = useTheme()
 const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
 
-const props = defineProps({
+defineProps({
   mesActual:  { type: Number, required: true },
   anioActual: { type: Number, required: true },
 })

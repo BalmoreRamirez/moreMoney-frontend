@@ -55,6 +55,7 @@
 </style>
 
 <script setup>
+import { todayDateInput } from '../utils/dates'
 import { ref, watch } from 'vue'
 import { formatCurrency }    from '../utils/currency'
 import { usePrestamosStore } from '../stores/prestamos'
@@ -77,7 +78,7 @@ watch(() => props.modelValue, (open) => {
   if (!open) return
   errorMsg.value = ''
   saving.value   = false
-  form.value     = { monto: '', fecha_pago: new Date().toISOString().split('T')[0], nota: '' }
+  form.value     = { monto: '', fecha_pago: todayDateInput(), nota: '' }
 })
 
 function close() { emit('update:modelValue', false) }

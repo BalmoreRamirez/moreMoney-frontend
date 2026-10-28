@@ -164,7 +164,7 @@ function formatLabel(label) {
 }
 
 const chartSeries = computed(() =>
-  tarjetas.value.map((t, i) => ({
+  tarjetas.value.map(t => ({
     name: t.nombre,
     data: t.totales.map(v => parseFloat(v.toFixed(2))),
   }))

@@ -1,8 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../utils/api'
-
-const TTL = 30_000
+import { useCuentasStore } from './cuentas'
 
 export const usePrestamosStore = defineStore('prestamos', () => {
   const prestamos = ref([])
@@ -10,20 +9,12 @@ export const usePrestamosStore = defineStore('prestamos', () => {
   const loading   = ref(false)
   const error     = ref(null)
 
-  let _lastFetch  = 0
-  let _lastParams = null
-
-  async function fetchPrestamos(params = {}, force = false) {
-    const paramsKey = JSON.stringify(params)
-    const fresh = !force && Date.now() - _lastFetch < TTL && prestamos.value.length && _lastParams === paramsKey
-    if (fresh) return
+  async function fetchPrestamos(params = {}) {
     loading.value = true
     error.value   = null
     try {
       const { data } = await api.get('/prestamos', { params })
       prestamos.value = data.data
-      _lastFetch      = Date.now()
-      _lastParams     = paramsKey
     } catch (e) {
       error.value = e.response?.data?.error || 'Error al cargar préstamos'
     } finally {
@@ -46,49 +37,46 @@ export const usePrestamosStore = defineStore('prestamos', () => {
 
   async function createPrestamo(payload) {
     const { data } = await api.post('/prestamos', payload)
-    _lastFetch = 0
-    await fetchPrestamos({}, true)
+    await Promise.all([fetchPrestamos(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function updatePrestamo(id, payload) {
     const { data } = await api.put(`/prestamos/${id}`, payload)
-    _lastFetch = 0
-    await fetchPrestamos({}, true)
+    await Promise.all([fetchPrestamos(), useCuentasStore().fetchCuentas()])
     return data
   }
 
   async function deletePrestamo(id) {
     await api.delete(`/prestamos/${id}`)
-    _lastFetch = 0
-    await fetchPrestamos({}, true)
+    await Promise.all([fetchPrestamos(), useCuentasStore().fetchCuentas()])
   }
 
   async function registrarAbono(id, payload) {
     const { data } = await api.post(`/prestamos/${id}/abono`, payload)
     prestamo.value = data
-    _lastFetch     = 0
+    await useCuentasStore().fetchCuentas()
     return data
   }
 
   async function updateAbono(prestamoId, abonoId, payload) {
     const { data } = await api.put(`/prestamos/${prestamoId}/abono/${abonoId}`, payload)
     prestamo.value = data
-    _lastFetch     = 0
+    await useCuentasStore().fetchCuentas()
     return data
   }
 
   async function deleteAbono(prestamoId, abonoId) {
     const { data } = await api.delete(`/prestamos/${prestamoId}/abono/${abonoId}`)
     prestamo.value = data
-    _lastFetch     = 0
+    await useCuentasStore().fetchCuentas()
     return data
   }
 
   async function marcarPagado(id) {
     const { data } = await api.post(`/prestamos/${id}/pagar`)
     prestamo.value = data
-    _lastFetch     = 0
+    await useCuentasStore().fetchCuentas()
     return data
   }
 

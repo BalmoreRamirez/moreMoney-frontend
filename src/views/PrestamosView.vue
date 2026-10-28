@@ -302,6 +302,7 @@
     <ConfirmDeleteModal
       v-if="deleteTarget"
       :nombre="deleteTarget.deudor_nombre"
+      warning="El egreso del préstamo se conservará en los movimientos de la cuenta; eliminar la ficha no devuelve el dinero."
       :error="deleteErrorMsg"
       :deleting="deleting"
       @confirm="doDelete"
@@ -352,7 +353,7 @@ onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos({
 function setFiltro(val) {
   filtro.value = val
   if (val === 'calendario') {
-    store.fetchPrestamos({ estado: 'activo' }, true)
+    store.fetchPrestamos({ estado: 'activo' })
   } else {
     store.fetchPrestamos(val ? { estado: val } : {})
   }

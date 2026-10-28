@@ -198,7 +198,7 @@
   <!-- Confirm logout -->
   <Teleport to="body">
     <Transition name="overlay">
-      <div v-if="showLogoutConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="showLogoutConfirm = false" @keydown.window.esc="showLogoutConfirm = false">
+      <div v-if="showLogoutConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="showLogoutConfirm = false" @keydown.esc="showLogoutConfirm = false">
         <div class="absolute inset-0" style="background:rgba(15,23,42,0.5);backdrop-filter:blur(6px)" />
         <div class="relative w-full max-w-xs rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
           <div class="flex items-start gap-4">
