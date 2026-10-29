@@ -21,7 +21,7 @@
         <!-- Logo -->
         <div class="logo-wrap">
           <div class="logo-icon">
-            <span class="material-symbols-outlined" style="font-size:28px;color:#F8BD26">account_balance</span>
+            <span class="material-symbols-outlined" style="font-size:28px;color:var(--color-accent)">account_balance</span>
           </div>
           <span class="logo-text">moreMoney</span>
         </div>
@@ -152,7 +152,7 @@ async function handleLogin() {
 .login-root {
   display: flex;
   min-height: 100vh;
-  background: #03246B;
+  background: var(--color-brand);
 }
 
 /* ── Panel izquierdo ─────────────────────────────────── */
@@ -161,7 +161,7 @@ async function handleLogin() {
   display: none;
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(145deg, #03246B 0%, #04307F 55%, #01132B 100%);
+  background: linear-gradient(145deg, var(--color-brand) 0%, var(--color-brand-hover) 55%, var(--sidebar-bg) 100%);
 }
 @media (min-width: 900px) { .left-panel { display: flex; align-items: center; justify-content: center; } }
 
@@ -173,7 +173,7 @@ async function handleLogin() {
 .deco-circle--1 {
   width: 420px; height: 420px;
   top: -100px; right: -80px;
-  background: rgba(248,189,38,0.07);
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
 }
 .deco-circle--2 {
   width: 280px; height: 280px;
@@ -183,7 +183,7 @@ async function handleLogin() {
 .deco-circle--3 {
   width: 180px; height: 180px;
   top: 42%; left: 55%;
-  background: rgba(248,189,38,0.04);
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
 }
 
 .float-icon {
@@ -213,8 +213,8 @@ async function handleLogin() {
   justify-content: center;
   width: 44px; height: 44px;
   border-radius: 12px;
-  background: rgba(248,189,38,0.18);
-  border: 1px solid rgba(248,189,38,0.30);
+  background: var(--sidebar-logo-icon-bg);
+  border: 1px solid var(--sidebar-active-border);
 }
 .logo-text {
   font-size: 20px;
@@ -250,7 +250,7 @@ async function handleLogin() {
 }
 .feature-icon {
   font-size: 18px;
-  color: #F8BD26;
+  color: var(--color-accent);
   flex-shrink: 0;
 }
 .feature-text {
@@ -265,7 +265,7 @@ async function handleLogin() {
   justify-content: center;
   width: 100%;
   padding: 24px 16px;
-  background: #F2F4F7;
+  background: var(--color-primary);
 }
 @media (min-width: 900px) {
   .right-panel {
@@ -286,13 +286,13 @@ async function handleLogin() {
 .form-title {
   font-size: 28px;
   font-weight: 800;
-  color: #03246B;
+  color: var(--color-brand);
   letter-spacing: -0.03em;
   margin-bottom: 6px;
 }
 .form-subtitle {
   font-size: 13px;
-  color: #64748B;
+  color: var(--color-text-secondary);
 }
 
 /* ── Campos ─────────────────────────────────────────── */
@@ -312,7 +312,7 @@ async function handleLogin() {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #4B5563;
+  color: var(--color-text-secondary);
 }
 
 .input-wrap {
@@ -320,19 +320,19 @@ async function handleLogin() {
   align-items: center;
   gap: 0;
   border-radius: 12px;
-  border: 1.5px solid #D0D5DD;
-  background: #FFFFFF;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
   transition: border-color 0.15s, box-shadow 0.15s;
   overflow: hidden;
 }
 .input-wrap.focused {
-  border-color: rgba(3,36,107,0.55);
-  box-shadow: 0 0 0 3px rgba(3,36,107,0.08);
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-brand-focus);
 }
 
 .input-icon {
   font-size: 18px;
-  color: #CBD5E1;
+  color: var(--color-text-muted);
   padding: 0 0 0 14px;
   flex-shrink: 0;
 }
@@ -341,23 +341,23 @@ async function handleLogin() {
   flex: 1;
   padding: 13px 14px;
   font-size: 14px;
-  color: #0F172A;
+  color: var(--color-text-primary);
   background: transparent;
   border: none;
   outline: none;
 }
-.login-input::placeholder { color: #CBD5E1; }
+.login-input::placeholder { color: var(--color-text-muted); }
 
 .toggle-pw {
   padding: 0 14px;
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #CBD5E1;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
 }
-.toggle-pw:hover { color: #64748B; }
+.toggle-pw:hover { color: var(--color-text-secondary); }
 
 /* ── Error ──────────────────────────────────────────── */
 .error-msg {
@@ -367,9 +367,9 @@ async function handleLogin() {
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 13px;
-  color: #EF4444;
-  background: rgba(239,68,68,0.07);
-  border: 1px solid rgba(239,68,68,0.18);
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
 }
 
 /* ── Botón submit ───────────────────────────────────── */
@@ -382,7 +382,7 @@ async function handleLogin() {
   padding: 14px;
   border-radius: 12px;
   border: none;
-  background: #03246B;
+  background: var(--color-brand);
   color: #FFFFFF;
   font-size: 14px;
   font-weight: 700;
@@ -391,7 +391,7 @@ async function handleLogin() {
   transition: background 0.15s, opacity 0.15s, transform 0.1s;
   margin-top: 4px;
 }
-.submit-btn:hover:not(:disabled) { background: #04307F; transform: translateY(-1px); }
+.submit-btn:hover:not(:disabled) { background: var(--color-brand-hover); transform: translateY(-1px); }
 .submit-btn:active:not(:disabled) { transform: translateY(0); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -400,10 +400,10 @@ async function handleLogin() {
   margin-top: 24px;
   text-align: center;
   font-size: 13px;
-  color: #64748B;
+  color: var(--color-text-secondary);
 }
 .register-link-a {
-  color: #03246B;
+  color: var(--color-brand);
   font-weight: 600;
   text-decoration: none;
   margin-left: 4px;

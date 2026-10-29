@@ -69,7 +69,7 @@
         :key="f.value"
         class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
         :style="filtro === f.value
-          ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid rgba(3,36,107,0.25)'
+          ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid var(--color-brand-border)'
           : 'background:var(--color-surface-mid);color:var(--color-text-secondary);border:1px solid transparent'"
         @click="setFiltro(f.value)"
       >

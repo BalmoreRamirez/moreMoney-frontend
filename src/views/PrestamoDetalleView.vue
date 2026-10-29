@@ -24,8 +24,8 @@
             <span
               class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
               :style="store.prestamo.estado === 'activo'
-                ? 'background:rgba(248,189,38,0.15);color:var(--color-alert)'
-                : 'background:rgba(16,185,129,0.15);color:var(--color-success)'"
+                ? 'background:var(--color-alert-bg);color:var(--color-alert)'
+                : 'background:var(--color-success-bg);color:var(--color-success)'"
             >
               {{ store.prestamo.estado === 'activo' ? 'Activo' : 'Pagado' }}
             </span>
@@ -166,7 +166,7 @@
               </div>
             </div>
 
-            <div v-if="errorEditar" class="mt-3 rounded-lg px-3 py-2 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid rgba(220,38,38,0.2)">
+            <div v-if="errorEditar" class="mt-3 rounded-lg px-3 py-2 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid var(--color-danger-border)">
               {{ errorEditar }}
             </div>
 
@@ -202,7 +202,7 @@
               </div>
             </div>
 
-            <div v-if="errorEliminar" class="mt-4 rounded-lg px-3 py-2 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid rgba(220,38,38,0.2)">
+            <div v-if="errorEliminar" class="mt-4 rounded-lg px-3 py-2 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid var(--color-danger-border)">
               {{ errorEliminar }}
             </div>
 

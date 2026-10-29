@@ -22,7 +22,7 @@
     </div>
 
     <!-- Totalizador -->
-    <div v-if="egresosFiltrados.length" class="mt-4 flex items-center justify-between rounded-xl px-5 py-3" style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.15)">
+    <div v-if="egresosFiltrados.length" class="mt-4 flex items-center justify-between rounded-xl px-5 py-3" style="background:var(--color-danger-bg);border:1px solid var(--color-danger-border)">
       <span class="text-sm" style="color:var(--color-text-secondary)">Total del período</span>
       <span class="font-mono text-lg font-bold" style="color:var(--color-danger)">{{ formatCurrency(totalPeriodo) }}</span>
     </div>
@@ -86,7 +86,7 @@
       <Transition name="modal">
         <div v-if="egresoEliminar" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="egresoEliminar = null">
           <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
-          <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid rgba(220,38,38,0.25)">
+          <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-danger-border)">
             <p class="text-base font-semibold" style="color:var(--color-text-primary)">¿Eliminar egreso?</p>
             <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">{{ egresoEliminar?.descripcion }} — {{ formatCurrency(egresoEliminar?.monto) }}</p>
             <div class="mt-5 flex gap-3">

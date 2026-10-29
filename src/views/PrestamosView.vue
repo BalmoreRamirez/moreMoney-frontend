@@ -77,7 +77,7 @@
         :key="f.value"
         class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
         :style="filtro === f.value
-          ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid rgba(3,36,107,0.25)'
+          ? 'background:var(--color-brand-light);color:var(--color-brand);border:1px solid var(--color-brand-border)'
           : 'background:var(--color-surface-mid);color:var(--color-text-secondary);border:1px solid transparent'"
         @click="setFiltro(f.value)"
       >
@@ -219,10 +219,10 @@
               v-for="loan in loansWithRange"
               :key="loan.id"
               class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer transition-opacity"
-              :style="`background:${loan.color}18;border:1px solid ${loan.color}40`"
+              :style="{ background: 'var(--color-surface-mid)', border: '1px solid var(--color-border)' }"
               @click="goToDetalle(loan.id)"
             >
-              <span class="h-2.5 w-2.5 rounded-full flex-shrink-0" :style="`background:${loan.color}`" />
+              <span class="h-2.5 w-2.5 rounded-full flex-shrink-0" :style="{ background: loan.color }" />
               <span style="color:var(--color-text-primary)">{{ loan.deudor_nombre }}</span>
               <span style="color:var(--color-text-muted)">· {{ loan.dias_duracion }} días</span>
             </div>
@@ -290,13 +290,13 @@
                         'loan-bar--end':   loan.isEnd,
                         'loan-bar--mid':   !loan.isStart && !loan.isEnd,
                       }"
-                      :style="`background:${loan.color}`"
+                      :style="{ background: loan.color, color: palette.calendarText }"
                       :title="`${loan.nombre}${loan.isStart ? ' · Inicio' : loan.isEnd ? ' · Vence' : ''}`"
                     >
                       <span
                         v-if="loan.isStart"
                         class="truncate px-1"
-                        style="font-size:9px;font-weight:700;line-height:1;color:#374151"
+                        style="font-size:9px;font-weight:700;line-height:1"
                       >{{ loan.nombre }}</span>
                     </div>
                   </div>
@@ -335,12 +335,16 @@ import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 import { useToast } from '../composables/useToast'
 import { exportarPrestamosActivosPDF } from '../composables/usePdfExport'
 import { todayDateInput } from '../utils/dates'
+import { useTheme } from '../composables/useTheme'
+import { getChartPalette } from '../utils/chartPalette'
 
 const store        = usePrestamosStore()
 const cuentasStore = useCuentasStore()
 const router       = useRouter()
 const toast        = useToast()
 const hoy = ref(todayDateInput())
+const { isDark } = useTheme()
+const palette = computed(() => getChartPalette(isDark.value))
 let timerActualizacionFecha
 
 const FILTROS = [
@@ -426,17 +430,6 @@ function progresoPct(p) {
 }
 
 // ── Calendario ────────────────────────────────────────────
-const LOAN_COLORS = [
-  '#93C5FD', // azul pastel
-  '#86EFAC', // verde pastel
-  '#FCD34D', // amarillo pastel
-  '#C4B5FD', // violeta pastel
-  '#FCA5A5', // rojo pastel
-  '#F9A8D4', // rosa pastel
-  '#5EEAD4', // teal pastel
-  '#FDBA74', // naranja pastel
-]
-
 const DOW_LABELS = ['L','M','X','J','V','S','D']
 
 const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -467,7 +460,8 @@ const loansWithRange = computed(() =>
       const start = new Date(p.fecha_inicio + 'T00:00:00')
       const end   = new Date(start)
       end.setDate(end.getDate() + p.dias_duracion - 1)
-      return { ...p, color: LOAN_COLORS[i % LOAN_COLORS.length], rangeStart: start, rangeEnd: end }
+      const colors = palette.value.calendarRanges
+      return { ...p, color: colors[i % colors.length], rangeStart: start, rangeEnd: end }
     })
 )
 

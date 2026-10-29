@@ -70,7 +70,7 @@
             </div>
 
             <!-- Preview cuota mensual -->
-            <div v-if="cuotaMensual" class="flex items-center justify-between rounded-xl px-4 py-3" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
+            <div v-if="cuotaMensual" class="flex items-center justify-between rounded-xl px-4 py-3" style="background:var(--color-success-bg);border:1px solid var(--color-success-border)">
               <span class="text-xs" style="color:var(--color-text-muted)">Cuota mensual estimada</span>
               <span class="font-mono text-lg font-bold text-success">{{ cuotaMensual }}</span>
             </div>
@@ -88,7 +88,7 @@
               <p v-if="errors.fecha_compra" class="mt-1 text-xs text-danger">{{ errors.fecha_compra }}</p>
             </div>
 
-            <div v-if="serverError" class="rounded-lg px-4 py-3 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid rgba(220,38,38,0.2)">
+            <div v-if="serverError" class="rounded-lg px-4 py-3 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid var(--color-danger-border)">
               {{ serverError }}
             </div>
 

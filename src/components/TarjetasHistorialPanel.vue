@@ -51,10 +51,10 @@
             v-for="(t, i) in tarjetas"
             :key="t.id"
             class="rounded-xl p-3"
-            :style="`background:${hexToRgba(COLORS[i % COLORS.length], 0.08)};border:1px solid ${hexToRgba(COLORS[i % COLORS.length], 0.2)}`"
+            :style="`background:${hexToRgba(chartColors[i % chartColors.length], 0.08)};border:1px solid ${hexToRgba(chartColors[i % chartColors.length], 0.2)}`"
           >
             <div class="flex items-center gap-1.5 mb-1.5">
-              <span class="h-2 w-2 rounded-full shrink-0" :style="`background:${COLORS[i % COLORS.length]}`" />
+              <span class="h-2 w-2 rounded-full shrink-0" :style="`background:${chartColors[i % chartColors.length]}`" />
               <span class="text-[10px] font-semibold truncate uppercase tracking-wider" style="color:var(--color-text-secondary)">{{ t.nombre }}</span>
             </div>
             <p class="font-mono text-[13px] font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(totalTarjeta(t)) }}</p>
@@ -72,7 +72,7 @@
           <div v-for="t in tarjetas" :key="t.id">
             <div class="flex items-center justify-between text-[11px] mb-1">
               <span class="font-medium truncate mr-2" style="color:var(--color-text-secondary)">{{ t.nombre }}</span>
-              <span class="font-mono font-semibold shrink-0" style="color:var(--color-brand)">
+              <span class="font-mono font-semibold shrink-0" :style="{ color: palette.brand }">
                 {{ formatCurrency(mesActualNormales(t) + mesActualCuotas(t)) }}
               </span>
             </div>
@@ -80,19 +80,17 @@
               <div class="h-full flex rounded-full overflow-hidden">
                 <div
                   class="h-full"
-                  style="background:var(--color-brand);transition:width 0.6s ease"
-                  :style="{ width: pctNormales(t) + '%' }"
+                  :style="{ width: pctNormales(t) + '%', background: palette.brand, transition: 'width 0.6s ease' }"
                 />
                 <div
                   class="h-full"
-                  style="background:var(--color-alert);transition:width 0.6s ease"
-                  :style="{ width: pctCuotas(t) + '%' }"
+                  :style="{ width: pctCuotas(t) + '%', background: palette.alert, transition: 'width 0.6s ease' }"
                 />
               </div>
             </div>
             <div class="flex gap-4 mt-1 text-[9px]" style="color:var(--color-text-muted)">
-              <span><span class="font-semibold" style="color:var(--color-brand)">{{ formatCurrency(mesActualNormales(t)) }}</span> normales</span>
-              <span><span class="font-semibold" style="color:var(--color-alert)">{{ formatCurrency(mesActualCuotas(t)) }}</span> cuotas</span>
+              <span><span class="font-semibold" :style="{ color: palette.brand }">{{ formatCurrency(mesActualNormales(t)) }}</span> normales</span>
+              <span><span class="font-semibold" :style="{ color: palette.alert }">{{ formatCurrency(mesActualCuotas(t)) }}</span> cuotas</span>
             </div>
           </div>
         </div>
@@ -106,11 +104,11 @@ import { ref, computed, watch } from 'vue'
 import { useReportesStore } from '../stores/reportes'
 import { formatCurrency }   from '../utils/currency'
 import { useTheme }         from '../composables/useTheme'
+import { getChartPalette } from '../utils/chartPalette'
 
 const { isDark } = useTheme()
 const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
-
-const COLORS = ['#03246B', '#10B981', '#D97706', '#7C3AED', '#DC2626', '#0891B2']
+const palette    = computed(() => getChartPalette(isDark.value))
 
 const MESES_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
@@ -178,7 +176,7 @@ const chartOptions = computed(() => ({
     zoom:    { enabled: false },
     animations: { enabled: true, easing: 'easeinout', speed: 500 },
   },
-  colors: COLORS,
+  colors: palette.value.series,
   stroke: { curve: 'smooth', width: 2 },
   fill: {
     type: 'gradient',
@@ -189,7 +187,7 @@ const chartOptions = computed(() => ({
   xaxis: {
     categories: meses.value.map(l => formatLabel(l)),
     labels: {
-      style: { colors: '#64748B', fontSize: '10px', fontFamily: 'inherit' },
+      style: { colors: palette.value.axis, fontSize: '10px', fontFamily: 'inherit' },
       rotate: 0,
     },
     axisBorder: { show: false },
@@ -197,7 +195,7 @@ const chartOptions = computed(() => ({
   },
   yaxis: {
     labels: {
-      style: { colors: '#94A3B8', fontSize: '10px', fontFamily: 'inherit' },
+      style: { colors: palette.value.axisMuted, fontSize: '10px', fontFamily: 'inherit' },
       formatter: (val) => {
         const abs = Math.abs(val)
         if (abs >= 1_000_000) return '$' + (val / 1_000_000).toFixed(1) + 'M'
@@ -207,7 +205,7 @@ const chartOptions = computed(() => ({
     },
   },
   grid: {
-    borderColor: '#E2E8F0',
+    borderColor: palette.value.grid,
     strokeDashArray: 3,
     xaxis: { lines: { show: false } },
     yaxis: { lines: { show: true  } },

@@ -25,7 +25,7 @@
               class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
               :style="store.credito.estado === 'activo'
                 ? 'background:var(--color-brand-light);color:var(--color-brand)'
-                : 'background:rgba(16,185,129,0.15);color:var(--color-success)'"
+                : 'background:var(--color-success-bg);color:var(--color-success)'"
             >
               {{ store.credito.estado === 'activo' ? 'Activo' : 'Pagado' }}
             </span>
@@ -114,7 +114,7 @@
                   <span
                     class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
                     :style="cuota.estado === 'pagada'
-                      ? 'background:rgba(16,185,129,0.15);color:var(--color-success)'
+                      ? 'background:var(--color-success-bg);color:var(--color-success)'
                       : 'background:var(--color-surface-mid);color:var(--color-text-muted)'"
                   >
                     {{ cuota.estado === 'pagada' ? 'Pagada' : 'Pendiente' }}

@@ -94,9 +94,11 @@ import { ref, computed, watch } from 'vue'
 import { useReportesStore } from '../stores/reportes'
 import { formatCurrency }   from '../utils/currency'
 import { useTheme }         from '../composables/useTheme'
+import { getChartPalette } from '../utils/chartPalette'
 
 const { isDark } = useTheme()
 const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
+const palette    = computed(() => getChartPalette(isDark.value))
 
 const reportesStore = useReportesStore()
 
@@ -207,7 +209,7 @@ const chartOptions = computed(() => ({
   },
   theme: { mode: apexTheme.value },
 
-  colors: ['#03246B', '#10B981', '#DC2626'],
+  colors: [palette.value.brand, palette.value.success, palette.value.danger],
 
   stroke: {
     curve: 'smooth',
@@ -230,20 +232,20 @@ const chartOptions = computed(() => ({
   xaxis: {
     categories: allLabels.value.map(l => formatLabel(l)),
     labels: {
-      style: { colors: '#64748B', fontSize: '10px', fontFamily: 'inherit' },
+      style: { colors: palette.value.axis, fontSize: '10px', fontFamily: 'inherit' },
       rotate: 0,
       hideOverlappingLabels: true,
     },
     axisBorder: { show: false },
     axisTicks:  { show: false },
     crosshairs: {
-      stroke: { color: 'rgba(3,36,107,0.3)', dashArray: 4 },
+      stroke: { color: palette.value.axisMuted, dashArray: 4 },
     },
   },
 
   yaxis: {
     labels: {
-      style: { colors: '#64748B', fontSize: '10px', fontFamily: 'inherit' },
+      style: { colors: palette.value.axis, fontSize: '10px', fontFamily: 'inherit' },
       formatter: (val) => {
         const abs = Math.abs(val)
         if (abs >= 1_000_000) return '$' + (val / 1_000_000).toFixed(1) + 'M'
@@ -254,7 +256,7 @@ const chartOptions = computed(() => ({
   },
 
   grid: {
-    borderColor: '#E2E8F0',
+    borderColor: palette.value.grid,
     strokeDashArray: 3,
     xaxis: { lines: { show: false } },
     yaxis: { lines: { show: true  } },
@@ -276,19 +278,19 @@ const chartOptions = computed(() => ({
       return `<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;padding:10px 13px;font-size:11px;min-width:170px">
         <div style="color:var(--color-text-muted);margin-bottom:7px;font-weight:600;font-size:10px">${label}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-          <span style="width:8px;height:8px;border-radius:50%;background:#03246B;flex-shrink:0"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:${palette.value.brand};flex-shrink:0"></span>
           <span style="color:var(--color-brand);flex:1">Tarjetas</span>
-          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(tarj)}</span>
+          <span style="color:var(--color-text-primary);font-family:var(--font-mono)">${formatCurrency(tarj)}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <span style="width:8px;height:8px;border-radius:50%;background:var(--color-success);flex-shrink:0"></span>
           <span style="color:var(--color-success);flex:1">Ingresos</span>
-          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(ingresos)}</span>
+          <span style="color:var(--color-text-primary);font-family:var(--font-mono)">${formatCurrency(ingresos)}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="width:8px;height:8px;border-radius:50%;background:#DC2626;flex-shrink:0"></span>
-          <span style="color:#DC2626;flex:1">Egresos</span>
-          <span style="color:var(--color-text-primary);font-family:monospace">${formatCurrency(egresos)}</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:${palette.value.danger};flex-shrink:0"></span>
+          <span style="color:${palette.value.danger};flex:1">Egresos</span>
+          <span style="color:var(--color-text-primary);font-family:var(--font-mono)">${formatCurrency(egresos)}</span>
         </div>
       </div>`
     },

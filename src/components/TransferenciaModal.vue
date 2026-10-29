@@ -11,8 +11,8 @@
         style="background:var(--color-surface);border:1px solid var(--color-border)"
       >
         <div class="flex items-center gap-3 mb-5">
-          <div class="flex h-9 w-9 items-center justify-center rounded-xl" style="background:rgba(167,139,250,0.12)">
-            <span class="material-symbols-outlined text-[20px]" style="color:#A78BFA">swap_horiz</span>
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl" style="background:var(--color-brand-light)">
+            <span class="material-symbols-outlined text-[20px]" style="color:var(--color-brand)">swap_horiz</span>
           </div>
           <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Mover fondos</h2>
         </div>
@@ -65,7 +65,7 @@
               class="fintech-input w-full"
             />
             <p v-if="saldoOrigen !== null" class="mt-1 text-[10px]" style="color:var(--color-text-muted)">
-              Disponible: <span class="font-mono" style="color:#A78BFA">{{ formatCurrency(saldoOrigen) }}</span>
+              Disponible: <span class="font-mono" style="color:var(--color-brand)">{{ formatCurrency(saldoOrigen) }}</span>
             </p>
           </div>
 
@@ -98,7 +98,7 @@
               type="submit"
               :disabled="saving"
               class="flex-1 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-              style="background:#A78BFA"
+              style="background:var(--color-brand)"
             >
               {{ saving ? 'Moviendo…' : 'Confirmar' }}
             </button>

@@ -213,8 +213,8 @@
                       :key="c.id"
                       class="flex items-center justify-between gap-1 rounded px-1.5 py-0.5 leading-tight"
                       :style="c.estado === 'pagada'
-                        ? 'background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);color:var(--color-success)'
-                        : 'background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);color:var(--color-alert)'"
+                        ? 'background:var(--color-success-bg);border:1px solid var(--color-success-border);color:var(--color-success)'
+                        : 'background:var(--color-alert-bg);border:1px solid var(--color-alert-border);color:var(--color-alert)'"
                     >
                       <span class="truncate text-[10px] font-medium" style="max-width:80px">{{ c.nombre }}</span>
                       <span class="shrink-0 font-mono text-[10px] font-semibold">{{ formatAmount(c.monto) }}</span>
@@ -232,7 +232,7 @@
 
           <!-- Empty state calendario -->
           <div v-if="!comprasStore.loading && !comprasStore.normales.length" class="mt-4 fintech-card flex flex-col items-center py-14 text-center">
-            <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.25)">receipt_long</span>
+            <span class="material-symbols-outlined text-5xl opacity-30" style="color:var(--color-success)">receipt_long</span>
             <p class="mt-3 font-semibold" style="color:var(--color-text-primary)">Sin compras este mes</p>
             <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Registra una nueva compra para verla en el calendario.</p>
           </div>
@@ -290,7 +290,7 @@
       <!-- ── TAB: Tasa Cero ── -->
       <div v-if="activeTab === 'tasa_cero'" class="mt-4 space-y-4">
         <div v-if="!comprasStore.tasaCero.length" class="fintech-card flex flex-col items-center py-14 text-center">
-          <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.3)">payments</span>
+          <span class="material-symbols-outlined text-5xl opacity-30" style="color:var(--color-success)">payments</span>
           <p class="mt-3 font-semibold" style="color:var(--color-text-primary)">Sin compras a tasa cero</p>
           <p class="mt-1 text-sm" style="color:var(--color-text-secondary)">Registra una compra con cuotas para verla aquí.</p>
         </div>
@@ -389,7 +389,7 @@
               v-if="!selectedDayData || !selectedDayData.purchases.length"
               class="flex flex-col items-center py-10 text-center"
             >
-              <span class="material-symbols-outlined text-5xl" style="color:rgba(16,185,129,0.25)">receipt_long</span>
+              <span class="material-symbols-outlined text-5xl opacity-30" style="color:var(--color-success)">receipt_long</span>
               <p class="mt-3 text-sm" style="color:var(--color-text-secondary)">No hay compras para este día.</p>
               <button
                 class="mt-4 flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
@@ -761,8 +761,8 @@ function exportPDF() {
 .cal-cell-active   { cursor: pointer; }
 .cal-cell-active:hover { background: var(--color-surface-high); }
 
-.cal-cell-today    { background: rgba(5, 150, 105, 0.08); }
-.cal-cell-selected { box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.5); }
+.cal-cell-today    { background: var(--color-brand-light); }
+.cal-cell-selected { box-shadow: inset 0 0 0 2px var(--color-success); }
 
 /* Botones de navegación del toolbar */
 .cal-nav-btn {
@@ -771,14 +771,18 @@ function exportPDF() {
   justify-content: center;
   height: 2rem;
   width: 2rem;
-  border-radius: 0.5rem;
+  border-radius: 0.65rem;
   color: var(--color-text-secondary);
-  background: transparent;
-  border: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.cal-nav-btn:hover { background: var(--color-surface-high); }
+.cal-nav-btn:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
 
 .cal-today-btn {
   margin-left: 0.25rem;
@@ -788,11 +792,15 @@ function exportPDF() {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  background: transparent;
+  background: var(--color-surface);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.cal-today-btn:hover { background: var(--color-surface-high); }
+.cal-today-btn:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
 
 /* Modal */
 .modal-box {

@@ -106,7 +106,7 @@
         <div class="fintech-card overflow-hidden">
           <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--color-border)">
             <div class="flex items-center gap-2">
-              <span class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:rgba(245,158,11,0.12)">
+              <span class="flex h-7 w-7 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
                 <span class="material-symbols-outlined text-[15px]" style="color:var(--color-alert)">credit_card_clock</span>
               </span>
               <div>
@@ -231,7 +231,7 @@
           <h2 class="text-xs font-semibold uppercase tracking-widest" style="color:var(--color-text-muted)">
             Tasa cero
             <span class="ml-1 rounded-full px-1.5 py-0.5 text-[10px]"
-              style="background:rgba(16,185,129,0.15);color:var(--color-success)">
+              style="background:var(--color-success-bg);color:var(--color-success)">
               {{ data.compras_tasa_cero.length }}
             </span>
           </h2>
@@ -265,8 +265,8 @@
                   <p class="font-mono text-base font-bold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto_total) }}</p>
                   <span class="text-[11px] rounded-full px-2 py-0.5"
                     :style="c.estado === 'activa'
-                      ? 'background:rgba(16,185,129,0.12);color:var(--color-success)'
-                      : 'background:rgba(100,116,139,0.1);color:var(--color-text-muted)'">
+                      ? 'background:var(--color-success-bg);color:var(--color-success)'
+                      : 'background:var(--color-surface-high);color:var(--color-text-muted)'">
                     {{ c.estado }}
                   </span>
                 </div>
@@ -331,7 +331,7 @@
           <div class="absolute inset-0" style="background:rgba(15,23,42,0.45);backdrop-filter:blur(6px)" />
           <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
             <div class="mb-1 flex items-center gap-3">
-              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background:rgba(220,38,38,0.1)">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background:var(--color-danger-bg)">
                 <span class="material-symbols-outlined text-[20px]" style="color:var(--color-danger)">delete</span>
               </span>
               <h3 class="text-base font-semibold" style="color:var(--color-text-primary)">Eliminar compra</h3>
@@ -565,8 +565,8 @@ function formatDate(d) {
 
 /* ── Badge próximo pago ────────────────────────── */
 .next-pay-badge {
-  background: rgba(180, 83, 9, 0.09);
-  border: 1px solid rgba(180, 83, 9, 0.2);
+  background: var(--color-alert-bg);
+  border: 1px solid var(--color-alert-border);
 }
 
 /* ── Filas de compras ──────────────────────────── */

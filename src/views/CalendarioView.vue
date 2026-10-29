@@ -32,12 +32,12 @@
     <!-- Legend -->
     <div class="mt-4 flex flex-wrap items-center gap-3 sm:gap-5">
       <div class="flex items-center gap-2 text-xs legend-text">
-        <span class="h-4 w-1 flex-shrink-0 rounded-full" style="background:rgba(59,130,246,0.6)" />
-        <span class="h-4 w-4 flex-shrink-0 rounded" style="background:rgba(59,130,246,0.08)" />
+        <span class="h-4 w-1 flex-shrink-0 rounded-full" style="background:var(--color-info)" />
+        <span class="h-4 w-4 flex-shrink-0 rounded" style="background:var(--color-info-bg)" />
         Corte
       </div>
       <div class="flex items-center gap-2 text-xs legend-text">
-        <span class="h-4 w-4 flex-shrink-0 rounded" style="background:rgba(16,185,129,0.1)" />
+        <span class="h-4 w-4 flex-shrink-0 rounded" style="background:var(--color-success-bg)" />
         Pago (pendiente)
       </div>
       <div class="flex items-center gap-2 text-xs legend-text">
@@ -48,7 +48,7 @@
 
     <!-- Loading -->
     <div v-if="store.loading" class="mt-8 flex items-center justify-center py-16">
-      <span class="material-symbols-outlined animate-spin text-4xl" style="color:rgba(16,185,129,0.5)">progress_activity</span>
+      <span class="material-symbols-outlined animate-spin text-4xl" style="color:var(--color-brand)">progress_activity</span>
     </div>
 
     <!-- Calendar grid -->
@@ -101,7 +101,7 @@
                 v-for="ev in corteEvents(day)"
                 :key="'corte-' + ev.tarjeta_id"
                 class="flex items-center gap-1 rounded-md px-1 py-0.5 sm:px-1.5"
-                style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2)"
+                style="background:var(--color-info-bg);border:1px solid var(--color-info-border)"
                 :title="`Corte: ${ev.tarjeta_nombre} (${ev.banco})`"
               >
                 <span class="h-1.5 w-1.5 flex-shrink-0 rounded-full" style="background:var(--color-brand)" />
@@ -115,7 +115,7 @@
                 type="button"
                 class="flex w-full items-center gap-1 rounded-md px-1 py-0.5 text-left transition-opacity hover:opacity-80 sm:px-1.5"
                 :style="ev.tiene_pendientes
-                  ? 'background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25)'
+                  ? 'background:var(--color-success-bg);border:1px solid var(--color-success-border)'
                   : 'background:var(--color-surface-mid);border:1px solid var(--color-border)'"
                 :title="`Pago: ${ev.tarjeta_nombre} · ${ev.tiene_pendientes ? ev.pendientes_count + ' pendientes' : 'Al día'}`"
                 @click="openPago(ev)"
@@ -219,11 +219,11 @@ function cellStyle(day) {
   const hasPagoPendiente = pagos.some(e => e.tiene_pendientes)
 
   if (hasPagoPendiente) {
-    base.background = 'rgba(16,185,129,0.07)'
-    if (hasCorte) base.boxShadow = 'inset 3px 0 0 rgba(59,130,246,0.45)'
+    base.background = 'var(--color-success-bg)'
+    if (hasCorte) base.boxShadow = 'inset 3px 0 0 var(--color-info)'
   } else if (hasCorte) {
-    base.background = 'rgba(59,130,246,0.06)'
-    base.boxShadow  = 'inset 3px 0 0 rgba(59,130,246,0.4)'
+    base.background = 'var(--color-info-bg)'
+    base.boxShadow  = 'inset 3px 0 0 var(--color-info)'
   }
   return base
 }
@@ -255,7 +255,7 @@ function onConfirmed() {
 
 <style scoped>
 .today-cell {
-  background: rgba(5, 150, 105, 0.08);
+  background: var(--color-brand-light);
 }
 .empty-cell {
   background: var(--color-surface-mid);
@@ -264,10 +264,21 @@ function onConfirmed() {
   border-right: 1px solid var(--color-border);
 }
 .nav-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
+  box-shadow: 0 1px 2px rgba(3,36,107,0.04);
+  transition: background 0.16s, border-color 0.16s, box-shadow 0.16s, transform 0.16s;
 }
 .nav-btn:hover {
-  background: var(--color-surface-high);
+  transform: translateY(-1px);
+  border-color: var(--color-brand);
+  background: var(--color-brand-light);
+  box-shadow: 0 4px 12px rgba(3,36,107,0.08);
+}
+.nav-btn:focus-visible {
+  outline: 3px solid rgba(248,189,38,0.65);
+  outline-offset: 2px;
 }
 .legend-text {
   color: var(--color-text-secondary);

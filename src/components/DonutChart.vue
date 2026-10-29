@@ -39,14 +39,13 @@
       <text
         :x="center" :y="center - 10"
         text-anchor="middle"
-        font-family="Roboto Mono, monospace"
         font-size="11"
         :style="{ fill: 'var(--color-text-muted)' }"
       >Disponible</text>
       <text
         :x="center" :y="center + 14"
         text-anchor="middle"
-        font-family="Roboto Mono, monospace"
+        font-family="var(--font-mono)"
         font-size="18"
         font-weight="700"
         :fill="disponibleColor"

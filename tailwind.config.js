@@ -10,7 +10,7 @@ export default {
       colors: {
         // Primario — brand navy
         navy: {
-          DEFAULT: '#03246B',
+          DEFAULT: 'var(--color-brand)',
           50:  '#E8EDF8',
           100: '#C6D2EC',
           200: '#8FA8D5',
@@ -24,27 +24,27 @@ export default {
         },
         // Accent — golden
         gold: {
-          DEFAULT: '#F8BD26',
-          light:   '#FEDE81',
-          dark:    '#D9970A',
+          DEFAULT: 'var(--color-accent)',
+          light:   'var(--color-accent-bg)',
+          dark:    'var(--color-accent-hover)',
         },
         // Éxito / Disponible / Pagado
         success: {
-          DEFAULT: '#10B981',
-          light:   '#34D399',
-          dark:    '#059669',
+          DEFAULT: 'var(--color-success)',
+          light:   'var(--color-success-bg)',
+          dark:    'var(--color-success-text)',
         },
         // Alerta / Gastado / Pendiente
         alert: {
-          DEFAULT: '#F59E0B',
-          light:   '#FCD34D',
-          dark:    '#D97706',
+          DEFAULT: 'var(--color-alert)',
+          light:   'var(--color-alert-bg)',
+          dark:    'var(--color-alert-text)',
         },
         // Peligro / Límite crítico
         danger: {
-          DEFAULT: '#DC2626',
-          light:   '#F87171',
-          dark:    '#B91C1C',
+          DEFAULT: 'var(--color-danger)',
+          light:   'var(--color-danger-bg)',
+          dark:    'var(--color-danger-text)',
         },
       },
       borderRadius: {

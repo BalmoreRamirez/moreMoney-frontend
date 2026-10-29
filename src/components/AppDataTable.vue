@@ -1,5 +1,5 @@
 <template>
-  <div class="fintech-card overflow-hidden my-3">
+  <div class="app-data-table fintech-card overflow-hidden my-3">
     <DataTable
       :value="data"
       :loading="loading"
@@ -49,25 +49,29 @@ const PT = {
   table:            { style: 'width:100%;border-collapse:collapse' },
   thead:            { style: 'border-bottom:1px solid var(--color-border)' },
   headerRow:        { style: 'background:var(--color-surface-mid)' },
-  columnHeader:     { style: 'padding:10px 16px;border:none;color:var(--color-text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;background:transparent' },
+  columnHeader:     { style: 'padding:13px 16px;border:none;color:var(--color-text-muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;white-space:nowrap;background:transparent' },
   columnHeaderContent: { style: 'display:flex;align-items:center;gap:4px' },
   columnTitle:      { style: 'color:var(--color-text-muted)' },
   tbody:            {},
-  row:              { style: 'border-bottom:1px solid var(--color-border);transition:background 0.15s' },
-  bodyCell:         { style: 'padding:11px 16px;border:none;color:var(--color-text-primary);font-size:13px;vertical-align:middle' },
+  row:              { style: 'border-bottom:1px solid var(--color-border-soft);transition:background 0.16s' },
+  bodyCell:         { style: 'padding:13px 16px;border:none;color:var(--color-text-primary);font-size:13px;vertical-align:middle' },
   emptyMessageCell: { style: 'border:none;padding:0' },
-  loadingOverlay:   { style: 'background:rgba(240,244,250,0.8);backdrop-filter:blur(2px)' },
+  loadingOverlay:   { style: 'background:color-mix(in srgb,var(--color-surface) 82%,transparent);backdrop-filter:blur(2px)' },
 }
 </script>
 
 <style scoped>
+.app-data-table {
+  background: var(--color-surface);
+  box-shadow: 0 2px 5px rgba(3,36,107,0.035), 0 12px 28px rgba(3,36,107,0.045);
+}
 /* Striped rows */
 :deep(.p-datatable-striped .p-datatable-row:nth-child(even) > td) {
-  background: rgba(10,25,47,0.02);
+  background: color-mix(in srgb, var(--color-surface-mid) 62%, transparent);
 }
 /* Row hover */
 :deep(.p-datatable-row:hover > td) {
-  background: rgba(10,25,47,0.03) !important;
+  background: color-mix(in srgb, var(--color-brand-light) 68%, transparent) !important;
 }
 /* Remove last row border */
 :deep(.p-datatable-row:last-child > td) {

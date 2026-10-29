@@ -13,7 +13,7 @@
           <span class="inline-block h-2 w-2 rounded-full" style="background:var(--color-danger)" />Egresos
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-2 w-2 rounded-full" style="background:#6366F1" />Saldo
+          <span class="inline-block h-2 w-2 rounded-full" :style="{ background: palette.purple }" />Saldo
         </span>
       </div>
     </div>
@@ -44,9 +44,11 @@ import { computed } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
 import { useTheme }        from '../composables/useTheme'
+import { getChartPalette } from '../utils/chartPalette'
 
 const { isDark } = useTheme()
 const apexTheme  = computed(() => isDark.value ? 'dark' : 'light')
+const palette    = computed(() => getChartPalette(isDark.value))
 
 defineProps({
   mesActual:  { type: Number, required: true },
@@ -82,20 +84,20 @@ const chartOptions = computed(() => ({
       dataLabels: { position: 'top' },
     },
   },
-  colors: ['#10B981', '#DC2626', '#6366F1'],
+  colors: [palette.value.success, palette.value.danger, palette.value.purple],
   dataLabels: { enabled: false },
   stroke: { show: true, width: 2, colors: ['transparent'] },
   xaxis: {
     categories: cuentas.value.map(c => c.nombre),
     labels: {
-      style: { colors: '#64748B', fontSize: '11px', fontFamily: 'inherit' },
+      style: { colors: palette.value.axis, fontSize: '11px', fontFamily: 'inherit' },
     },
     axisBorder: { show: false },
     axisTicks:  { show: false },
   },
   yaxis: {
     labels: {
-      style: { colors: '#94A3B8', fontSize: '10px', fontFamily: 'inherit' },
+      style: { colors: palette.value.axisMuted, fontSize: '10px', fontFamily: 'inherit' },
       formatter: (val) => {
         const abs = Math.abs(val)
         if (abs >= 1_000_000) return '$' + (val / 1_000_000).toFixed(1) + 'M'
@@ -105,7 +107,7 @@ const chartOptions = computed(() => ({
     },
   },
   grid: {
-    borderColor: '#E2E8F0',
+    borderColor: palette.value.grid,
     strokeDashArray: 3,
     xaxis: { lines: { show: false } },
     yaxis: { lines: { show: true  } },

@@ -257,8 +257,8 @@ const REFERENCIA_LABELS = {
 function labelReferencia(tipo) { return REFERENCIA_LABELS[tipo] ?? tipo }
 
 function iconoTipo(tipo)  { return { banco: 'account_balance', efectivo: 'payments', digital: 'phone_iphone' }[tipo] ?? 'wallet' }
-function iconoBg(tipo)    { return { banco: 'background:rgba(3,36,107,0.10)', efectivo: 'background:rgba(16,185,129,0.10)', digital: 'background:rgba(99,102,241,0.10)' }[tipo] ?? '' }
-function iconoColor(tipo) { return { banco: '#03246B', efectivo: '#10B981', digital: '#6366F1' }[tipo] ?? '#64748B' }
+function iconoBg(tipo)    { return { banco: 'background:var(--color-brand-light)', efectivo: 'background:var(--color-success-bg)', digital: 'background:var(--color-info-bg)' }[tipo] ?? '' }
+function iconoColor(tipo) { return { banco: 'var(--color-brand)', efectivo: 'var(--color-success)', digital: 'var(--color-info)' }[tipo] ?? 'var(--color-text-muted)' }
 
 // Modal movimiento manual
 const showMovModal = ref(false)

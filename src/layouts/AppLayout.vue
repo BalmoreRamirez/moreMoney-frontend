@@ -12,38 +12,35 @@
 
     <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 lg:translate-x-0"
+      class="app-sidebar fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 lg:translate-x-0"
       :class="[
         menuOpen ? 'translate-x-0' : '-translate-x-full',
         sidebarCollapsed ? 'lg:w-14' : 'lg:w-60',
         'w-60'
       ]"
-      style="background:var(--sidebar-bg)"
     >
       <!-- Logo + toggle desktop -->
       <div
-        class="flex h-16 items-center flex-shrink-0 transition-all duration-300"
+        class="sidebar-brand flex h-[76px] flex-shrink-0 items-center transition-all duration-300"
         :class="sidebarCollapsed ? 'lg:justify-center lg:px-0' : 'gap-3 px-4'"
-        style="border-bottom:1px solid var(--sidebar-border)"
       >
-        <!-- Logo icon: oculto en desktop colapsado -->
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0 transition-all duration-300"
+          class="sidebar-logo-mark flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-300"
           :class="sidebarCollapsed ? 'lg:hidden' : ''"
-          style="background:var(--sidebar-logo-icon-bg)"
         >
-          <span class="material-symbols-outlined text-[18px]" style="color:var(--sidebar-logo-icon-color)">account_balance</span>
+          <span class="material-symbols-outlined text-[19px]">account_balance</span>
         </div>
-        <!-- Texto: oculto en desktop colapsado -->
-        <span
-          class="text-base font-bold tracking-tight overflow-hidden whitespace-nowrap transition-all duration-300 flex-1"
+        <div
+          class="min-w-0 flex-1 overflow-hidden whitespace-nowrap transition-all duration-300"
           :class="sidebarCollapsed ? 'lg:hidden' : ''"
-          style="color:var(--sidebar-text)"
-        >moreMoney</span>
-        <!-- Botón toggle — solo desktop -->
+        >
+          <p class="text-[15px] font-bold tracking-tight" style="color:var(--sidebar-text)">moreMoney</p>
+          <p class="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.16em]" style="color:var(--sidebar-text-muted)">Finanzas personales</p>
+        </div>
         <button
           class="sidebar-collapse-btn hidden lg:flex flex-shrink-0"
           :title="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
+          :aria-label="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
           @click="toggleSidebar"
         >
           <span class="material-symbols-outlined text-[20px]">
@@ -58,33 +55,33 @@
           <!-- Separador entre grupos -->
           <div
             v-if="gIdx > 0"
-            class="transition-all duration-300"
-            :class="sidebarCollapsed ? 'my-1 mx-1 border-t' : 'h-3'"
-            style="border-color:var(--sidebar-border)"
+            class="sidebar-section-divider transition-all duration-300"
+            :class="sidebarCollapsed ? 'my-2 mx-1' : 'my-3 mx-2'"
           />
           <!-- Etiqueta de grupo -->
           <span
-            class="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest overflow-hidden whitespace-nowrap transition-all duration-300"
+            class="sidebar-section-label mb-1 overflow-hidden whitespace-nowrap px-2 text-[9px] font-bold uppercase tracking-[0.18em] transition-all duration-300"
             :class="sidebarCollapsed ? 'lg:opacity-0 lg:h-0 lg:mb-0' : 'lg:opacity-100'"
-            style="color:var(--sidebar-text-muted)"
           >{{ group.label }}</span>
           <!-- Ítems del grupo -->
           <router-link
             v-for="item in group.items"
             :key="item.to"
             :to="item.to"
-            class="nav-link group flex items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-150"
+            class="sidebar-nav-link group flex items-center rounded-xl py-1.5 text-sm font-medium transition-all duration-200"
             :class="[
               isActive(item.to) ? 'nav-link--active' : 'nav-link--idle',
-              sidebarCollapsed ? 'lg:justify-center lg:px-0 lg:gap-0' : 'px-3 gap-3'
+              sidebarCollapsed ? 'lg:justify-center lg:px-0 lg:gap-0' : 'px-2.5 gap-2.5'
             ]"
             :title="sidebarCollapsed ? item.label : ''"
             @click="menuOpen = false"
           >
-            <span
-              class="material-symbols-outlined text-[20px] flex-shrink-0 transition-colors duration-150"
-              :class="isActive(item.to) ? 'nav-icon--active' : 'nav-icon--idle'"
-            >{{ item.icon }}</span>
+            <span class="nav-icon-shell flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[10px] transition-all duration-200">
+              <span
+                class="material-symbols-outlined text-[19px] transition-colors duration-150"
+                :class="isActive(item.to) ? 'nav-icon--active' : 'nav-icon--idle'"
+              >{{ item.icon }}</span>
+            </span>
             <span
               class="overflow-hidden whitespace-nowrap transition-all duration-300"
               :class="sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto lg:opacity-100'"
@@ -95,12 +92,11 @@
 
       <!-- Footer sidebar -->
       <div
-        class="px-4 py-4 overflow-hidden transition-all duration-300"
+        class="sidebar-footer overflow-hidden px-4 py-4 transition-all duration-300"
         :class="sidebarCollapsed ? 'lg:px-2' : ''"
-        style="border-top:1px solid var(--sidebar-border)"
       >
         <p
-          class="text-[11px] whitespace-nowrap overflow-hidden transition-all duration-300"
+          class="whitespace-nowrap overflow-hidden text-[10px] font-medium transition-all duration-300"
           :class="sidebarCollapsed ? 'lg:opacity-0' : 'lg:opacity-100'"
           style="color:var(--sidebar-text-muted)"
         >moreMoney © {{ currentYear }}</p>
@@ -114,57 +110,68 @@
     >
       <!-- Top bar -->
       <header
-        class="sticky top-0 z-20 flex h-16 items-center justify-between px-4 lg:px-6"
-        style="background:var(--header-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--color-border-soft)"
+        class="app-topbar sticky top-0 z-20 flex h-[72px] items-center justify-between gap-3 px-4 lg:px-7"
       >
-        <div class="flex items-center gap-2">
+        <div class="flex min-w-0 items-center gap-3">
           <button
-            class="flex h-9 w-9 items-center justify-center rounded-lg transition-colors lg:hidden"
-            style="color:var(--color-text-secondary);background:transparent"
-            @mouseenter="e => e.currentTarget.style.background = 'var(--color-surface-high)'"
-            @mouseleave="e => e.currentTarget.style.background = 'transparent'"
+            class="topbar-icon-btn lg:hidden"
+            aria-label="Abrir menú de navegación"
             @click="menuOpen = !menuOpen"
           >
-            <span class="material-symbols-outlined text-[22px]">{{ menuOpen ? 'close' : 'menu' }}</span>
+            <span class="material-symbols-outlined text-[21px]">{{ menuOpen ? 'close' : 'menu' }}</span>
           </button>
-          <span class="material-symbols-outlined hidden text-[18px] sm:block" style="color:var(--color-brand)">{{ currentNav?.icon }}</span>
-          <span class="text-sm font-bold" style="color:var(--color-text-primary)">{{ currentNav?.label }}</span>
-        </div>
 
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <span class="hidden text-xs tabular-nums md:block" style="color:var(--color-text-muted)">{{ todayLabel }}</span>
-            <button
-              class="theme-toggle"
-              :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-              @click="toggle"
-            >
-              <span class="material-symbols-outlined text-[17px]">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
-            </button>
+          <div class="topbar-page-icon hidden sm:flex">
+            <span class="material-symbols-outlined text-[20px]">{{ currentNav?.icon }}</span>
           </div>
 
-          <div class="flex items-center gap-2 pl-3" style="border-left:1px solid var(--color-border)">
-            <div
-              class="hidden h-7 w-7 items-center justify-center rounded-full sm:flex"
-              style="background:var(--color-brand-light)"
-            >
-              <span class="material-symbols-outlined text-[15px]" style="color:var(--color-brand)">person</span>
+          <div class="min-w-0">
+            <p class="hidden text-[10px] font-semibold uppercase tracking-[0.16em] sm:block" style="color:var(--color-text-muted)">
+              MoreMoney · Finanzas personales
+            </p>
+            <h1 class="truncate text-sm font-bold sm:mt-0.5 sm:text-base" style="color:var(--color-text-primary)">
+              {{ currentNav?.label }}
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex flex-shrink-0 items-center gap-2 sm:gap-3">
+          <div class="topbar-date hidden md:flex">
+            <span class="material-symbols-outlined text-[17px]">calendar_today</span>
+            <span class="capitalize">{{ todayLabel }}</span>
+          </div>
+
+          <button
+            class="topbar-icon-btn"
+            :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+            :aria-label="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+            @click="toggle"
+          >
+            <span class="material-symbols-outlined text-[18px]">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
+          </button>
+
+          <div class="topbar-user">
+            <div class="topbar-avatar">
+              <span class="material-symbols-outlined text-[16px]">person</span>
             </div>
-            <span class="hidden text-xs font-semibold sm:block" style="color:var(--color-text-secondary)">{{ authStore.usuario?.usuario }}</span>
+            <span class="hidden max-w-32 truncate text-xs font-semibold sm:block" style="color:var(--color-text-secondary)">
+              {{ authStore.usuario?.usuario }}
+            </span>
             <button
-              class="logout-btn flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-all"
+              class="topbar-logout"
               title="Cerrar sesión"
+              aria-label="Cerrar sesión"
               @click="showLogoutConfirm = true"
             >
-              <span class="material-symbols-outlined text-[15px]">logout</span>
-              <span class="hidden sm:inline">Salir</span>
+              <span class="material-symbols-outlined text-[17px]">logout</span>
+              <span class="hidden lg:inline">Salir</span>
             </button>
           </div>
         </div>
       </header>
 
       <!-- Contenido de la ruta activa -->
-      <main class="flex-1 p-4 lg:p-6" style="background:var(--page-header-gradient)">
+      <main class="app-content flex-1 p-4 lg:p-7">
         <router-view />
       </main>
     </div>
@@ -178,7 +185,7 @@
       <div
         v-if="inactivityWarning"
         class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex items-center gap-3 rounded-2xl px-5 py-3 shadow-card"
-        style="background:var(--color-alert-bg);border:1px solid rgba(245,158,11,0.35);min-width:280px"
+        style="background:var(--color-alert-bg);border:1px solid var(--color-alert-border);min-width:280px"
       >
         <span class="material-symbols-outlined text-[20px]" style="color:var(--color-alert)">timer</span>
         <p class="flex-1 text-sm font-medium" style="color:var(--color-alert)">
@@ -313,63 +320,170 @@ const todayLabel = computed(() =>
 </script>
 
 <style scoped>
-/* Header */
-:root         { --header-bg: rgba(255,255,255,0.92); }
-[data-theme="dark"] { --header-bg: rgba(22,27,34,0.92); }
+/* Barra superior */
+.app-topbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-soft);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.045);
+}
+.topbar-page-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(3, 36, 107, 0.08);
+  border-radius: 13px;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+.topbar-icon-btn {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;
+}
+.topbar-icon-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(3, 36, 107, 0.2);
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+.topbar-date {
+  height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-mid);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.topbar-date .material-symbols-outlined { color: var(--color-brand); }
+.topbar-user {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 6px 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface-mid);
+}
+.topbar-avatar {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(3, 36, 107, 0.08);
+  border-radius: 11px;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+.topbar-logout {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.topbar-logout:hover {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
 
-/* Nav links — sobre fondo navy oscuro */
-.nav-link--active {
+.app-sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(77, 123, 211, 0.2), transparent 38%),
+    var(--sidebar-bg);
+  box-shadow: 12px 0 32px rgba(3, 16, 42, 0.16);
+}
+.sidebar-brand {
+  border-bottom: 1px solid var(--sidebar-border);
+}
+.sidebar-logo-mark {
+  border: 1px solid rgba(248, 189, 38, 0.28);
+  background: var(--sidebar-logo-icon-bg);
+  color: var(--sidebar-logo-icon-color);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+.sidebar-section-divider {
+  height: 1px;
+  flex-shrink: 0;
+  background: var(--sidebar-border);
+}
+.sidebar-section-label {
+  color: var(--sidebar-text-muted);
+}
+.sidebar-footer {
+  border-top: 1px solid var(--sidebar-border);
+}
+.sidebar-nav-link {
+  position: relative;
+  min-height: 44px;
+  border: 1px solid transparent;
   color: var(--sidebar-text);
-  background: var(--sidebar-active-bg);
-  border: 1px solid var(--sidebar-active-border);
+  text-decoration: none;
+}
+.nav-link--active {
+  border-color: var(--sidebar-active-border);
+  background: linear-gradient(100deg, var(--sidebar-active-bg), rgba(248, 189, 38, 0.04));
   font-weight: 700;
+}
+.nav-link--active::before {
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: -1px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--sidebar-active-icon);
+  content: '';
+}
+.nav-link--active .nav-icon-shell {
+  background: rgba(248, 189, 38, 0.13);
 }
 .nav-icon--active { color: var(--sidebar-active-icon); }
 
 .nav-link--idle {
-  color: var(--sidebar-text);
-  border: 1px solid transparent;
   opacity: 0.75;
 }
 .nav-link--idle:hover {
+  transform: translateX(2px);
+  border-color: var(--sidebar-border);
   background: var(--sidebar-hover-bg);
   opacity: 1;
 }
 .nav-icon--idle { color: var(--sidebar-text); }
-.nav-link--idle:hover .nav-icon--idle { color: var(--sidebar-text); }
-
-/* Botón toggle de tema */
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  background: var(--color-surface-mid);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-}
-.theme-toggle:hover {
-  background: var(--color-brand-light);
-  color: var(--color-brand);
-  border-color: rgba(3,36,107,0.2);
-}
-
-/* Botón logout */
-.logout-btn {
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-  background: transparent;
-  cursor: pointer;
-}
-.logout-btn:hover {
-  background: var(--color-surface-high);
-  color: var(--color-danger);
-  border-color: var(--color-danger);
+.nav-link--idle:hover .nav-icon-shell { background: rgba(255, 255, 255, 0.07); }
+.sidebar-nav-link:focus-visible,
+.sidebar-collapse-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .overlay-enter-active, .overlay-leave-active { transition: opacity 0.25s ease; }
@@ -379,9 +493,9 @@ const todayLabel = computed(() =>
 .sidebar-collapse-btn {
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   border: 1px solid var(--sidebar-border);
   color: var(--sidebar-text);
   background: transparent;

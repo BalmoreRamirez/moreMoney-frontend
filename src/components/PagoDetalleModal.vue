@@ -47,8 +47,8 @@
                     <span
                       class="text-xs font-semibold px-2 py-0.5 rounded-full"
                       :style="c.estado === 'pagada'
-                        ? 'background:rgba(16,185,129,0.15);color:#10B981'
-                        : 'background:rgba(245,158,11,0.15);color:#F59E0B'"
+                        ? 'background:var(--color-success-bg);color:var(--color-success)'
+                        : 'background:var(--color-alert-bg);color:var(--color-alert)'"
                     >{{ c.estado }}</span>
                     <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(c.monto) }}</span>
                   </div>
@@ -89,7 +89,7 @@
             </div>
 
             <!-- Total -->
-            <div class="flex items-center justify-between rounded-xl px-5 py-4" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
+            <div class="flex items-center justify-between rounded-xl px-5 py-4" style="background:var(--color-success-bg);border:1px solid var(--color-success-border)">
               <span class="font-semibold" style="color:var(--color-text-primary)">Total a pagar</span>
               <span class="font-mono text-2xl font-bold" style="color:var(--color-success)">{{ formatCurrency(store.detalle.total) }}</span>
             </div>
@@ -114,7 +114,7 @@
               </p>
               <div v-if="cuentaId" class="mt-2 flex items-center justify-between rounded-lg px-3 py-2 text-xs"
                    :style="saldoResultante < 0
-                     ? 'background:var(--color-danger-bg);border:1px solid rgba(220,38,38,0.2)'
+                     ? 'background:var(--color-danger-bg);border:1px solid var(--color-danger-border)'
                      : 'background:var(--color-surface-mid);border:1px solid var(--color-border)'">
                 <span :style="saldoResultante < 0 ? 'color:var(--color-danger);font-weight:500' : 'color:var(--color-text-secondary)'">
                   Saldo resultante
@@ -127,7 +127,7 @@
             </div>
 
             <!-- Error -->
-            <div v-if="errorMsg" class="rounded-lg px-4 py-3 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid rgba(220,38,38,0.2)">
+            <div v-if="errorMsg" class="rounded-lg px-4 py-3 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid var(--color-danger-border)">
               {{ errorMsg }}
             </div>
 

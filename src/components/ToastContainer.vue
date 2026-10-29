@@ -67,53 +67,35 @@ const icons = {
 
 /* Success */
 .toast--success {
-  background: var(--toast-success-bg, rgba(240,253,244,0.97));
-  border-color: #10B981;
-  color: #065f46;
+  background: var(--color-success-bg);
+  border-color: var(--color-success);
+  color: var(--color-success-text);
 }
-.toast--success .toast-icon { color: #10B981; }
+.toast--success .toast-icon { color: var(--color-success); }
 
 /* Error */
 .toast--error {
-  background: var(--toast-error-bg, rgba(254,242,242,0.97));
-  border-color: #DC2626;
-  color: #7f1d1d;
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger-text);
 }
-.toast--error .toast-icon { color: #DC2626; }
+.toast--error .toast-icon { color: var(--color-danger); }
 
 /* Warning */
 .toast--warning {
-  background: var(--toast-warning-bg, rgba(255,251,235,0.97));
-  border-color: #F59E0B;
-  color: #78350f;
+  background: var(--color-alert-bg);
+  border-color: var(--color-alert);
+  color: var(--color-alert-text);
 }
-.toast--warning .toast-icon { color: #F59E0B; }
+.toast--warning .toast-icon { color: var(--color-alert); }
 
 /* Info */
 .toast--info {
-  background: var(--toast-info-bg, rgba(239,246,255,0.97));
-  border-color: #3B82F6;
-  color: #1e3a8a;
+  background: var(--color-info-bg);
+  border-color: var(--color-info);
+  color: var(--color-info-text);
 }
-.toast--info .toast-icon { color: #3B82F6; }
-
-/* Dark mode */
-[data-theme="dark"] .toast--success {
-  background: rgba(6,78,59,0.92);
-  color: #a7f3d0;
-}
-[data-theme="dark"] .toast--error {
-  background: rgba(127,29,29,0.92);
-  color: #fecaca;
-}
-[data-theme="dark"] .toast--warning {
-  background: rgba(120,53,15,0.92);
-  color: #fde68a;
-}
-[data-theme="dark"] .toast--info {
-  background: rgba(30,58,138,0.92);
-  color: #bfdbfe;
-}
+.toast--info .toast-icon { color: var(--color-info); }
 
 .toast-icon {
   font-size: 20px;
@@ -126,7 +108,7 @@ const icons = {
   font-size: 13.5px;
   font-weight: 500;
   line-height: 1.45;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .toast-close {
