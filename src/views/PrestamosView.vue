@@ -113,9 +113,21 @@
           </template>
         </Column>
 
+        <Column field="fecha_inicio" header="Inicio" sortable style="min-width:125px">
+          <template #body="{ data: p }">
+            <span style="color:var(--color-text-secondary)">{{ formatFecha(p.fecha_inicio) }}</span>
+          </template>
+        </Column>
+
+        <Column header="Días restantes" style="min-width:135px">
+          <template #body="{ data: p }">
+            <span :style="{ color: colorDiasRestantes(p) }">{{ textoDiasRestantes(p) }}</span>
+          </template>
+        </Column>
+
         <Column field="estado" header="Estado" sortable style="min-width:100px">
           <template #body="{ data: p }">
-            <Tag :value="p.estado === 'activo' ? 'Activo' : 'Pagado'" :severity="p.estado === 'activo' ? 'success' : 'secondary'" />
+            <Tag :value="estadoVisible(p).label" :severity="estadoVisible(p).severity" />
           </template>
         </Column>
 
@@ -312,7 +324,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePrestamosStore } from '../stores/prestamos'
 import { useCuentasStore }   from '../stores/cuentas'
@@ -322,11 +334,14 @@ import PrestamoFormModal  from '../components/PrestamoFormModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 import { useToast } from '../composables/useToast'
 import { exportarPrestamosActivosPDF } from '../composables/usePdfExport'
+import { todayDateInput } from '../utils/dates'
 
 const store        = usePrestamosStore()
 const cuentasStore = useCuentasStore()
 const router       = useRouter()
 const toast        = useToast()
+const hoy = ref(todayDateInput())
+let timerActualizacionFecha
 
 const FILTROS = [
   { value: 'activo',     label: 'Activos' },
@@ -348,7 +363,11 @@ const kpi = computed(() => {
   return { capital, pagado, restante, activos, pct }
 })
 
-onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos({ estado: 'activo' })]))
+onMounted(() => {
+  Promise.all([cuentasStore.fetchCuentas(), store.fetchPrestamos({ estado: 'activo' })])
+  timerActualizacionFecha = setInterval(() => { hoy.value = todayDateInput() }, 60_000)
+})
+onUnmounted(() => clearInterval(timerActualizacionFecha))
 
 function setFiltro(val) {
   filtro.value = val
@@ -361,6 +380,45 @@ function setFiltro(val) {
 
 function goToDetalle(id) { router.push(`/prestamos/${id}`) }
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
+function formatFecha(fecha) {
+  if (!fecha) return '—'
+  return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-SV', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  })
+}
+function diaCalendario(fecha) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return null
+  const [year, month, day] = fecha.split('-').map(Number)
+  return Date.UTC(year, month - 1, day) / 86_400_000
+}
+function diasRestantes(prestamo) {
+  const duracion = Number(prestamo.dias_duracion)
+  if (prestamo.estado !== 'activo' || !Number.isInteger(duracion) || duracion <= 0) return null
+  const inicio = diaCalendario(prestamo.fecha_inicio)
+  const actual = diaCalendario(hoy.value)
+  if (inicio == null || actual == null) return null
+  return inicio + duracion - 1 - actual
+}
+function textoDiasRestantes(prestamo) {
+  if (prestamo.estado === 'pagado') return '—'
+  const restantes = diasRestantes(prestamo)
+  if (restantes == null) return 'Sin duración'
+  if (restantes < 0) return `Vencido hace ${Math.abs(restantes)} día${restantes === -1 ? '' : 's'}`
+  if (restantes === 0) return 'Vence hoy'
+  return `${restantes} día${restantes === 1 ? '' : 's'}`
+}
+function colorDiasRestantes(prestamo) {
+  const restantes = diasRestantes(prestamo)
+  if (restantes == null) return 'var(--color-text-muted)'
+  if (restantes < 0) return 'var(--color-danger)'
+  if (restantes === 0) return 'var(--color-alert)'
+  return 'var(--color-text-secondary)'
+}
+function estadoVisible(prestamo) {
+  if (prestamo.estado === 'pagado') return { label: 'Pagado', severity: 'secondary' }
+  if (diasRestantes(prestamo) < 0) return { label: 'Vencido', severity: 'danger' }
+  return { label: 'Activo', severity: 'success' }
+}
 
 function progresoPct(p) {
   if (!p.total_deuda || p.total_deuda <= 0) return 100
