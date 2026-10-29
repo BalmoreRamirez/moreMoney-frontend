@@ -41,7 +41,14 @@
 
     <!-- ── Panel derecho (formulario) ─────────────────────── -->
     <div class="right-panel">
-      <div class="form-box">
+      <div class="form-box fintech-card px-6 py-8 sm:px-8 sm:py-9">
+        <div class="mobile-brand" aria-label="moreMoney">
+          <div class="mobile-brand-icon">
+            <span class="material-symbols-outlined" aria-hidden="true">account_balance</span>
+          </div>
+          <span class="mobile-brand-name">moreMoney</span>
+        </div>
+
         <!-- Cabecera del form -->
         <div class="form-header">
           <h1 class="form-title">Bienvenido</h1>
@@ -49,19 +56,21 @@
         </div>
 
         <!-- Form -->
-        <form class="login-form" @submit.prevent="handleLogin">
+        <form class="login-form" aria-label="Iniciar sesión" novalidate @submit.prevent="handleLogin">
 
           <!-- Usuario -->
           <div class="field">
-            <label class="field-label">Usuario</label>
+            <label class="field-label" for="login-usuario">Usuario</label>
             <div class="input-wrap" :class="{ focused: focusedField === 'usuario' }">
               <span class="material-symbols-outlined input-icon">person</span>
               <input
                 v-model="form.usuario"
+                id="login-usuario"
                 type="text"
                 autocomplete="username"
                 placeholder="Tu nombre de usuario"
                 class="login-input"
+                required
                 @focus="focusedField = 'usuario'"
                 @blur="focusedField = null"
               />
@@ -70,19 +79,27 @@
 
           <!-- Contraseña -->
           <div class="field">
-            <label class="field-label">Contraseña</label>
+            <label class="field-label" for="login-contrasena">Contraseña</label>
             <div class="input-wrap" :class="{ focused: focusedField === 'contrasena' }">
               <span class="material-symbols-outlined input-icon">lock</span>
               <input
                 v-model="form.contrasena"
+                id="login-contrasena"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password"
                 placeholder="Tu contraseña"
                 class="login-input"
+                required
                 @focus="focusedField = 'contrasena'"
                 @blur="focusedField = null"
               />
-              <button type="button" class="toggle-pw" @click="showPassword = !showPassword">
+              <button
+                type="button"
+                class="toggle-pw"
+                :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                :aria-pressed="showPassword"
+                @click="showPassword = !showPassword"
+              >
                 <span class="material-symbols-outlined" style="font-size:18px">
                   {{ showPassword ? 'visibility_off' : 'visibility' }}
                 </span>
@@ -91,7 +108,7 @@
           </div>
 
           <!-- Error -->
-          <div v-if="errorMsg" class="error-msg">
+          <div v-if="errorMsg" class="error-msg" role="alert" aria-live="polite">
             <span class="material-symbols-outlined" style="font-size:16px">error</span>
             {{ errorMsg }}
           </div>
@@ -152,6 +169,7 @@ async function handleLogin() {
 .login-root {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--color-brand);
 }
 
@@ -277,14 +295,39 @@ async function handleLogin() {
 
 .form-box {
   width: 100%;
-  max-width: 360px;
+  max-width: 400px;
+}
+
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto 30px;
+}
+.mobile-brand-icon {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+.mobile-brand-icon .material-symbols-outlined { font-size: 22px; }
+.mobile-brand-name {
+  color: var(--color-brand);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
 }
 
 .form-header {
   margin-bottom: 32px;
 }
 .form-title {
-  font-size: 28px;
+  font-size: clamp(25px, 5vw, 29px);
   font-weight: 800;
   color: var(--color-brand);
   letter-spacing: -0.03em;
@@ -319,7 +362,8 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   gap: 0;
-  border-radius: 12px;
+  min-height: 50px;
+  border-radius: 13px;
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -329,6 +373,7 @@ async function handleLogin() {
   border-color: var(--color-brand);
   box-shadow: 0 0 0 3px var(--color-brand-focus);
 }
+.input-wrap:focus-within .input-icon { color: var(--color-brand); }
 
 .input-icon {
   font-size: 18px;
@@ -358,6 +403,11 @@ async function handleLogin() {
   align-items: center;
 }
 .toggle-pw:hover { color: var(--color-text-secondary); }
+.toggle-pw:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid var(--color-brand);
+  outline-offset: -3px;
+}
 
 /* ── Error ──────────────────────────────────────────── */
 .error-msg {
@@ -379,8 +429,9 @@ async function handleLogin() {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  min-height: 50px;
+  padding: 13px 16px;
+  border-radius: 13px;
   border: none;
   background: var(--color-brand);
   color: #FFFFFF;
@@ -388,10 +439,15 @@ async function handleLogin() {
   font-weight: 700;
   letter-spacing: 0.01em;
   cursor: pointer;
-  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-brand) 20%, transparent);
+  transition: background 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s;
   margin-top: 4px;
 }
-.submit-btn:hover:not(:disabled) { background: var(--color-brand-hover); transform: translateY(-1px); }
+.submit-btn:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 26%, transparent);
+  transform: translateY(-1px);
+}
 .submit-btn:active:not(:disabled) { transform: translateY(0); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -409,4 +465,17 @@ async function handleLogin() {
   margin-left: 4px;
 }
 .register-link-a:hover { text-decoration: underline; }
+
+@media (min-width: 900px) {
+  .mobile-brand { display: none; }
+  .form-header { text-align: left; }
+}
+
+@media (max-width: 899px) {
+  .form-header { text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
 </style>
