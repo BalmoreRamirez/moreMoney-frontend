@@ -391,6 +391,15 @@ async function handleLogin() {
   border: none;
   outline: none;
 }
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus,
+.login-input:autofill {
+  -webkit-text-fill-color: var(--color-text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  caret-color: var(--color-text-primary);
+}
 .login-input::placeholder { color: var(--color-text-muted); }
 
 .toggle-pw {
