@@ -273,7 +273,7 @@ function toggleSidebar() {
 
 function handleLogout() {
   showLogoutConfirm.value = false
-  authStore.logout()
+  void authStore.logout()
   router.push('/login')
 }
 

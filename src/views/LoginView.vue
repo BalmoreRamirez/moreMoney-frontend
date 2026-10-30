@@ -58,20 +58,20 @@
         <!-- Form -->
         <form class="login-form" aria-label="Iniciar sesión" novalidate @submit.prevent="handleLogin">
 
-          <!-- Usuario -->
+          <!-- Correo electrónico -->
           <div class="field">
-            <label class="field-label" for="login-usuario">Usuario</label>
-            <div class="input-wrap" :class="{ focused: focusedField === 'usuario' }">
-              <span class="material-symbols-outlined input-icon">person</span>
+            <label class="field-label" for="login-identidad">{{ usesSupabaseAuth ? 'Correo electrónico' : 'Usuario' }}</label>
+            <div class="input-wrap" :class="{ focused: focusedField === 'identidad' }">
+              <span class="material-symbols-outlined input-icon">{{ usesSupabaseAuth ? 'mail' : 'person' }}</span>
               <input
-                v-model="form.usuario"
-                id="login-usuario"
-                type="text"
-                autocomplete="username"
-                placeholder="Tu nombre de usuario"
+                v-model="form.identidad"
+                id="login-identidad"
+                :type="usesSupabaseAuth ? 'email' : 'text'"
+                :autocomplete="usesSupabaseAuth ? 'email' : 'username'"
+                :placeholder="usesSupabaseAuth ? 'tu@correo.com' : 'Tu nombre de usuario'"
                 class="login-input"
                 required
-                @focus="focusedField = 'usuario'"
+                @focus="focusedField = 'identidad'"
                 @blur="focusedField = null"
               />
             </div>
@@ -129,11 +129,13 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { AUTH_PROVIDER } from '../utils/authProvider'
 
 const router    = useRouter()
 const authStore = useAuthStore()
+const usesSupabaseAuth = AUTH_PROVIDER === 'supabase'
 
-const form          = ref({ usuario: '', contrasena: '' })
+const form          = ref({ identidad: '', contrasena: '' })
 const errorMsg      = ref('')
 const loading       = ref(false)
 const showPassword  = ref(false)
@@ -148,7 +150,7 @@ const features = [
 
 async function handleLogin() {
   errorMsg.value = ''
-  if (!form.value.usuario || !form.value.contrasena) {
+  if (!form.value.identidad || !form.value.contrasena) {
     errorMsg.value = 'Completa todos los campos.'
     return
   }
@@ -156,8 +158,15 @@ async function handleLogin() {
   try {
     await authStore.login(form.value)
     router.push('/')
-  } catch {
-    errorMsg.value = 'Credenciales inválidas. Intenta de nuevo.'
+  } catch (error) {
+    const status = error.status || error.response?.status
+    if (status === 400 || status === 401) {
+      errorMsg.value = 'Credenciales inválidas. Intenta de nuevo.'
+    } else if (error.message?.startsWith('Configura ')) {
+      errorMsg.value = error.message
+    } else {
+      errorMsg.value = 'No se pudo conectar a Supabase Auth. Verifica la conexión e inténtalo de nuevo.'
+    }
   } finally {
     loading.value = false
   }
@@ -390,6 +399,14 @@ async function handleLogin() {
   background: transparent;
   border: none;
   outline: none;
+}
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text-primary);
+  caret-color: var(--color-text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
 }
 .login-input::placeholder { color: var(--color-text-muted); }
 
