@@ -47,11 +47,6 @@ function pctTasa(t) {
   return parseFloat((parseFloat(t) * 100).toFixed(2))
 }
 
-function progresoPct(p) {
-  if (!p.total_deuda || p.total_deuda <= 0) return 100
-  return Math.min(100, Math.round((p.total_pagado / p.total_deuda) * 100))
-}
-
 // Dibuja la cabecera de página (banda navy top)
 function drawPageHeader(doc, W, fechaStr) {
   doc.setFillColor(...PALETTE.brand)
@@ -60,7 +55,7 @@ function drawPageHeader(doc, W, fechaStr) {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(12)
   doc.setTextColor(...PALETTE.white)
-  doc.text('moreMoney · Reporte de Préstamos Activos', 12, 8)
+  doc.text('moreMoney · Estado de cuenta de préstamos', 12, 8)
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(7.5)
@@ -80,45 +75,9 @@ function drawFooter(doc, W) {
   doc.text(`Página ${pageN} de ${total}`, W / 2, H - 5, { align: 'center' })
 }
 
-// Dibuja una fila de KPIs (4 cajas)
-function drawKpiRow(doc, startY, kpis, W) {
-  const kpiH   = 14
-  const kpiGap = 3
-  const kpiW   = (W - 24 - kpiGap * (kpis.length - 1)) / kpis.length
-
-  kpis.forEach((k, i) => {
-    const x = 12 + i * (kpiW + kpiGap)
-    doc.setFillColor(...PALETTE.kpiBg)
-    doc.roundedRect(x, startY, kpiW, kpiH, 2, 2, 'F')
-
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(6)
-    doc.setTextColor(...PALETTE.muted)
-    doc.text(k.label.toUpperCase(), x + 3, startY + 4.5)
-
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8.5)
-    doc.setTextColor(...k.color)
-    doc.text(k.value, x + 3, startY + 10.5)
-  })
-
-  return startY + kpiH
-}
-
-// Barra de progreso inline
-function drawProgressBar(doc, x, y, width, pct, color) {
-  const h = 3
-  doc.setFillColor(220, 224, 232)
-  doc.roundedRect(x, y, width, h, 1, 1, 'F')
-  if (pct > 0) {
-    doc.setFillColor(...color)
-    doc.roundedRect(x, y, Math.max(1, width * (pct / 100)), h, 1, 1, 'F')
-  }
-}
-
 // ── EXPORT PRINCIPAL ────────────────────────────────────────────────────────
-export function exportarPrestamosActivosPDF(prestamos) {
-  const activos = prestamos.filter(p => p.estado === 'activo')
+export function exportarEstadoCuentaPrestamosPDF(prestamos) {
+  const activos = prestamos.filter(p => p && p.id != null)
   if (!activos.length) return
 
   const doc    = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
@@ -126,147 +85,28 @@ export function exportarPrestamosActivosPDF(prestamos) {
   const hoy    = new Date()
   const fechaStr = `${hoy.getDate().toString().padStart(2,'0')} de ${MONTHS_ES[hoy.getMonth()]} de ${hoy.getFullYear()}`
 
-  // ══════════════════════════════════════════════════════
-  //  PÁGINA 1 — RESUMEN GLOBAL
-  // ══════════════════════════════════════════════════════
-  drawPageHeader(doc, W, fechaStr)
-
-  // KPIs globales
-  const totalCapital   = activos.reduce((s, p) => s + parseFloat(p.capital          || 0), 0)
-  const totalInteres   = activos.reduce((s, p) => s + parseFloat(p.interes_generado || 0), 0)
-  const totalPagado    = activos.reduce((s, p) => s + parseFloat(p.total_pagado     || 0), 0)
-  const totalPendiente = activos.reduce((s, p) => s + Math.max(0, parseFloat(p.saldo_pendiente || 0)), 0)
-  const totalDeuda     = activos.reduce((s, p) => s + parseFloat(p.total_deuda      || 0), 0)
-
-  const globalKpis = [
-    { label: 'Capital en calle',  value: formatCurrency(totalCapital),   color: PALETTE.brand },
-    { label: 'Interés generado',  value: formatCurrency(totalInteres),   color: PALETTE.muted },
-    { label: 'Total recuperado',  value: formatCurrency(totalPagado),    color: PALETTE.success },
-    { label: 'Saldo por cobrar',  value: formatCurrency(totalPendiente), color: PALETTE.alert },
-  ]
-
-  const afterKpi = drawKpiRow(doc, 22, globalKpis, W)
-
-  // Título sección
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(9)
-  doc.setTextColor(...PALETTE.brand)
-  doc.text(`Préstamos activos — ${activos.length} registro${activos.length !== 1 ? 's' : ''}`, 12, afterKpi + 7)
-
-  // Tabla resumen
-  const summaryHead = [[
-    '#', 'Deudor', 'Contacto', 'Inicio', 'Antigüedad (meses)', 'Interés total (%)',
-    'Capital', 'Interés gen.', 'Total deuda', 'Pagado', 'Pendiente', 'Progreso',
-  ]]
-
-  const summaryBody = activos.map((p, idx) => [
-    idx + 1,
-    p.deudor_nombre,
-    p.deudor_contacto || '—',
-    fmtDate(p.fecha_inicio),
-    calcMeses(p.fecha_inicio),
-    `${pctTasa(p.tasa_interes_mensual)}%`,
-    formatCurrency(p.capital),
-    formatCurrency(p.interes_generado),
-    formatCurrency(p.total_deuda),
-    formatCurrency(p.total_pagado),
-    formatCurrency(Math.max(0, p.saldo_pendiente)),
-    `${progresoPct(p)}%`,
-  ])
-
-  // Fila de totales
-  summaryBody.push([
-    { content: `TOTALES (${activos.length})`, colSpan: 6, styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand } },
-    { content: formatCurrency(totalCapital),   styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand, halign:'right' } },
-    { content: formatCurrency(totalInteres),   styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.muted, halign:'right' } },
-    { content: formatCurrency(totalDeuda),     styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand, halign:'right' } },
-    { content: formatCurrency(totalPagado),    styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.success, halign:'right' } },
-    { content: formatCurrency(totalPendiente), styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.alert, halign:'right' } },
-    { content: '',                             styles: { fillColor: PALETTE.totalBg } },
-  ])
-
-  autoTable(doc, {
-    startY: afterKpi + 10,
-    head: summaryHead,
-    body: summaryBody,
-    theme: 'grid',
-    styles: {
-      font: 'helvetica',
-      fontSize: 7.5,
-      cellPadding: { top: 2.5, right: 2.5, bottom: 2.5, left: 2.5 },
-      textColor: [30, 35, 45],
-      lineColor: [220, 225, 232],
-      lineWidth: 0.2,
-    },
-    headStyles: {
-      fillColor: PALETTE.brand,
-      textColor: PALETTE.white,
-      fontStyle: 'bold',
-      fontSize: 7,
-      halign: 'center',
-    },
-    columnStyles: {
-      0:  { cellWidth: 7,  halign: 'center' },
-      1:  { cellWidth: 32 },
-      2:  { cellWidth: 26 },
-      3:  { cellWidth: 17, halign: 'center' },
-      4:  { cellWidth: 11, halign: 'center' },
-      5:  { cellWidth: 13, halign: 'center' },
-      6:  { cellWidth: 22, halign: 'right' },
-      7:  { cellWidth: 22, halign: 'right' },
-      8:  { cellWidth: 22, halign: 'right' },
-      9:  { cellWidth: 22, halign: 'right' },
-      10: { cellWidth: 22, halign: 'right' },
-      11: { cellWidth: 14, halign: 'center' },
-    },
-    alternateRowStyles: { fillColor: PALETTE.rowAlt },
-    didDrawPage: () => drawFooter(doc, W),
-  })
-
-  // ══════════════════════════════════════════════════════
-  //  PÁGINAS DE DETALLE — una sección por préstamo
-  // ══════════════════════════════════════════════════════
+  // Una página de estado de cuenta por préstamo seleccionado.
   activos.forEach((p, idx) => {
-    doc.addPage()
+    if (idx > 0) doc.addPage()
     drawPageHeader(doc, W, fechaStr)
 
     const meses   = calcMeses(p.fecha_inicio)
-    const pct     = progresoPct(p)
     const pagos   = Array.isArray(p.pagos) ? p.pagos : []
-    const cuenta  = p.cuenta?.nombre || '—'
 
     // ── Encabezado del préstamo ──
     let y = 23
 
-    // Badge de número
-    doc.setFillColor(...PALETTE.brand)
-    doc.circle(18, y + 3.5, 5, 'F')
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8)
-    doc.setTextColor(...PALETTE.white)
-    doc.text(`${idx + 1}`, 18, y + 4.5, { align: 'center' })
-
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(13)
     doc.setTextColor(...PALETTE.brand)
-    doc.text(p.deudor_nombre, 27, y + 4)
+    doc.text(p.deudor_nombre, 12, y + 4)
 
     if (p.deudor_contacto) {
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(8)
       doc.setTextColor(...PALETTE.muted)
-      doc.text(`Contacto: ${p.deudor_contacto}`, 27, y + 9.5)
+      doc.text(`Contacto: ${p.deudor_contacto}`, 12, y + 9.5)
     }
-
-    // Estado badge
-    const estadoColor = PALETTE.success
-    doc.setFillColor(...estadoColor)
-    const badgeX = W - 42
-    doc.roundedRect(badgeX, y, 30, 8, 2, 2, 'F')
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8)
-    doc.setTextColor(...PALETTE.white)
-    doc.text('ACTIVO', badgeX + 15, y + 5.5, { align: 'center' })
 
     y += 15
 
@@ -279,7 +119,6 @@ export function exportarPrestamosActivosPDF(prestamos) {
       { label: 'Total adeudado',    value: formatCurrency(p.total_deuda),                     color: PALETTE.brand },
       { label: 'Total pagado',      value: formatCurrency(p.total_pagado),                    color: PALETTE.success },
       { label: 'Saldo pendiente',   value: formatCurrency(Math.max(0, p.saldo_pendiente)),    color: p.saldo_pendiente > 0 ? PALETTE.alert : PALETTE.success },
-      { label: 'Cuenta origen',     value: cuenta,                                            color: PALETTE.brand },
     ]
 
     const kpiH   = 13
@@ -303,21 +142,6 @@ export function exportarPrestamosActivosPDF(prestamos) {
     })
 
     y += kpiH + 5
-
-    // ── Barra de progreso ──
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8)
-    doc.setTextColor(...PALETTE.brand)
-    doc.text('Progreso de recuperación', 12, y + 1)
-
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(8)
-    doc.setTextColor(pct >= 100 ? PALETTE.success[0] : PALETTE.alert[0], pct >= 100 ? PALETTE.success[1] : PALETTE.alert[1], pct >= 100 ? PALETTE.success[2] : PALETTE.alert[2])
-    doc.text(`${pct}%`, W - 12, y + 1, { align: 'right' })
-
-    y += 4
-    drawProgressBar(doc, 12, y, W - 24, pct, pct >= 100 ? PALETTE.success : PALETTE.alert)
-    y += 7
 
     // ── Datos clave adicionales ──
     const metaItems = [
@@ -361,7 +185,7 @@ export function exportarPrestamosActivosPDF(prestamos) {
       doc.text('Sin abonos registrados para este préstamo.', W / 2, y + 7.5, { align: 'center' })
       y += 16
     } else {
-      const abonosHead = [['#', 'Fecha de pago', 'Monto', 'Nota / Descripción', 'Saldo restante acumulado']]
+      const abonosHead = [['#', 'Fecha de pago', 'Monto', 'Saldo restante acumulado']]
 
       let acumulado = 0
       const abonosBody = pagos
@@ -374,7 +198,6 @@ export function exportarPrestamosActivosPDF(prestamos) {
             i + 1,
             fmtDate(abono.fecha_pago),
             { content: formatCurrency(abono.monto), styles: { fontStyle:'bold', textColor: PALETTE.success, halign:'right' } },
-            abono.nota || '—',
             { content: formatCurrency(saldoTras), styles: { halign:'right', textColor: saldoTras <= 0 ? PALETTE.success : PALETTE.alert } },
           ]
         })
@@ -383,7 +206,7 @@ export function exportarPrestamosActivosPDF(prestamos) {
       abonosBody.push([
         { content: 'TOTAL ABONADO', colSpan: 2, styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.brand } },
         { content: formatCurrency(p.total_pagado), styles: { fontStyle:'bold', fillColor: PALETTE.totalBg, textColor: PALETTE.success, halign:'right' } },
-        { content: '', colSpan: 2, styles: { fillColor: PALETTE.totalBg } },
+        { content: '', styles: { fillColor: PALETTE.totalBg } },
       ])
 
       autoTable(doc, {
@@ -410,8 +233,7 @@ export function exportarPrestamosActivosPDF(prestamos) {
           0: { cellWidth: 10,  halign: 'center' },
           1: { cellWidth: 30,  halign: 'center' },
           2: { cellWidth: 35,  halign: 'right' },
-          3: { cellWidth: 'auto' },
-          4: { cellWidth: 45,  halign: 'right' },
+          3: { cellWidth: 'auto', halign: 'right' },
         },
         alternateRowStyles: { fillColor: PALETTE.rowAlt },
         didDrawPage: () => drawFooter(doc, W),
@@ -434,7 +256,11 @@ export function exportarPrestamosActivosPDF(prestamos) {
 
   const mes  = MONTHS_ES[hoy.getMonth()]
   const anio = hoy.getFullYear()
-  doc.save(`prestamos-activos-${mes}-${anio}.pdf`)
+  const nombreArchivo = activos.length === 1
+    ? `estado-cuenta-${activos[0].deudor_nombre}`
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    : `estados-cuenta-${activos.length}-prestamos`
+  doc.save(`${nombreArchivo}-${mes}-${anio}.pdf`)
 }
 
 // ════════════════════════════════════════════════════════════════════════════

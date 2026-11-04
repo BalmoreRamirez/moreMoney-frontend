@@ -8,13 +8,13 @@
       </div>
       <div class="flex items-center gap-2">
         <button
-          v-if="filtro === 'activo' && store.prestamos.length"
-          class="btn-ghost"
-          title="Exportar préstamos activos a PDF"
-          @click="exportPDF"
+          v-if="filtro !== 'calendario' && selectedPrestamos.length"
+          class="btn-brand"
+          :title="`Exportar estado de cuenta de ${selectedPrestamos.length} préstamo${selectedPrestamos.length === 1 ? '' : 's'}`"
+          @click="exportSelectedStatement"
         >
-          <span class="material-symbols-outlined text-[17px]">picture_as_pdf</span>
-          <span class="hidden sm:inline">Exportar PDF</span>
+          <span class="material-symbols-outlined text-[17px]">description</span>
+          <span>Estado de cuenta ({{ selectedPrestamos.length }})</span>
         </button>
         <button class="btn-brand" @click="showFormModal = true">
           <span class="material-symbols-outlined text-[18px]">add</span>
@@ -98,7 +98,10 @@
         :loading="store.loading"
         empty-text="Sin préstamos registrados"
         empty-icon="handshake"
+        v-model:selection="selectedPrestamos"
+        dataKey="id"
       >
+        <Column selectionMode="multiple" headerStyle="width:3rem" />
         <Column field="deudor_nombre" header="Deudor" sortable style="min-width:180px">
           <template #body="{ data: p }">
             <div class="flex items-center gap-3 cursor-pointer" @click="goToDetalle(p.id)">
@@ -178,9 +181,12 @@
           </template>
         </Column>
 
-        <Column header="" style="min-width:100px;width:100px">
+        <Column header="" style="min-width:135px;width:135px">
           <template #body="{ data: p }">
             <div class="flex items-center justify-end gap-1">
+              <button class="icon-btn" title="Exportar estado de cuenta" @click="exportStatement([p])">
+                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+              </button>
               <button class="icon-btn" title="Ver detalle" @click="goToDetalle(p.id)">
                 <span class="material-symbols-outlined text-[16px]">open_in_new</span>
               </button>
@@ -333,7 +339,7 @@ import AppDataTable       from '../components/AppDataTable.vue'
 import PrestamoFormModal  from '../components/PrestamoFormModal.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 import { useToast } from '../composables/useToast'
-import { exportarPrestamosActivosPDF } from '../composables/usePdfExport'
+import { exportarEstadoCuentaPrestamosPDF } from '../composables/usePdfExport'
 import { todayDateInput } from '../utils/dates'
 import { useTheme } from '../composables/useTheme'
 import { getChartPalette } from '../utils/chartPalette'
@@ -355,6 +361,7 @@ const FILTROS = [
 ]
 
 const filtro = ref('activo')
+const selectedPrestamos = ref([])
 
 const kpi = computed(() => {
   const list     = store.prestamos
@@ -374,6 +381,7 @@ onMounted(() => {
 onUnmounted(() => clearInterval(timerActualizacionFecha))
 
 function setFiltro(val) {
+  selectedPrestamos.value = []
   filtro.value = val
   if (val === 'calendario') {
     store.fetchPrestamos({ estado: 'activo' })
@@ -530,9 +538,12 @@ async function doDelete() {
   }
 }
 
-// ── Exportar PDF ──────────────────────────────────────────
-function exportPDF() {
-  exportarPrestamosActivosPDF(store.prestamos)
+function exportStatement(prestamos) {
+  exportarEstadoCuentaPrestamosPDF(prestamos)
+}
+
+function exportSelectedStatement() {
+  exportStatement(selectedPrestamos.value)
 }
 </script>
 

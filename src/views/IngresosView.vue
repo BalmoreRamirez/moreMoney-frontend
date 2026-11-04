@@ -4,7 +4,7 @@
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold" style="color:var(--color-text-primary)">Ingresos</h1>
-        <p class="mt-1 text-sm" style="color:var(--color-text-muted)">Sueldos e inversiones registradas.</p>
+        <p class="mt-1 text-sm" style="color:var(--color-text-muted)">{{ tabDescription }}</p>
       </div>
       <button class="btn-brand" @click="onTabCreate">
         <span class="material-symbols-outlined text-[18px]">add</span>
@@ -84,32 +84,27 @@
         </Column>
 
         <!-- Acciones -->
-        <Column header="" style="min-width:120px;width:120px">
+        <Column header="Acciones" style="min-width:152px;width:152px">
           <template #body="{ data: s }">
-            <div class="flex items-center justify-end gap-1">
-              <button
+            <div class="flex items-center justify-center gap-2">
+              <AccionIcono
                 v-if="s.activo"
-                class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                style="background:var(--color-success-bg);color:var(--color-success)"
+                icon="payments"
+                label="Cobrar sueldo"
+                variant="success"
                 @click="openCobrar(s)"
-              >
-                <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                Cobrar
-              </button>
-              <button
-                class="icon-btn"
-                title="Editar"
+              />
+              <AccionIcono
+                icon="edit"
+                label="Editar sueldo"
                 @click="openEditSueldo(s)"
-              >
-                <span class="material-symbols-outlined text-[16px]">edit</span>
-              </button>
-              <button
-                class="icon-btn-danger"
-                title="Eliminar"
+              />
+              <AccionIcono
+                icon="delete"
+                label="Eliminar sueldo"
+                variant="danger"
                 @click="confirmDeleteSueldo(s)"
-              >
-                <span class="material-symbols-outlined text-[16px]">delete</span>
-              </button>
+              />
             </div>
           </template>
         </Column>
@@ -118,8 +113,12 @@
 
     <!-- ════ INVERSIONES ════ -->
     <template v-else-if="activeTab === 'inversiones'">
-      <!-- Filtro estado -->
-      <div class="mt-6 flex flex-wrap gap-2">
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">Seguimiento de inversiones</h2>
+          <p class="mt-0.5 text-xs" style="color:var(--color-text-muted)">Capital, cobros y rentabilidad en un solo lugar</p>
+        </div>
+        <div class="flex flex-wrap gap-2" aria-label="Filtrar inversiones por estado">
         <button
           v-for="f in FILTROS_ESTADO"
           :key="f.value"
@@ -129,13 +128,26 @@
             : 'background:var(--color-surface-mid);color:var(--color-text-secondary);border:1px solid transparent'"
           @click="setFiltroEstado(f.value)"
         >{{ f.label }}</button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-end justify-between gap-2">
+        <h3 class="text-sm font-semibold" style="color:var(--color-text-primary)">Resumen de inversiones</h3>
+        <p class="text-[11px]" style="color:var(--color-text-muted)">Totales según el filtro seleccionado</p>
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-3 xl:grid-cols-5">
+        <article v-for="metric in resumenInversiones" :key="metric.label" class="rounded-xl border p-3 sm:p-4" :class="metric.label === 'Ganancia estimada' ? 'col-span-2 sm:col-span-1' : ''" style="background:var(--color-surface);border-color:var(--color-border)">
+          <p class="text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]" style="color:var(--color-text-muted)">{{ metric.label }}</p>
+          <p class="mt-1.5 font-mono text-base font-bold sm:mt-2 sm:text-lg" :style="{ color: metric.color }">{{ formatCurrency(metric.value) }}</p>
+          <p v-if="metric.note" class="mt-1 text-[11px]" style="color:var(--color-text-muted)">{{ metric.note }}</p>
+        </article>
       </div>
 
       <AppDataTable
-        class="mt-4"
+        class="mt-4 hidden sm:block"
         :data="store.inversiones"
         :loading="store.loading"
-        empty-text="Sin inversiones registradas"
+        :empty-text="emptyInvestmentsText"
         empty-icon="trending_up"
       >
         <!-- Nombre + estado -->
@@ -144,6 +156,7 @@
             <div class="min-w-0">
               <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ inv.nombre }}</p>
               <div v-if="inv.fecha_compra" class="text-[11px]" style="color:var(--color-text-muted)">{{ formatDate(inv.fecha_compra) }}</div>
+              <div v-if="inv.estado === 'vendida'" class="text-[11px]" style="color:var(--color-text-muted)">Venta: {{ formatDate(fechaVenta(inv)) }}</div>
             </div>
           </template>
         </Column>
@@ -159,42 +172,55 @@
         </Column>
 
         <!-- Costo -->
-        <Column field="costo_total" header="Costo" sortable style="min-width:120px">
+        <Column field="costo_total" header="Capital" sortable style="min-width:120px">
           <template #body="{ data: inv }">
             <span class="font-mono text-sm font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(inv.costo_total) }}</span>
           </template>
         </Column>
 
-        <!-- Cobrado / Ganancia -->
-        <Column header="Cobrado / Ganancia" style="min-width:150px">
+        <!-- Ingreso cobrado -->
+        <Column header="Cobrado" style="min-width:125px">
           <template #body="{ data: inv }">
-            <div class="text-sm">
-              <div v-if="inv.estado === 'en_curso' && inv.total_cobrado > 0">
-                <span class="font-mono font-semibold" style="color:var(--color-success)">{{ formatCurrency(inv.total_cobrado) }}</span>
-                <span v-if="inv.saldo_por_cobrar > 0" class="ml-1 text-[11px]" style="color:var(--color-alert)">falta {{ formatCurrency(inv.saldo_por_cobrar) }}</span>
-              </div>
-              <span v-if="inv.ganancia != null" class="font-mono font-semibold" :style="{ color: inv.ganancia >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
-                +{{ formatCurrency(inv.ganancia) }}
-              </span>
-              <span v-else-if="inv.ganancia_esperada != null" class="font-mono font-semibold" style="color:var(--color-alert)">
-                ~{{ formatCurrency(inv.ganancia_esperada) }}
-              </span>
-              <span v-else class="text-[11px]" style="color:var(--color-text-muted)">—</span>
-            </div>
+            <span class="font-mono text-sm font-semibold" style="color:var(--color-success)">{{ formatCurrency(inv.total_cobrado ?? 0) }}</span>
+            <p class="mt-0.5 text-[10px]" style="color:var(--color-text-muted)">{{ inv.estado === 'vendida' ? 'Total recibido' : 'Abonos recibidos' }}</p>
+          </template>
+        </Column>
+
+        <Column header="Por cobrar" style="min-width:125px">
+          <template #body="{ data: inv }">
+            <template v-if="inv.estado === 'en_curso' && inv.saldo_por_cobrar != null">
+              <span class="font-mono text-sm font-semibold" :style="{ color: Number(inv.saldo_por_cobrar) > 0 ? 'var(--color-alert)' : 'var(--color-success)' }">{{ formatCurrency(Math.max(0, Number(inv.saldo_por_cobrar))) }}</span>
+              <p class="mt-0.5 text-[10px]" style="color:var(--color-text-muted)">del precio esperado</p>
+            </template>
+            <span v-else class="text-sm" style="color:var(--color-text-muted)">—</span>
+          </template>
+        </Column>
+
+        <Column header="Ganancia" style="min-width:125px">
+          <template #body="{ data: inv }">
+            <template v-if="(inv.estado === 'vendida' ? inv.ganancia : inv.ganancia_esperada) != null">
+              <span class="font-mono text-sm font-semibold" :style="{ color: Number(inv.estado === 'vendida' ? inv.ganancia : inv.ganancia_esperada) >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">{{ formatCurrency(inv.estado === 'vendida' ? inv.ganancia : inv.ganancia_esperada) }}</span>
+              <p class="mt-0.5 text-[10px]" style="color:var(--color-text-muted)">{{ inv.estado === 'vendida' ? 'Realizada' : 'Estimada' }}</p>
+            </template>
+            <span v-else class="text-sm" style="color:var(--color-text-muted)">—</span>
           </template>
         </Column>
 
         <!-- Progreso (en_curso con cobros) -->
         <Column header="Progreso" style="min-width:130px">
           <template #body="{ data: inv }">
-            <template v-if="inv.estado === 'en_curso' && inv.precio_esperado && inv.total_cobrado > 0">
+            <template v-if="inv.estado === 'vendida'">
+              <div class="text-[10px] mb-1" style="color:var(--color-success)">Completada</div>
+              <div class="progress-bar-track"><div class="progress-bar-fill" style="width:100%" /></div>
+            </template>
+            <template v-else-if="inv.precio_esperado && Number(inv.precio_esperado) > 0">
               <div class="text-[10px] mb-1" style="color:var(--color-text-muted)">
-                {{ Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) }}%
+                {{ progresoCobro(inv) }}%
               </div>
               <div class="progress-bar-track">
                 <div
                   class="progress-bar-fill"
-                  :style="{ width: Math.min(100, Math.round((inv.total_cobrado / parseFloat(inv.precio_esperado)) * 100)) + '%' }"
+                  :style="{ width: progresoCobro(inv) + '%' }"
                 />
               </div>
             </template>
@@ -203,50 +229,84 @@
         </Column>
 
         <!-- Acciones -->
-        <Column header="" style="min-width:140px;width:140px">
+        <Column header="Acciones" style="min-width:184px;width:184px">
           <template #body="{ data: inv }">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                v-if="inv.estado === 'en_curso'"
-                class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                style="background:var(--color-success-bg);color:var(--color-success)"
-                @click="openCobrarInv(inv)"
-              >
-                <span class="material-symbols-outlined text-[14px]">payments</span>
-                Cobrar
-              </button>
-              <button
-                v-if="inv.estado === 'en_curso'"
-                class="icon-btn"
-                title="Editar"
-                @click="openEditInversion(inv)"
-              >
-                <span class="material-symbols-outlined text-[16px]">edit</span>
-              </button>
-              <button
-                v-if="inv.estado === 'en_curso' && !inv.cobros?.length"
-                class="icon-btn-danger"
-                title="Eliminar"
-                @click="confirmDeleteInversion(inv)"
-              >
-                <span class="material-symbols-outlined text-[16px]">delete</span>
-              </button>
-              <template v-if="inv.estado === 'vendida'">
-                <span class="text-xs mr-1" style="color:var(--color-text-muted)">{{ fechaVenta(inv) }}</span>
-                <button
-                  class="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium transition-colors hover:opacity-80"
-                  style="background:var(--color-alert-bg);color:var(--color-alert)"
-                  title="Resetear a En curso"
-                  @click="doResetearInversion(inv)"
-                >
-                  <span class="material-symbols-outlined text-[14px]">restart_alt</span>
-                  Resetear
-                </button>
-              </template>
-            </div>
+            <InversionAcciones
+              :inversion="inv"
+              @detalle="openDetalleInversion(inv)"
+              @cobrar="openCobrarInv(inv)"
+              @editar="openEditInversion(inv)"
+              @eliminar="confirmDeleteInversion(inv)"
+              @resetear="doResetearInversion(inv)"
+            />
           </template>
         </Column>
       </AppDataTable>
+
+      <div v-if="store.loading" class="mt-4 flex justify-center rounded-xl border py-8 sm:hidden" style="background:var(--color-surface);border-color:var(--color-border)">
+        <div class="h-6 w-6 animate-spin rounded-full border-2" style="border-color:var(--color-brand);border-top-color:transparent" />
+      </div>
+      <div v-else-if="!store.inversiones.length" class="mt-4 flex flex-col items-center rounded-xl border py-8 text-center sm:hidden" style="background:var(--color-surface);border-color:var(--color-border)">
+        <span class="material-symbols-outlined mb-2 text-4xl" style="color:var(--color-text-muted);opacity:.35">trending_up</span>
+        <p class="text-sm" style="color:var(--color-text-muted)">{{ emptyInvestmentsText }}</p>
+      </div>
+      <div v-else class="mt-4 space-y-3 sm:hidden">
+        <article v-for="inv in store.inversiones" :key="inv.id" class="rounded-xl border p-4" style="background:var(--color-surface);border-color:var(--color-border)">
+          <header class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="truncate text-sm font-semibold" style="color:var(--color-text-primary)">{{ inv.nombre }}</h3>
+              <p class="mt-1 text-[11px]" style="color:var(--color-text-muted)">Compra: {{ formatDate(inv.fecha_compra) }}</p>
+              <p v-if="inv.estado === 'vendida'" class="text-[11px]" style="color:var(--color-text-muted)">Venta: {{ formatDate(fechaVenta(inv)) }}</p>
+            </div>
+            <span class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold" :style="inv.estado === 'en_curso' ? 'background:var(--color-alert-bg);color:var(--color-alert)' : 'background:var(--color-success-bg);color:var(--color-success)'">
+              {{ inv.estado === 'en_curso' ? 'En curso' : 'Vendida' }}
+            </span>
+          </header>
+
+          <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+            <div>
+              <dt class="text-[10px] uppercase tracking-wide" style="color:var(--color-text-muted)">Capital</dt>
+              <dd class="mt-1 font-mono text-sm font-semibold" style="color:var(--color-text-primary)">{{ formatCurrency(inv.costo_total) }}</dd>
+            </div>
+            <div>
+              <dt class="text-[10px] uppercase tracking-wide" style="color:var(--color-text-muted)">Cobrado</dt>
+              <dd class="mt-1 font-mono text-sm font-semibold" style="color:var(--color-success)">{{ formatCurrency(inv.total_cobrado ?? 0) }}</dd>
+            </div>
+            <div>
+              <dt class="text-[10px] uppercase tracking-wide" style="color:var(--color-text-muted)">Por cobrar</dt>
+              <dd class="mt-1 font-mono text-sm font-semibold" :style="{ color: inv.estado === 'en_curso' && Number(inv.saldo_por_cobrar || 0) > 0 ? 'var(--color-alert)' : 'var(--color-text-secondary)' }">
+                {{ inv.estado === 'en_curso' && inv.saldo_por_cobrar != null ? formatCurrency(Math.max(0, Number(inv.saldo_por_cobrar))) : '—' }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-[10px] uppercase tracking-wide" style="color:var(--color-text-muted)">{{ inv.estado === 'vendida' ? 'Ganancia' : 'Ganancia estimada' }}</dt>
+              <dd v-if="(inv.estado === 'vendida' ? inv.ganancia : inv.ganancia_esperada) != null" class="mt-1 font-mono text-sm font-semibold" :style="{ color: Number(inv.estado === 'vendida' ? inv.ganancia : inv.ganancia_esperada) >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
+                {{ formatCurrency(inv.estado === 'vendida' ? inv.ganancia : inv.ganancia_esperada) }}
+              </dd>
+              <dd v-else class="mt-1 text-sm" style="color:var(--color-text-muted)">—</dd>
+            </div>
+          </dl>
+
+          <div v-if="inv.estado === 'vendida' || (inv.precio_esperado && Number(inv.precio_esperado) > 0)" class="mt-4">
+            <div class="mb-1.5 flex justify-between text-[10px]" :style="{ color: inv.estado === 'vendida' ? 'var(--color-success)' : 'var(--color-text-muted)' }">
+              <span>{{ inv.estado === 'vendida' ? 'Completada' : 'Progreso de cobro' }}</span>
+              <span v-if="inv.estado !== 'vendida'">{{ progresoCobro(inv) }}%</span>
+            </div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" :style="{ width: (inv.estado === 'vendida' ? 100 : progresoCobro(inv)) + '%' }" /></div>
+          </div>
+
+          <div class="mt-4 border-t pt-3" style="border-color:var(--color-border-soft)">
+            <InversionAcciones
+              :inversion="inv"
+              @detalle="openDetalleInversion(inv)"
+              @cobrar="openCobrarInv(inv)"
+              @editar="openEditInversion(inv)"
+              @eliminar="confirmDeleteInversion(inv)"
+              @resetear="doResetearInversion(inv)"
+            />
+          </div>
+        </article>
+      </div>
     </template>
 
     <!-- ════ OTROS INGRESOS ════ -->
@@ -287,23 +347,20 @@
         </Column>
 
         <!-- Acciones -->
-        <Column header="" style="min-width:90px;width:90px">
+        <Column header="Acciones" style="min-width:120px;width:120px">
           <template #body="{ data: item }">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                class="icon-btn"
-                title="Editar"
+            <div class="flex items-center justify-center gap-2">
+              <AccionIcono
+                icon="edit"
+                label="Editar ingreso"
                 @click="openEditOtro(item)"
-              >
-                <span class="material-symbols-outlined text-[16px]">edit</span>
-              </button>
-              <button
-                class="icon-btn-danger"
-                title="Eliminar"
+              />
+              <AccionIcono
+                icon="delete"
+                label="Eliminar ingreso"
+                variant="danger"
                 @click="confirmDeleteOtro(item)"
-              >
-                <span class="material-symbols-outlined text-[16px]">delete</span>
-              </button>
+              />
             </div>
           </template>
         </Column>
@@ -335,6 +392,12 @@
       @saved="onCobrarInv"
     />
 
+    <InversionDetalleModal
+      :inversion="detalleInversion"
+      :cuentas="cuentasStore.cuentas"
+      @close="detalleInversion = null"
+    />
+
     <IngresoFormModal
       v-model="showOtroModal"
       :ingreso="editOtro"
@@ -363,6 +426,9 @@ import SueldoFormModal      from '../components/SueldoFormModal.vue'
 import CobrarSueldoModal    from '../components/CobrarSueldoModal.vue'
 import InversionFormModal   from '../components/InversionFormModal.vue'
 import CobrarInversionModal from '../components/CobrarInversionModal.vue'
+import InversionDetalleModal from '../components/InversionDetalleModal.vue'
+import InversionAcciones from '../components/InversionAcciones.vue'
+import AccionIcono from '../components/AccionIcono.vue'
 import IngresoFormModal     from '../components/IngresoFormModal.vue'
 import ConfirmDeleteModal   from '../components/ConfirmDeleteModal.vue'
 import { useToast } from '../composables/useToast'
@@ -378,13 +444,13 @@ const TABS = [
 ]
 
 const FILTROS_ESTADO = [
-  { value: '',         label: 'Todos' },
   { value: 'en_curso', label: 'En curso' },
   { value: 'vendida',  label: 'Vendidas' },
+  { value: '',         label: 'Todas' },
 ]
 
 const activeTab    = ref('sueldos')
-const filtroEstado = ref('')
+const filtroEstado = ref('en_curso')
 
 onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchSueldos(), store.fetchInversiones(), store.fetchOtros()]))
 
@@ -399,6 +465,36 @@ const tabCreateLabel = computed(() => ({
   inversiones: 'Nueva inversión',
   otros:       'Nuevo ingreso',
 }[activeTab.value]))
+
+const tabDescription = computed(() => ({
+  sueldos: 'Consulta tus sueldos y cobros registrados.',
+  inversiones: 'Sigue el capital, los cobros y la rentabilidad.',
+  otros: 'Administra tus otros ingresos registrados.',
+}[activeTab.value]))
+
+const emptyInvestmentsText = computed(() => {
+  if (filtroEstado.value === 'en_curso') return 'No hay inversiones en curso.'
+  if (filtroEstado.value === 'vendida') return 'No hay inversiones vendidas.'
+  return 'Sin inversiones registradas.'
+})
+
+const resumenInversiones = computed(() => {
+  const inversiones = store.inversiones || []
+  const sumar = (selector) => inversiones.reduce((total, inv) => total + Number(selector(inv) || 0), 0)
+  return [
+    { label: 'Capital invertido', value: sumar(inv => inv.costo_total), color: 'var(--color-text-primary)' },
+    { label: 'Total cobrado', value: sumar(inv => inv.total_cobrado), color: 'var(--color-success)' },
+    { label: 'Por cobrar', value: sumar(inv => inv.estado === 'en_curso' ? Math.max(0, Number(inv.saldo_por_cobrar || 0)) : 0), color: 'var(--color-alert)' },
+    { label: 'Ganancia realizada', value: sumar(inv => inv.estado === 'vendida' ? inv.ganancia : 0), color: 'var(--color-success)' },
+    { label: 'Ganancia estimada', value: sumar(inv => inv.estado === 'en_curso' ? inv.ganancia_esperada : 0), color: 'var(--color-alert)' },
+  ]
+})
+
+function progresoCobro(inversion) {
+  const objetivo = Number(inversion.precio_esperado)
+  if (!objetivo || objetivo <= 0) return 0
+  return Math.min(100, Math.round((Number(inversion.total_cobrado || 0) / objetivo) * 100))
+}
 
 function onTabCreate() {
   if (activeTab.value === 'sueldos')     openCreateSueldo()
@@ -465,9 +561,11 @@ async function onCobrar(payload) {
 // ─── INVERSIONES ─────────────────────────────────────────────────────────────
 const showInversionModal = ref(false)
 const editInversion      = ref(null)
+const detalleInversion   = ref(null)
 
 function openCreateInversion()  { editInversion.value = null; showInversionModal.value = true }
 function openEditInversion(inv) { editInversion.value = inv;  showInversionModal.value = true }
+function openDetalleInversion(inv) { detalleInversion.value = inv }
 
 async function onInversionSaved(payload) {
   try {
