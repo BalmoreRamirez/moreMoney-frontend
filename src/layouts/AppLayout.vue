@@ -256,7 +256,7 @@ const { isWarning: inactivityWarning } = useInactivityTimeout({
   onWarning: () => { /* banner ya reactivo via isWarning */ },
   onTimeout: () => {
     authStore.logout()
-    router.push('/login')
+    router.push({ name: 'login' })
     toast.warning('Sesión cerrada por inactividad')
   },
 })
@@ -274,32 +274,32 @@ function toggleSidebar() {
 function handleLogout() {
   showLogoutConfirm.value = false
   authStore.logout()
-  router.push('/login')
+  router.push({ name: 'login' })
 }
 
 const navGroups = [
   {
     label: 'General',
     items: [
-      { to: '/', icon: 'dashboard', label: 'Dashboard' },
+      { to: { name: 'dashboard' }, icon: 'dashboard', label: 'Dashboard' },
     ],
   },
   {
     label: 'Tarjetas',
     items: [
-      { to: '/tarjetas',   icon: 'credit_card',    label: 'Tarjetas' },
-      { to: '/compras',    icon: 'shopping_bag',   label: 'Compras' },
-      { to: '/calendario', icon: 'calendar_month', label: 'Calendario' },
+      { to: { name: 'tarjetas' },   icon: 'credit_card',    label: 'Tarjetas' },
+      { to: { name: 'compras' },    icon: 'shopping_bag',   label: 'Compras' },
+      { to: { name: 'calendario' }, icon: 'calendar_month', label: 'Calendario' },
     ],
   },
   {
     label: 'Finanzas',
     items: [
-      { to: '/cuentas',   icon: 'account_balance_wallet', label: 'Cuentas' },
-      { to: '/ingresos',  icon: 'payments',               label: 'Ingresos' },
-      { to: '/egresos',   icon: 'money_off',              label: 'Egresos' },
-      { to: '/prestamos', icon: 'handshake',              label: 'Préstamos' },
-      { to: '/creditos',  icon: 'credit_score',           label: 'Créditos' },
+      { to: { name: 'cuentas' },   icon: 'account_balance_wallet', label: 'Cuentas' },
+      { to: { name: 'ingresos' },  icon: 'payments',               label: 'Ingresos' },
+      { to: { name: 'egresos' },   icon: 'money_off',              label: 'Egresos' },
+      { to: { name: 'prestamos' }, icon: 'handshake',              label: 'Préstamos' },
+      { to: { name: 'creditos' },  icon: 'credit_score',           label: 'Créditos' },
     ],
   },
 ]

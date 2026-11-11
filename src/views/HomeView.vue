@@ -102,7 +102,7 @@
         <div v-else class="mt-3 fintech-card flex flex-col items-center justify-center gap-3 py-8 text-center">
           <span class="material-symbols-outlined text-3xl" style="color:var(--color-text-muted)">handshake</span>
           <p class="text-sm" style="color:var(--color-text-muted)">Sin préstamos activos</p>
-          <router-link to="/prestamos" class="btn-brand text-xs px-3 py-1.5">
+          <router-link :to="{ name: 'prestamos' }" class="btn-brand text-xs px-3 py-1.5">
             <span class="material-symbols-outlined text-[16px]">add</span>
             Registrar préstamo
           </router-link>
@@ -137,7 +137,7 @@
           <router-link
             v-for="t in tarjetasStore.tarjetas"
             :key="t.id"
-            :to="`/tarjetas/${t.id}`"
+            :to="{ name: 'tarjeta-detalle', params: { id: encodeUrlSegment(t.id) } }"
             class="fintech-card flex flex-col items-center px-4 py-5 text-center card-link"
           >
             <!-- Nombre y banco -->
@@ -201,7 +201,7 @@
         <div v-else class="fintech-card flex flex-col items-center justify-center gap-3 py-8 text-center">
           <span class="material-symbols-outlined text-3xl" style="color:var(--color-text-muted)">credit_card_off</span>
           <p class="text-sm" style="color:var(--color-text-muted)">Sin tarjetas registradas</p>
-          <router-link to="/tarjetas" class="btn-brand text-xs px-3 py-1.5">
+          <router-link :to="{ name: 'tarjetas' }" class="btn-brand text-xs px-3 py-1.5">
             <span class="material-symbols-outlined text-[16px]">add</span>
             Agregar tarjeta
           </router-link>
@@ -217,6 +217,7 @@ import { computed, onMounted, ref } from 'vue'
 import { usePrestamosStore } from '../stores/prestamos'
 import { useCuentasStore }   from '../stores/cuentas'
 import { useTarjetasStore }  from '../stores/tarjetas'
+import { encodeUrlSegment } from '../utils/urlEncoding'
 import { formatCurrency }    from '../utils/currency'
 
 const prestamosStore = usePrestamosStore()

@@ -360,6 +360,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useTarjetasStore } from '../stores/tarjetas'
 import { useComprasStore }  from '../stores/compras'
 import { formatCurrency } from '../utils/currency'
+import { decodeUrlSegment } from '../utils/urlEncoding'
 import CompraNormalFormModal   from '../components/CompraNormalFormModal.vue'
 import CompraTasaCeroFormModal from '../components/CompraTasaCeroFormModal.vue'
 import { useToast } from '../composables/useToast'
@@ -370,9 +371,9 @@ const store        = useTarjetasStore()
 const comprasStore = useComprasStore()
 const toast        = useToast()
 
-const tarjetaId = computed(() => Number(route.params.id))
+const tarjetaId = computed(() => Number(decodeUrlSegment(route.params.id)))
 
-onMounted(() => store.fetchTarjeta(route.params.id))
+onMounted(() => store.fetchTarjeta(tarjetaId.value))
 
 // ── Modales de compra ─────────────────────────────────────
 const showNormal   = ref(false)
@@ -404,7 +405,7 @@ async function onEditTasaCeroSaved(payload) {
     toast.success('Compra tasa cero actualizada')
     showEditTasaCero.value = false
     editTasaCero.value = null
-    await store.fetchTarjeta(route.params.id)
+    await store.fetchTarjeta(tarjetaId.value)
   } catch (e) { toast.fromError(e, 'No se pudo actualizar la compra') }
 }
 
@@ -418,20 +419,20 @@ async function executeDelete() {
     toast.success('Compra eliminada')
     showDeleteConfirm.value = false
     deleteTarget.value = null
-    await store.fetchTarjeta(route.params.id)
+    await store.fetchTarjeta(tarjetaId.value)
   } catch (e) { toast.fromError(e, 'No se pudo eliminar') }
   finally { deleting.value = false }
 }
 
 async function onNormalSaved() {
   // El modal hizo el API call y mostró el toast; refrescamos el detalle
-  await store.fetchTarjeta(route.params.id)
+  await store.fetchTarjeta(tarjetaId.value)
 }
 
 async function onTasaCeroSaved(payload) {
   try {
     await comprasStore.createTasaCero(payload)
-    await store.fetchTarjeta(route.params.id)
+    await store.fetchTarjeta(tarjetaId.value)
     toast.success('Compra tasa cero registrada')
   } catch (e) { toast.fromError(e, 'No se pudo registrar la compra') }
 }

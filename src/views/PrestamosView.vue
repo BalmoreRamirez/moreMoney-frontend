@@ -332,6 +332,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { encodeUrlSegment } from '../utils/urlEncoding'
 import { usePrestamosStore } from '../stores/prestamos'
 import { useCuentasStore }   from '../stores/cuentas'
 import { formatCurrency }    from '../utils/currency'
@@ -390,7 +391,7 @@ function setFiltro(val) {
   }
 }
 
-function goToDetalle(id) { router.push(`/prestamos/${id}`) }
+function goToDetalle(id) { router.push({ name: 'prestamo-detalle', params: { id: encodeUrlSegment(id) } }) }
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 function formatFecha(fecha) {
   if (!fecha) return '—'

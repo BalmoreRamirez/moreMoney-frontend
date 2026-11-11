@@ -1,17 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '../layouts/AppLayout.vue'
+import { encodeUrlSegment as enc } from '../utils/urlEncoding'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/login',
+      path: `/${enc('login')}`,
       name: 'login',
       component: () => import('../views/LoginView.vue'),
       meta: { public: true },
     },
     {
-      path: '/',
+      path: `/${enc('dashboard')}`,
       component: AppLayout,
       children: [
         {
@@ -20,62 +21,62 @@ const router = createRouter({
           component: () => import('../views/HomeView.vue'),
         },
         {
-          path: 'tarjetas',
+          path: enc('tarjetas'),
           name: 'tarjetas',
           component: () => import('../views/TarjetasView.vue'),
         },
         {
-          path: 'tarjetas/:id',
+          path: `${enc('tarjetas')}/:id`,
           name: 'tarjeta-detalle',
           component: () => import('../views/TarjetaDetalleView.vue'),
         },
         {
-          path: 'compras',
+          path: enc('compras'),
           name: 'compras',
           component: () => import('../views/ComprasView.vue'),
         },
         {
-          path: 'calendario',
+          path: enc('calendario'),
           name: 'calendario',
           component: () => import('../views/CalendarioView.vue'),
         },
         {
-          path: 'cuentas',
+          path: enc('cuentas'),
           name: 'cuentas',
           component: () => import('../views/CuentasView.vue'),
         },
         {
-          path: 'cuentas/:id',
+          path: `${enc('cuentas')}/:id`,
           name: 'cuenta-detalle',
           component: () => import('../views/CuentaDetalleView.vue'),
         },
         {
-          path: 'ingresos',
+          path: enc('ingresos'),
           name: 'ingresos',
           component: () => import('../views/IngresosView.vue'),
         },
         {
-          path: 'egresos',
+          path: enc('egresos'),
           name: 'egresos',
           component: () => import('../views/EgresosView.vue'),
         },
         {
-          path: 'prestamos',
+          path: enc('prestamos'),
           name: 'prestamos',
           component: () => import('../views/PrestamosView.vue'),
         },
         {
-          path: 'prestamos/:id',
+          path: `${enc('prestamos')}/:id`,
           name: 'prestamo-detalle',
           component: () => import('../views/PrestamoDetalleView.vue'),
         },
         {
-          path: 'creditos',
+          path: enc('creditos'),
           name: 'creditos',
           component: () => import('../views/CreditosView.vue'),
         },
         {
-          path: 'creditos/:id',
+          path: `${enc('creditos')}/:id`,
           name: 'credito-detalle',
           component: () => import('../views/CreditoDetalleView.vue'),
         },
@@ -83,7 +84,7 @@ const router = createRouter({
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/',
+      redirect: { name: 'dashboard' },
     },
   ],
 })

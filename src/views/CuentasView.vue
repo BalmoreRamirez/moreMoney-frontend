@@ -127,6 +127,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCuentasStore } from '../stores/cuentas'
+import { encodeUrlSegment } from '../utils/urlEncoding'
 import { formatCurrency } from '../utils/currency'
 import AppDataTable       from '../components/AppDataTable.vue'
 import CuentaFormModal    from '../components/CuentaFormModal.vue'
@@ -140,7 +141,7 @@ const toast  = useToast()
 
 onMounted(() => store.fetchCuentas())
 
-function goToDetalle(id) { router.push(`/cuentas/${id}`) }
+function goToDetalle(id) { router.push({ name: 'cuenta-detalle', params: { id: encodeUrlSegment(id) } }) }
 
 function iconoTipo(tipo) {
   return { banco: 'account_balance', efectivo: 'payments', digital: 'phone_iphone' }[tipo] ?? 'wallet'

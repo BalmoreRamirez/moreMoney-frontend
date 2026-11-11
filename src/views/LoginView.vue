@@ -155,7 +155,7 @@ async function handleLogin() {
   loading.value = true
   try {
     await authStore.login(form.value)
-    router.push('/')
+    router.push({ name: 'dashboard' })
   } catch {
     errorMsg.value = 'Credenciales inválidas. Intenta de nuevo.'
   } finally {

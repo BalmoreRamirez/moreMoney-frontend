@@ -142,7 +142,7 @@
 
     <!-- Empty state: no tarjetas -->
     <div v-if="!store.loading && store.tarjetas.length === 0" class="mt-4 rounded-xl px-6 py-8 text-center text-sm" style="color:var(--color-text-secondary);background:var(--color-surface-mid);border:1px dashed var(--color-border)">
-      No tienes tarjetas registradas. Añade una desde la sección <router-link to="/tarjetas" class="text-success hover:underline">Tarjetas</router-link>.
+      No tienes tarjetas registradas. Añade una desde la sección <router-link :to="{ name: 'tarjetas' }" class="text-success hover:underline">Tarjetas</router-link>.
     </div>
 
     <!-- Pago detalle modal -->

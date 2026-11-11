@@ -197,6 +197,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { encodeUrlSegment } from '../utils/urlEncoding'
 import { useTarjetasStore } from '../stores/tarjetas'
 import TarjetaFormModal from '../components/TarjetaFormModal.vue'
 import { formatCurrency } from '../utils/currency'
@@ -233,7 +234,7 @@ const pageRange = computed(() => {
 function changePage(p) { store.fetchTarjetas(p) }
 
 // Navegación
-function goToDetalle(id) { router.push(`/tarjetas/${id}`) }
+function goToDetalle(id) { router.push({ name: 'tarjeta-detalle', params: { id: encodeUrlSegment(id) } }) }
 
 // Crear
 const showModal  = ref(false)

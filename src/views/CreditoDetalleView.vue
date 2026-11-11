@@ -153,6 +153,7 @@ import { useRoute, useRouter }     from 'vue-router'
 import { useCreditosStore }        from '../stores/creditos'
 import { useCuentasStore }         from '../stores/cuentas'
 import { formatCurrency }          from '../utils/currency'
+import { decodeUrlSegment } from '../utils/urlEncoding'
 import PagarCuotaCreditoModal      from '../components/PagarCuotaCreditoModal.vue'
 import { useToast } from '../composables/useToast'
 
@@ -161,8 +162,9 @@ const cuentasStore = useCuentasStore()
 const route        = useRoute()
 const router       = useRouter()
 const toast        = useToast()
+const creditoId    = computed(() => decodeUrlSegment(route.params.id))
 
-onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchCredito(route.params.id)]))
+onMounted(() => Promise.all([cuentasStore.fetchCuentas(), store.fetchCredito(creditoId.value)]))
 
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 
@@ -194,7 +196,7 @@ function openPagar(cuota) {
 
 async function onPagarCuota(payload) {
   try {
-    await store.pagarCuota(route.params.id, cuotaSeleccionada.value.id, payload)
+    await store.pagarCuota(creditoId.value, cuotaSeleccionada.value.id, payload)
     toast.success('Cuota pagada')
   } catch (e) {
     toast.fromError(e, 'No se pudo registrar el pago')

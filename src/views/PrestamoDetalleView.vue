@@ -230,6 +230,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter }  from 'vue-router'
 import { usePrestamosStore }    from '../stores/prestamos'
 import { formatCurrency }       from '../utils/currency'
+import { decodeUrlSegment } from '../utils/urlEncoding'
 import AbonoFormModal           from '../components/AbonoFormModal.vue'
 import { useToast } from '../composables/useToast'
 
@@ -237,6 +238,7 @@ const store  = usePrestamosStore()
 const route  = useRoute()
 const router = useRouter()
 const toast  = useToast()
+const prestamoId = computed(() => decodeUrlSegment(route.params.id))
 
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 
@@ -247,7 +249,7 @@ const progresoPct = computed(() => {
 })
 
 // ── Carga ──────────────────────────────────────────────────
-onMounted(() => store.fetchPrestamo(route.params.id))
+onMounted(() => store.fetchPrestamo(prestamoId.value))
 
 // ── Abono ─────────────────────────────────────────────────
 const showAbonoModal = ref(false)
@@ -270,7 +272,7 @@ async function guardarEdicion() {
   guardando.value   = true
   errorEditar.value = ''
   try {
-    await store.updateAbono(route.params.id, abonoEditando.value.id, editForm.value)
+    await store.updateAbono(prestamoId.value, abonoEditando.value.id, editForm.value)
     abonoEditando.value = null
   } catch (e) {
     errorEditar.value = e?.response?.data?.error || 'Error al guardar el abono'
@@ -293,7 +295,7 @@ async function confirmarEliminar() {
   eliminando.value    = true
   errorEliminar.value = ''
   try {
-    await store.deleteAbono(route.params.id, abonoAEliminar.value.id)
+    await store.deleteAbono(prestamoId.value, abonoAEliminar.value.id)
     toast.success('Abono eliminado')
     abonoAEliminar.value = null
   } catch (e) {

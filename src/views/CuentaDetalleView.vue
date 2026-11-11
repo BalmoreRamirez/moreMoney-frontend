@@ -208,13 +208,14 @@ import { useCuentasStore }      from '../stores/cuentas'
 import { useTransaccionesStore } from '../stores/transacciones'
 import { formatCurrency }        from '../utils/currency'
 import ConfirmDeleteModal        from '../components/ConfirmDeleteModal.vue'
+import { decodeUrlSegment } from '../utils/urlEncoding'
 
 const route        = useRoute()
 const router       = useRouter()
 const cuentasStore = useCuentasStore()
 const txStore      = useTransaccionesStore()
 
-const cuentaId = computed(() => route.params.id)
+const cuentaId = computed(() => decodeUrlSegment(route.params.id))
 const cuenta   = computed(() => cuentasStore.cuentas.find(c => String(c.id) === String(cuentaId.value)))
 
 const filtroTipo  = ref('')

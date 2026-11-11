@@ -203,6 +203,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter }        from 'vue-router'
+import { encodeUrlSegment } from '../utils/urlEncoding'
 import { useCreditosStore } from '../stores/creditos'
 import { useCuentasStore }  from '../stores/cuentas'
 import { formatCurrency }   from '../utils/currency'
@@ -242,7 +243,7 @@ function setFiltro(val) {
   store.fetchCreditos(val ? { estado: val } : {})
 }
 
-function goToDetalle(id) { router.push(`/creditos/${id}`) }
+function goToDetalle(id) { router.push({ name: 'credito-detalle', params: { id: encodeUrlSegment(id) } }) }
 function pctTasa(t)      { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
 
 function progresoPct(c) {
