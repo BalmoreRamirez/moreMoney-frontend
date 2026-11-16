@@ -184,9 +184,6 @@
         <Column header="" style="min-width:135px;width:135px">
           <template #body="{ data: p }">
             <div class="flex items-center justify-end gap-1">
-              <button class="icon-btn" title="Exportar estado de cuenta" @click="exportStatement([p])">
-                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
-              </button>
               <button class="icon-btn" title="Ver detalle" @click="goToDetalle(p.id)">
                 <span class="material-symbols-outlined text-[16px]">open_in_new</span>
               </button>
