@@ -42,37 +42,40 @@
           <p class="mt-1 text-right text-[10px]" style="color:var(--color-text-secondary)">{{ progresoPct }}% cobrado</p>
         </div>
 
-        <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
+        <form novalidate class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Monto a cobrar ($)</label>
-            <input
-              v-model.number="form.monto"
+
+            <FloatLabel variant="on" class="block w-full"><input
+              v-model.number="form.monto" id="float-CobrarInversionModal-monto"
               type="number" min="0.01" step="0.01"
-              :placeholder="sugerido > 0 ? sugerido.toFixed(2) : '0.00'"
               required
-              class="fintech-input w-full"
-            />
+              class="fintech-input w-full" :class="{ 'p-filled': form.monto !== '' && form.monto != null }"
+              @blur="v$.monto.$touch()"
+            /><label for="float-CobrarInversionModal-monto" class="text-xs" style="color:var(--color-text-secondary)">Monto a cobrar ($)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.monto.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.monto.$errors[0].$message }}</p>
+            <p v-if="sugerido > 0" class="mt-1 text-[10px]" style="color:var(--color-text-muted)">Pendiente sugerido: {{ formatCurrency(sugerido) }}</p>
             <p v-if="nuevoTotal !== null" class="mt-1 text-xs" style="color:var(--color-text-secondary)">
               Total cobrado después: <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(nuevoTotal) }}</span>
             </p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Fecha de cobro</label>
-            <input v-model="form.fecha_cobro" type="date" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.fecha_cobro" id="float-CobrarInversionModal-fecha_cobro" type="date" required class="fintech-input w-full" :class="{ 'p-filled': form.fecha_cobro !== '' && form.fecha_cobro != null }" @blur="v$.fecha_cobro.$touch()" /><label for="float-CobrarInversionModal-fecha_cobro" class="text-xs" style="color:var(--color-text-secondary)">Fecha de cobro<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha_cobro.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha_cobro.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Cuenta de ingreso</label>
-            <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
-              <option value="" disabled>Selecciona una cuenta</option>
+
+            <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_id" id="float-CobrarInversionModal-cuenta_id" required class="fintech-input w-full" :class="{ 'p-filled': form.cuenta_id !== '' && form.cuenta_id != null }" @blur="v$.cuenta_id.$touch()">
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
-            </select>
+            </select><label for="float-CobrarInversionModal-cuenta_id" class="text-xs" style="color:var(--color-text-secondary)">Cuenta de ingreso<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.cuenta_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.cuenta_id.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-secondary)">Nota <span style="color:var(--color-text-secondary)">(opcional)</span></label>
-            <input v-model="form.nota" type="text" placeholder="Ej. Pago parcial cliente" class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.nota" id="float-CobrarInversionModal-nota" type="text" class="fintech-input w-full" :class="{ 'p-filled': form.nota !== '' && form.nota != null }"  /><label for="float-CobrarInversionModal-nota" class="text-xs" style="color:var(--color-text-secondary)">Nota (opcional)</label></FloatLabel>
           </div>
 
           <!-- Toggle pago final (solo si no hay precio esperado o aún no se cubre) -->
@@ -103,6 +106,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
@@ -118,6 +123,8 @@ const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
 
 const form     = ref({ monto: '', fecha_cobro: '', cuenta_id: '', nota: '', es_pago_final: false })
+const v$ = useVuelidate(buildFormRules(form, { positive: { monto: 'El monto' }, dates: { fecha_cobro: 'La fecha de cobro' }, required: { cuenta_id: 'La cuenta de ingreso' } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
@@ -150,6 +157,7 @@ const mostrarToggleFinal = computed(() => {
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   errorMsg.value = ''
   saving.value   = false
   form.value = {
@@ -164,6 +172,7 @@ watch(() => props.modelValue, (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

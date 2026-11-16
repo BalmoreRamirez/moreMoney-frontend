@@ -5,6 +5,7 @@ import PrimeVue from 'primevue/config'
 import Aura    from '@primeuix/themes/aura'
 import Column  from 'primevue/column'
 import Tag     from 'primevue/tag'
+import FloatLabel from 'primevue/floatlabel'
 import App from './App.vue'
 import router from './router'
 import 'material-symbols/outlined.css'
@@ -22,4 +23,5 @@ app.use(PrimeVue, {
 })
 app.component('Column', Column)
 app.component('Tag', Tag)
+app.component('FloatLabel', FloatLabel)
 app.mount('#app')

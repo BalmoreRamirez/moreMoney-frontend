@@ -12,28 +12,31 @@
       >
         <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">{{ editData ? 'Editar sueldo' : 'Nuevo sueldo' }}</h2>
 
-        <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
+        <form novalidate class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nombre</label>
-            <input v-model="form.nombre" type="text" placeholder="Ej. Sueldo empresa XYZ" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.nombre" id="float-SueldoFormModal-nombre" type="text" required class="fintech-input w-full" :class="{ 'p-filled': form.nombre !== '' && form.nombre != null }" @blur="v$.nombre.$touch()" /><label for="float-SueldoFormModal-nombre" class="text-xs" style="color:var(--color-text-muted)">Nombre<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.nombre.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.nombre.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Monto mensual ($)</label>
-            <input v-model.number="form.monto" type="number" min="0.01" step="0.01" placeholder="700.00" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model.number="form.monto" id="float-SueldoFormModal-monto" type="number" min="0.01" step="0.01" required class="fintech-input w-full" :class="{ 'p-filled': form.monto !== '' && form.monto != null }" @blur="v$.monto.$touch()" /><label for="float-SueldoFormModal-monto" class="text-xs" style="color:var(--color-text-muted)">Monto mensual ($)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.monto.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.monto.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Día de cobro (1–31)</label>
-            <input v-model.number="form.dia_cobro" type="number" min="1" max="31" placeholder="15" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model.number="form.dia_cobro" id="float-SueldoFormModal-dia_cobro" type="number" min="1" max="31" required class="fintech-input w-full" :class="{ 'p-filled': form.dia_cobro !== '' && form.dia_cobro != null }" @blur="v$.dia_cobro.$touch()" /><label for="float-SueldoFormModal-dia_cobro" class="text-xs" style="color:var(--color-text-muted)">Día de cobro (1–31)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.dia_cobro.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.dia_cobro.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de ingreso</label>
-            <select v-model.number="form.cuenta_id" required class="fintech-input w-full">
-              <option value="" disabled>Selecciona una cuenta</option>
+
+            <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_id" id="float-SueldoFormModal-cuenta_id" required class="fintech-input w-full" :class="{ 'p-filled': form.cuenta_id !== '' && form.cuenta_id != null }" @blur="v$.cuenta_id.$touch()">
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
-            </select>
+            </select><label for="float-SueldoFormModal-cuenta_id" class="text-xs" style="color:var(--color-text-muted)">Cuenta de ingreso<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.cuenta_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.cuenta_id.$errors[0].$message }}</p>
           </div>
 
           <div v-if="editData" class="flex items-center gap-2">
@@ -59,6 +62,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency }  from '../utils/currency'
@@ -73,11 +78,14 @@ const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
 
 const form     = ref({ nombre: '', monto: '', dia_cobro: '', cuenta_id: '', activo: true })
+const v$ = useVuelidate(buildFormRules(form, { required: { nombre: 'El nombre', cuenta_id: 'La cuenta' }, positive: { monto: 'El monto mensual' }, integers: { dia_cobro: { label: 'El día de cobro', min: 1, max: 31 } } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   errorMsg.value = ''
   if (props.editData) {
     form.value = {
@@ -95,6 +103,7 @@ watch(() => props.modelValue, (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

@@ -31,18 +31,19 @@
           </div>
         </div>
 
-        <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
+        <form novalidate class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de donde sale el pago</label>
-            <select v-model.number="form.cuenta_pago_id" required class="fintech-input w-full">
-              <option value="" disabled>Selecciona una cuenta</option>
+
+            <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_pago_id" id="float-PagarCuotaCreditoModal-cuenta_pago_id" required class="fintech-input w-full" :class="{ 'p-filled': form.cuenta_pago_id !== '' && form.cuenta_pago_id != null }" @blur="v$.cuenta_pago_id.$touch()">
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
-            </select>
+            </select><label for="float-PagarCuotaCreditoModal-cuenta_pago_id" class="text-xs" style="color:var(--color-text-muted)">Cuenta de donde sale el pago<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.cuenta_pago_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.cuenta_pago_id.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de pago</label>
-            <input v-model="form.fecha_pago" type="date" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.fecha_pago" id="float-PagarCuotaCreditoModal-fecha_pago" type="date" required class="fintech-input w-full" :class="{ 'p-filled': form.fecha_pago !== '' && form.fecha_pago != null }" @blur="v$.fecha_pago.$touch()" /><label for="float-PagarCuotaCreditoModal-fecha_pago" class="text-xs" style="color:var(--color-text-muted)">Fecha de pago<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha_pago.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha_pago.$errors[0].$message }}</p>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
@@ -63,6 +64,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, watch } from 'vue'
 import { computed }   from 'vue'
@@ -80,11 +83,14 @@ const cuentasStore = useCuentasStore()
 const cuentas      = computed(() => cuentasStore.cuentas)
 
 const form     = ref({ cuenta_pago_id: '', fecha_pago: '' })
+const v$ = useVuelidate(buildFormRules(form, { required: { cuenta_pago_id: 'La cuenta de pago' }, dates: { fecha_pago: 'La fecha de pago' } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   saving.value   = false
   errorMsg.value = ''
   form.value     = { cuenta_pago_id: '', fecha_pago: todayDateInput() }
@@ -93,6 +99,7 @@ watch(() => props.modelValue, (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

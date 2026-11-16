@@ -16,77 +16,79 @@
             </button>
           </div>
 
-          <form @submit.prevent="submit" class="space-y-4">
+          <form novalidate @submit.prevent="submit" class="space-y-4">
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Nombre de la tarjeta</label>
-              <input v-model.trim="form.nombre" type="text" class="fintech-input" placeholder="Ej: Visa Platino" required />
+
+              <FloatLabel variant="on" class="block w-full"><input v-model.trim="form.nombre" id="float-TarjetaFormModal-nombre" type="text" class="fintech-input" :class="{ 'p-filled': form.nombre !== '' && form.nombre != null }" required @blur="v$.nombre.$touch()" /><label for="float-TarjetaFormModal-nombre" class="text-xs" style="color:var(--color-text-muted)">Nombre de la tarjeta<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.nombre.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.nombre.$errors[0].$message }}</p>
               <p v-if="errors.nombre" class="mt-1 text-xs text-danger">{{ errors.nombre }}</p>
             </div>
 
             <!-- Banco -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Banco emisor</label>
-              <input v-model.trim="form.banco" type="text" class="fintech-input" placeholder="Ej: Banco Nacional" required />
+
+              <FloatLabel variant="on" class="block w-full"><input v-model.trim="form.banco" id="float-TarjetaFormModal-banco" type="text" class="fintech-input" :class="{ 'p-filled': form.banco !== '' && form.banco != null }" required @blur="v$.banco.$touch()" /><label for="float-TarjetaFormModal-banco" class="text-xs" style="color:var(--color-text-muted)">Banco emisor<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.banco.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.banco.$errors[0].$message }}</p>
               <p v-if="errors.banco" class="mt-1 text-xs text-danger">{{ errors.banco }}</p>
             </div>
 
             <!-- Límite de crédito -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Límite de crédito</label>
+
               <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm" style="color:var(--color-text-muted)">$</span>
-                <input
-                  v-model="form.limite_credito"
+                <FloatLabel variant="on" class="block w-full"><input
+                  v-model="form.limite_credito" id="float-TarjetaFormModal-limite_credito"
                   type="number"
                   step="0.01"
                   min="0.01"
-                  class="fintech-input pl-7 font-mono"
-                  placeholder="0.00"
+                  class="fintech-input pl-7 font-mono" :class="{ 'p-filled': form.limite_credito !== '' && form.limite_credito != null }"
                   required
-                />
+                @blur="v$.limite_credito.$touch()" /><label for="float-TarjetaFormModal-limite_credito" class="text-xs" style="color:var(--color-text-muted)">Límite de crédito<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.limite_credito.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.limite_credito.$errors[0].$message }}</p>
               </div>
               <p v-if="errors.limite_credito" class="mt-1 text-xs text-danger">{{ errors.limite_credito }}</p>
             </div>
 
             <!-- Cuenta de pago por defecto -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Cuenta de pago (opcional)</label>
-              <select v-model.number="form.cuenta_pago_id" class="fintech-input w-full">
+
+              <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_pago_id" id="float-TarjetaFormModal-cuenta_pago_id" class="fintech-input w-full" :class="{ 'p-filled': form.cuenta_pago_id !== '' && form.cuenta_pago_id != null }">
                 <option :value="null">Sin cuenta predeterminada</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
                   {{ c.nombre }} ({{ c.tipo }})
                 </option>
-              </select>
+              </select><label for="float-TarjetaFormModal-cuenta_pago_id" class="text-xs" style="color:var(--color-text-muted)">Cuenta de pago (opcional)</label></FloatLabel>
               <p class="mt-1 text-xs" style="color:var(--color-text-muted)">Se usará por defecto al confirmar el pago de esta tarjeta.</p>
             </div>
 
             <!-- Días -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Día de corte</label>
-                <input
-                  v-model.number="form.dia_corte"
+
+                <FloatLabel variant="on" class="block w-full"><input
+                  v-model.number="form.dia_corte" id="float-TarjetaFormModal-dia_corte"
                   type="number"
                   min="1"
                   max="31"
-                  class="fintech-input"
-                  placeholder="1–31"
+                  class="fintech-input" :class="{ 'p-filled': form.dia_corte !== '' && form.dia_corte != null }"
                   required
-                />
+                @blur="v$.dia_corte.$touch()" /><label for="float-TarjetaFormModal-dia_corte" class="text-xs" style="color:var(--color-text-muted)">Día de corte<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.dia_corte.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.dia_corte.$errors[0].$message }}</p>
                 <p v-if="errors.dia_corte" class="mt-1 text-xs text-danger">{{ errors.dia_corte }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Día de pago</label>
-                <input
-                  v-model.number="form.dia_pago"
+
+                <FloatLabel variant="on" class="block w-full"><input
+                  v-model.number="form.dia_pago" id="float-TarjetaFormModal-dia_pago"
                   type="number"
                   min="1"
                   max="31"
-                  class="fintech-input"
-                  placeholder="1–31"
+                  class="fintech-input" :class="{ 'p-filled': form.dia_pago !== '' && form.dia_pago != null }"
                   required
-                />
+                @blur="v$.dia_pago.$touch()" /><label for="float-TarjetaFormModal-dia_pago" class="text-xs" style="color:var(--color-text-muted)">Día de pago<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.dia_pago.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.dia_pago.$errors[0].$message }}</p>
                 <p v-if="errors.dia_pago" class="mt-1 text-xs text-danger">{{ errors.dia_pago }}</p>
               </div>
             </div>
@@ -117,6 +119,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { ref, watch, computed } from 'vue'
 import { useCuentasStore }   from '../stores/cuentas'
 import { useTarjetasStore }  from '../stores/tarjetas'
@@ -139,10 +143,13 @@ const EMPTY = { nombre: '', banco: '', limite_credito: '', dia_corte: '', dia_pa
 const form        = ref({ ...EMPTY })
 const errors      = ref({})
 const serverError = ref('')
+const v$ = useVuelidate(buildFormRules(form, { required: { nombre: 'El nombre de la tarjeta', banco: 'El banco' }, positive: { limite_credito: 'El límite de crédito' }, integers: { dia_corte: { label: 'El día de corte', min: 1, max: 31 }, dia_pago: { label: 'El día de pago', min: 1, max: 31 } } }), form)
+
 const saving      = ref(false)
 
 watch(() => props.modelValue, async (open) => {
   if (open) {
+    v$.value.$reset()
     if (!cuentasStore.cuentas.length) await cuentasStore.fetchCuentas()
     form.value  = props.tarjetaEdit
       ? { nombre: props.tarjetaEdit.nombre, banco: props.tarjetaEdit.banco,
@@ -155,22 +162,8 @@ watch(() => props.modelValue, async (open) => {
   }
 })
 
-watch(form, () => { errors.value = {} }, { deep: true })
-
-function validate() {
-  const e = {}
-  if (!form.value.nombre) e.nombre = 'El nombre es requerido'
-  if (!form.value.banco)  e.banco  = 'El banco es requerido'
-  const lim = parseFloat(form.value.limite_credito)
-  if (!form.value.limite_credito || isNaN(lim) || lim <= 0) e.limite_credito = 'El límite debe ser mayor a 0'
-  if (!form.value.dia_corte || form.value.dia_corte < 1 || form.value.dia_corte > 31) e.dia_corte = 'Día entre 1 y 31'
-  if (!form.value.dia_pago  || form.value.dia_pago  < 1 || form.value.dia_pago  > 31) e.dia_pago  = 'Día entre 1 y 31'
-  errors.value = e
-  return !Object.keys(e).length
-}
-
 async function submit() {
-  if (!validate()) return
+  if (!(await v$.value.$validate())) return
   saving.value      = true
   serverError.value = ''
   try {

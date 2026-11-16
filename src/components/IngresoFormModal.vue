@@ -14,45 +14,46 @@
           </div>
 
           <!-- Form -->
-          <form class="px-6 pb-6 space-y-4" @submit.prevent="submit">
+          <form novalidate class="px-6 pb-6 space-y-4" @submit.prevent="submit">
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Descripción</label>
-              <input
-                v-model="form.descripcion"
+
+              <FloatLabel variant="on" class="block w-full"><input
+                v-model="form.descripcion" id="float-IngresoFormModal-descripcion"
                 type="text"
-                class="fintech-input"
-                placeholder="Ej: Venta de artículo, comisión, regalo…"
+                class="fintech-input" :class="{ 'p-filled': form.descripcion !== '' && form.descripcion != null }"
                 required
-              />
+              @blur="v$.descripcion.$touch()" /><label for="float-IngresoFormModal-descripcion" class="text-xs" style="color:var(--color-text-secondary)">Descripción<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.descripcion.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.descripcion.$errors[0].$message }}</p>
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Monto ($)</label>
-              <input
-                v-model.number="form.monto"
+
+              <FloatLabel variant="on" class="block w-full"><input
+                v-model.number="form.monto" id="float-IngresoFormModal-monto"
                 type="number"
                 min="0.01"
                 step="0.01"
-                class="fintech-input"
-                placeholder="0.00"
+                class="fintech-input" :class="{ 'p-filled': form.monto !== '' && form.monto != null }"
                 required
-              />
+              @blur="v$.monto.$touch()" /><label for="float-IngresoFormModal-monto" class="text-xs" style="color:var(--color-text-secondary)">Monto ($)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.monto.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.monto.$errors[0].$message }}</p>
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Fecha</label>
-              <input v-model="form.fecha" type="date" class="fintech-input" required />
+
+              <FloatLabel variant="on" class="block w-full"><input v-model="form.fecha" id="float-IngresoFormModal-fecha" type="date" class="fintech-input" :class="{ 'p-filled': form.fecha !== '' && form.fecha != null }" required @blur="v$.fecha.$touch()" /><label for="float-IngresoFormModal-fecha" class="text-xs" style="color:var(--color-text-secondary)">Fecha<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha.$errors[0].$message }}</p>
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">Cuenta destino</label>
-              <select v-model.number="form.cuenta_id" class="fintech-input" required>
-                <option :value="null" disabled>Selecciona una cuenta</option>
+
+              <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_id" id="float-IngresoFormModal-cuenta_id" class="fintech-input" :class="{ 'p-filled': form.cuenta_id !== '' && form.cuenta_id != null }" required @blur="v$.cuenta_id.$touch()">
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
                   {{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}
                 </option>
-              </select>
+              </select><label for="float-IngresoFormModal-cuenta_id" class="text-xs" style="color:var(--color-text-secondary)">Cuenta destino<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.cuenta_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.cuenta_id.$errors[0].$message }}</p>
             </div>
 
             <p v-if="errorMsg" class="text-sm" style="color:var(--color-danger)">{{ errorMsg }}</p>
@@ -77,6 +78,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
@@ -99,11 +102,14 @@ const defaultForm = () => ({
 })
 
 const form     = ref(defaultForm())
+const v$ = useVuelidate(buildFormRules(form, { required: { descripcion: 'La descripción', cuenta_id: 'La cuenta' }, positive: { monto: 'El monto' }, dates: { fecha: 'La fecha' } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
 watch(() => props.modelValue, async (open) => {
   if (!open) return
+  v$.value.$reset()
   errorMsg.value = ''
   form.value = props.ingreso
     ? { descripcion: props.ingreso.descripcion, monto: parseFloat(props.ingreso.monto), fecha: props.ingreso.fecha, cuenta_id: props.ingreso.cuenta_id }
@@ -114,6 +120,7 @@ watch(() => props.modelValue, async (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

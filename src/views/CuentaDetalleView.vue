@@ -26,7 +26,7 @@
 
         <button
           class="btn-brand"
-          @click="showMovModal = true"
+          @click="abrirMovModal"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
           Registrar movimiento
@@ -66,8 +66,14 @@
             >{{ opt.label }}</button>
           </div>
           <!-- Fecha desde/hasta -->
-          <input v-model="fechaDesde" type="date" class="fintech-input w-36 text-xs" @change="recargar" />
-          <input v-model="fechaHasta" type="date" class="fintech-input w-36 text-xs" @change="recargar" />
+          <FloatLabel variant="on" class="block w-36 shrink-0">
+            <input id="filtro-fecha-desde" v-model="fechaDesde" type="date" class="fintech-input w-36 text-xs" :class="{ 'p-filled': fechaDesde }" @change="recargar" />
+            <label for="filtro-fecha-desde" class="text-xs">Desde</label>
+          </FloatLabel>
+          <FloatLabel variant="on" class="block w-36 shrink-0">
+            <input id="filtro-fecha-hasta" v-model="fechaHasta" type="date" class="fintech-input w-36 text-xs" :class="{ 'p-filled': fechaHasta }" @change="recargar" />
+            <label for="filtro-fecha-hasta" class="text-xs">Hasta</label>
+          </FloatLabel>
         </div>
       </div>
 
@@ -155,25 +161,29 @@
           <div class="absolute inset-0" style="background:rgba(7,17,31,0.4);backdrop-filter:blur(6px)" @click="showMovModal = false" />
           <div class="relative w-full max-w-sm rounded-2xl p-6" style="background:var(--color-surface);border:1px solid var(--color-border)">
             <h3 class="mb-4 font-semibold" style="color:var(--color-text-primary)">Registrar movimiento</h3>
-            <form class="space-y-4" @submit.prevent="guardarMovimiento">
+            <form class="space-y-4" novalidate @submit.prevent="guardarMovimiento">
+
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Tipo</label>
-                <select v-model="movForm.tipo" class="fintech-input" required>
+
+                <FloatLabel variant="on" class="block w-full"><select v-model="movForm.tipo" id="float-CuentaDetalleView-tipo" class="fintech-input" :class="{ 'p-filled': movForm.tipo !== '' && movForm.tipo != null }" required @blur="vMov.tipo.$touch()">
                   <option value="ingreso">Ingreso</option>
                   <option value="egreso">Egreso</option>
-                </select>
+                </select><label for="float-CuentaDetalleView-tipo" class="text-xs" style="color:var(--color-text-muted)">Tipo<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel><p v-if="vMov.tipo.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ vMov.tipo.$errors[0].$message }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Monto</label>
-                <input v-model.number="movForm.monto" type="number" min="0.01" step="0.01" class="fintech-input" placeholder="0.00" required />
+
+                <FloatLabel variant="on" class="block w-full"><input v-model.number="movForm.monto" id="float-CuentaDetalleView-monto" type="number" min="0.01" step="0.01" class="fintech-input" :class="{ 'p-filled': movForm.monto !== '' && movForm.monto != null }" required @blur="vMov.monto.$touch()" /><label for="float-CuentaDetalleView-monto" class="text-xs" style="color:var(--color-text-muted)">Monto<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+                <p v-if="vMov.monto.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ vMov.monto.$errors[0].$message }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Descripción</label>
-                <input v-model="movForm.descripcion" class="fintech-input" placeholder="Ej: Depósito, pago de servicio…" required />
+
+                <FloatLabel variant="on" class="block w-full"><input v-model="movForm.descripcion" id="float-CuentaDetalleView-descripcion" class="fintech-input" :class="{ 'p-filled': movForm.descripcion !== '' && movForm.descripcion != null }" required @blur="vMov.descripcion.$touch()" /><label for="float-CuentaDetalleView-descripcion" class="text-xs" style="color:var(--color-text-muted)">Descripción<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+                <p v-if="vMov.descripcion.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ vMov.descripcion.$errors[0].$message }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Fecha</label>
-                <input v-model="movForm.fecha" type="date" class="fintech-input" required />
+
+                <FloatLabel variant="on" class="block w-full"><input v-model="movForm.fecha" id="float-CuentaDetalleView-fecha" type="date" class="fintech-input" :class="{ 'p-filled': movForm.fecha !== '' && movForm.fecha != null }" required @blur="vMov.fecha.$touch()" /><label for="float-CuentaDetalleView-fecha" class="text-xs" style="color:var(--color-text-muted)">Fecha<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+                <p v-if="vMov.fecha.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ vMov.fecha.$errors[0].$message }}</p>
               </div>
               <p v-if="movError" class="text-xs text-danger">{{ movError }}</p>
               <div class="flex gap-3 pt-1">
@@ -209,6 +219,8 @@ import { useTransaccionesStore } from '../stores/transacciones'
 import { formatCurrency }        from '../utils/currency'
 import ConfirmDeleteModal        from '../components/ConfirmDeleteModal.vue'
 import { decodeUrlSegment } from '../utils/urlEncoding'
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 
 const route        = useRoute()
 const router       = useRouter()
@@ -266,8 +278,12 @@ const showMovModal = ref(false)
 const savingMov   = ref(false)
 const movError    = ref('')
 const movForm     = ref({ tipo: 'ingreso', monto: null, descripcion: '', fecha: todayDateInput() })
+const vMov = useVuelidate(buildFormRules(movForm, { required: { tipo: 'El tipo', descripcion: 'La descripción' }, positive: { monto: 'El monto' }, dates: { fecha: 'La fecha' } }), movForm)
+
+function abrirMovModal() { movForm.value = { tipo: 'ingreso', monto: null, descripcion: '', fecha: todayDateInput() }; vMov.value.$reset(); showMovModal.value = true }
 
 async function guardarMovimiento() {
+  if (!(await vMov.value.$validate())) return
   savingMov.value = true
   movError.value  = ''
   try {

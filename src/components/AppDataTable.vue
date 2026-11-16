@@ -3,7 +3,13 @@
     <DataTable
       :value="data"
       :loading="loading"
+      v-model:first="first"
       stripedRows
+      paginator
+      :rows="10"
+      :rowsPerPageOptions="[10, 25, 50]"
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      currentPageReportTemplate="{first}–{last} de {totalRecords}"
       :pt="PT"
       v-bind="$attrs"
     >
@@ -26,12 +32,18 @@
         </div>
       </template>
 
+      <Column header="ID" headerStyle="width:4.5rem" bodyStyle="color:var(--color-text-muted);font-variant-numeric:tabular-nums">
+        <template #body="{ index }">{{ first + index + 1 }}</template>
+      </Column>
+
       <slot />
     </DataTable>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 
 defineProps({
@@ -42,6 +54,8 @@ defineProps({
 })
 
 defineOptions({ inheritAttrs: false })
+
+const first = ref(0)
 
 const PT = {
   root:             { style: 'background:transparent;border:none;font-family:inherit' },
@@ -57,6 +71,7 @@ const PT = {
   bodyCell:         { style: 'padding:13px 16px;border:none;color:var(--color-text-primary);font-size:13px;vertical-align:middle' },
   emptyMessageCell: { style: 'border:none;padding:0' },
   loadingOverlay:   { style: 'background:color-mix(in srgb,var(--color-surface) 82%,transparent);backdrop-filter:blur(2px)' },
+  pcPaginator:      { style: 'padding:12px 16px;border-top:1px solid var(--color-border-soft);background:var(--color-surface)' },
 }
 </script>
 
@@ -82,5 +97,42 @@ const PT = {
   color: var(--color-text-muted);
   width: 12px;
   height: 12px;
+}
+:deep(.p-paginator) {
+  gap: 4px;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+}
+:deep(.p-paginator-page),
+:deep(.p-paginator-first),
+:deep(.p-paginator-prev),
+:deep(.p-paginator-next),
+:deep(.p-paginator-last),
+:deep(.p-paginator-rpp-dropdown) {
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+}
+:deep(.p-paginator-page:not(.p-disabled):not(.p-paginator-page-selected):hover),
+:deep(.p-paginator-first:not(.p-disabled):hover),
+:deep(.p-paginator-prev:not(.p-disabled):hover),
+:deep(.p-paginator-next:not(.p-disabled):hover),
+:deep(.p-paginator-last:not(.p-disabled):hover) {
+  background: var(--color-surface-mid);
+}
+:deep(.p-paginator-page-selected) {
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+@media (max-width: 640px) {
+  :deep(.p-paginator) {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px 8px;
+  }
+  :deep(.p-paginator-current) {
+    width: 100%;
+    text-align: center;
+    order: 1;
+  }
 }
 </style>

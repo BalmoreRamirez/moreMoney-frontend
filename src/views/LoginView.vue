@@ -60,39 +60,38 @@
 
           <!-- Usuario -->
           <div class="field">
-            <label class="field-label" for="login-usuario">Usuario</label>
+
             <div class="input-wrap" :class="{ focused: focusedField === 'usuario' }">
               <span class="material-symbols-outlined input-icon">person</span>
-              <input
+              <FloatLabel variant="on" class="block w-full"><input
                 v-model="form.usuario"
                 id="login-usuario"
                 type="text"
                 autocomplete="username"
-                placeholder="Tu nombre de usuario"
-                class="login-input"
+                class="login-input" :class="{ 'p-filled': form.usuario !== '' && form.usuario != null }"
                 required
                 @focus="focusedField = 'usuario'"
                 @blur="focusedField = null"
-              />
+              /><label for="login-usuario" class="text-xs">Usuario<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
             </div>
+            <p v-if="v$.usuario.$error" class="mt-1 text-xs" style="color:var(--color-danger)">{{ v$.usuario.$errors[0].$message }}</p>
           </div>
 
           <!-- Contraseña -->
           <div class="field">
-            <label class="field-label" for="login-contrasena">Contraseña</label>
+
             <div class="input-wrap" :class="{ focused: focusedField === 'contrasena' }">
               <span class="material-symbols-outlined input-icon">lock</span>
-              <input
+              <FloatLabel variant="on" class="block w-full"><input
                 v-model="form.contrasena"
                 id="login-contrasena"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password"
-                placeholder="Tu contraseña"
-                class="login-input"
+                class="login-input" :class="{ 'p-filled': form.contrasena !== '' && form.contrasena != null }"
                 required
                 @focus="focusedField = 'contrasena'"
                 @blur="focusedField = null"
-              />
+              /><label for="login-contrasena" class="text-xs">Contraseña<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
               <button
                 type="button"
                 class="toggle-pw"
@@ -105,6 +104,7 @@
                 </span>
               </button>
             </div>
+            <p v-if="v$.contrasena.$error" class="mt-1 text-xs" style="color:var(--color-danger)">{{ v$.contrasena.$errors[0].$message }}</p>
           </div>
 
           <!-- Error -->
@@ -126,6 +126,9 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { required, helpers } from '@vuelidate/validators'
+import { computed } from 'vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -134,6 +137,11 @@ const router    = useRouter()
 const authStore = useAuthStore()
 
 const form          = ref({ usuario: '', contrasena: '' })
+const rules = computed(() => ({
+  usuario: { required: helpers.withMessage('El usuario es obligatorio.', required) },
+  contrasena: { required: helpers.withMessage('La contraseña es obligatoria.', required) },
+}))
+const v$ = useVuelidate(rules, form)
 const errorMsg      = ref('')
 const loading       = ref(false)
 const showPassword  = ref(false)
@@ -148,10 +156,7 @@ const features = [
 
 async function handleLogin() {
   errorMsg.value = ''
-  if (!form.value.usuario || !form.value.contrasena) {
-    errorMsg.value = 'Completa todos los campos.'
-    return
-  }
+  if (!(await v$.value.$validate())) return
   loading.value = true
   try {
     await authStore.login(form.value)

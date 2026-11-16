@@ -367,7 +367,20 @@ body {
     background: var(--color-surface);
     box-shadow: 0 0 0 4px var(--color-brand-focus);
   }
-  .fintech-input::placeholder { color: var(--color-text-muted); }
   .fintech-input option       { background: var(--color-surface); color: var(--color-text-primary); }
   .fintech-input option:disabled { color: var(--color-text-muted); }
+}
+
+/* PrimeVue inyecta el tema fuera de las capas de Tailwind; mantener el ajuste
+   fuera de @layer para que el FloatLabel de los selectores tenga precedencia. */
+:root .p-floatlabel-on:has(> select.fintech-input) > label {
+  top: 0 !important;
+  transform: translateY(-50%) !important;
+  font-size: 0.75rem !important;
+  background: var(--color-surface) !important;
+  padding: 0 0.25rem !important;
+}
+
+:root .p-floatlabel-on:has(> select.fintech-input:focus) > label {
+  color: var(--color-brand) !important;
 }

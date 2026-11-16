@@ -12,32 +12,34 @@
       >
         <h2 class="text-base font-semibold" style="color:var(--color-text-primary)">{{ editData ? 'Editar inversión' : 'Registrar inversión' }}</h2>
 
-        <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
+        <form novalidate class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nombre / Descripción</label>
-            <input v-model="form.nombre" type="text" placeholder="Ej. Pantalones para reventa" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.nombre" id="float-InversionFormModal-nombre" type="text" required class="fintech-input w-full" :class="{ 'p-filled': form.nombre !== '' && form.nombre != null }" @blur="v$.nombre.$touch()" /><label for="float-InversionFormModal-nombre" class="text-xs" style="color:var(--color-text-muted)">Nombre / Descripción<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.nombre.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.nombre.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Costo total ($)</label>
-            <input v-model.number="form.costo_total" type="number" min="0.01" step="0.01" placeholder="150.00" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model.number="form.costo_total" id="float-InversionFormModal-costo_total" type="number" min="0.01" step="0.01" required class="fintech-input w-full" :class="{ 'p-filled': form.costo_total !== '' && form.costo_total != null }" @blur="v$.costo_total.$touch()" /><label for="float-InversionFormModal-costo_total" class="text-xs" style="color:var(--color-text-muted)">Costo total ($)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.costo_total.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.costo_total.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de compra</label>
-            <input v-model="form.fecha_compra" type="date" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.fecha_compra" id="float-InversionFormModal-fecha_compra" type="date" required class="fintech-input w-full" :class="{ 'p-filled': form.fecha_compra !== '' && form.fecha_compra != null }" @blur="v$.fecha_compra.$touch()" /><label for="float-InversionFormModal-fecha_compra" class="text-xs" style="color:var(--color-text-muted)">Fecha de compra<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha_compra.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha_compra.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">
-              Precio de venta esperado ($)
-              <span class="ml-1" style="color:var(--color-text-muted)">(opcional)</span>
-            </label>
-            <input
-              v-model.number="form.precio_esperado"
-              type="number" min="0.01" step="0.01" placeholder="Ej. 200.00"
-              class="fintech-input w-full"
-            />
+
+            <FloatLabel variant="on" class="block w-full"><input
+              v-model.number="form.precio_esperado" id="float-InversionFormModal-precio_esperado"
+              type="number" min="0.01" step="0.01"
+              class="fintech-input w-full" :class="{ 'p-filled': form.precio_esperado !== '' && form.precio_esperado != null }"
+            @blur="v$.precio_esperado.$touch()" /><label for="float-InversionFormModal-precio_esperado" class="text-xs" style="color:var(--color-text-muted)">Precio de venta esperado ($)
+              (opcional)</label></FloatLabel>
+            <p v-if="v$.precio_esperado.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.precio_esperado.$errors[0].$message }}</p>
             <p v-if="gananciaEsperada !== null" class="mt-1.5 text-xs" :style="gananciaEsperada >= 0 ? 'color:var(--color-success)' : 'color:var(--color-danger)'">
               Ganancia esperada: {{ formatCurrency(gananciaEsperada) }}
               ({{ gananciaEsperadaPct }}%)
@@ -45,11 +47,11 @@
           </div>
 
           <div v-if="!editData">
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de egreso (donde sale el dinero)</label>
-            <select v-model.number="form.cuenta_egreso_id" required class="fintech-input w-full">
-              <option value="" disabled>Selecciona una cuenta</option>
+
+            <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_egreso_id" id="float-InversionFormModal-cuenta_egreso_id" required class="fintech-input w-full" :class="{ 'p-filled': form.cuenta_egreso_id !== '' && form.cuenta_egreso_id != null }" @blur="v$.cuenta_egreso_id.$touch()">
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
-            </select>
+            </select><label for="float-InversionFormModal-cuenta_egreso_id" class="text-xs" style="color:var(--color-text-muted)">Cuenta de egreso (donde sale el dinero)<span v-if="!editData" aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.cuenta_egreso_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.cuenta_egreso_id.$errors[0].$message }}</p>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
@@ -70,6 +72,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
@@ -86,6 +90,8 @@ const cuentas = computed(() => cuentasStore.cuentas)
 
 const today    = todayDateInput()
 const form     = ref({ nombre: '', costo_total: '', precio_esperado: '', fecha_compra: today, cuenta_egreso_id: '' })
+const v$ = useVuelidate(buildFormRules(form, { required: { nombre: 'El nombre' }, positive: { costo_total: 'El costo total' }, optionalPositive: { precio_esperado: 'El precio esperado' }, dates: { fecha_compra: 'La fecha de compra' }, conditionalRequired: { cuenta_egreso_id: { label: 'La cuenta de origen', when: () => !props.editData } } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
@@ -104,6 +110,7 @@ const gananciaEsperadaPct = computed(() => {
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   errorMsg.value = ''
   saving.value   = false
   if (props.editData) {
@@ -122,6 +129,7 @@ watch(() => props.modelValue, (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

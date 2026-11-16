@@ -39,10 +39,11 @@
       </div>
     </div>
     <div v-if="modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <form class="fintech-card w-full max-w-md space-y-3 p-5" @submit.prevent="guardar">
+      <form class="fintech-card w-full max-w-md space-y-3 p-5" novalidate @submit.prevent="guardar">
         <h2 class="font-semibold" style="color:var(--color-text-primary)">{{ editando ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
-        <input v-model="form.nombre" class="fintech-input w-full" placeholder="Nombre completo" required />
-        <input v-model="form.contacto" class="fintech-input w-full" placeholder="Teléfono o correo (opcional)" />
+        <FloatLabel variant="on" class="block w-full"><input v-model="form.nombre" id="float-ClientesPrestamoView-nombre" class="fintech-input w-full" :class="{ 'p-filled': form.nombre !== '' && form.nombre != null }" required @blur="v$.nombre.$touch()" /><label for="float-ClientesPrestamoView-nombre" class="text-xs">Nombre completo<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.nombre.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.nombre.$errors[0].$message }}</p>
+        <FloatLabel variant="on" class="block w-full"><input v-model="form.contacto" id="float-ClientesPrestamoView-contacto" class="fintech-input w-full" :class="{ 'p-filled': form.contacto !== '' && form.contacto != null }"  /><label for="float-ClientesPrestamoView-contacto" class="text-xs">Teléfono o correo (opcional)</label></FloatLabel>
         <p v-if="error" class="text-xs" style="color:var(--color-danger)">{{ error }}</p>
         <div class="flex justify-end gap-2"><button type="button" class="btn-ghost" @click="modal=false">Cancelar</button><button class="btn-brand" :disabled="saving">Guardar</button></div>
       </form>
@@ -52,11 +53,14 @@
 </template>
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { required, helpers } from '@vuelidate/validators'
 import api from '../utils/api'
 import { formatCurrency } from '../utils/currency'
 import AppDataTable from '../components/AppDataTable.vue'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.vue'
 const clientes=ref([]),loading=ref(false),modal=ref(false),saving=ref(false),error=ref(''),editando=ref(null),form=ref({nombre:'',contacto:''}),clienteSeleccionado=ref(null),clienteEliminar=ref(null),eliminando=ref(false),errorEliminar=ref(''),cambiandoEstado=ref(null)
+const v$ = useVuelidate({ nombre: { required: helpers.withMessage('El nombre del cliente es obligatorio.', required) } }, form)
 const labels={anticipado:'Pagó antes',puntual:'Pagó a tiempo',tardio:'Pagó tarde',pendiente:'En curso',vencido:'Vencido',sin_historial:'Sin historial',sin_vencimiento:'Sin vencimiento'}
 function money(v){return formatCurrency(v)}
 function fecha(v){return v?new Date(`${v}T00:00:00`).toLocaleDateString('es-SV'):'—'}
@@ -70,8 +74,8 @@ async function cambiarEstado(c){cambiandoEstado.value=c.id;error.value='';try{aw
 function color(k){return ({anticipado:'var(--color-success)',puntual:'var(--color-success)',tardio:'var(--color-danger)',vencido:'var(--color-danger)',pendiente:'var(--color-alert)'})[k]||'var(--color-text-muted)'}
 function badge(k){return `background:${k==='tardio'||k==='vencido'?'var(--color-danger-bg)':'var(--color-success-bg)'};color:${color(k)}`}
 async function cargar(){loading.value=true;try{clientes.value=(await api.get('/clientes-prestamo')).data.data||[]}catch(e){error.value=e.response?.data?.error||'No se pudieron cargar los clientes'}finally{loading.value=false}}
-function nuevo(){form.value={nombre:'',contacto:''};editando.value=null;error.value='';modal.value=true}
-function editar(c){form.value={nombre:c.nombre,contacto:c.contacto||''};editando.value=c.id;error.value='';modal.value=true}
-async function guardar(){saving.value=true;error.value='';try{if(editando.value)await api.put(`/clientes-prestamo/${editando.value}`,form.value);else await api.post('/clientes-prestamo',form.value);modal.value=false;await cargar()}catch(e){error.value=e.response?.data?.error||'No se pudo guardar el cliente'}finally{saving.value=false}}
+function nuevo(){form.value={nombre:'',contacto:''};v$.value.$reset();editando.value=null;error.value='';modal.value=true}
+function editar(c){form.value={nombre:c.nombre,contacto:c.contacto||''};v$.value.$reset();editando.value=c.id;error.value='';modal.value=true}
+async function guardar(){if(!(await v$.value.$validate()))return;saving.value=true;error.value='';try{if(editando.value)await api.put(`/clientes-prestamo/${editando.value}`,form.value);else await api.post('/clientes-prestamo',form.value);modal.value=false;await cargar()}catch(e){error.value=e.response?.data?.error||'No se pudo guardar el cliente'}finally{saving.value=false}}
 onMounted(cargar)
 </script>

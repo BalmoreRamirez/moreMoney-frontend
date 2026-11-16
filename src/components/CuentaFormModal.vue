@@ -9,35 +9,37 @@
             {{ editData ? 'Editar cuenta' : 'Nueva cuenta' }}
           </h2>
 
-          <form class="space-y-4" @submit.prevent="submit">
+          <form novalidate class="space-y-4" @submit.prevent="submit">
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Nombre</label>
-              <input v-model="form.nombre" class="fintech-input" placeholder="Ej: BHD León, Efectivo casa" required />
+
+              <FloatLabel variant="on" class="block w-full"><input v-model="form.nombre" id="float-CuentaFormModal-nombre" class="fintech-input" :class="{ 'p-filled': form.nombre !== '' && form.nombre != null }" required @blur="v$.nombre.$touch()" /><label for="float-CuentaFormModal-nombre" class="text-xs" style="color:var(--color-text-muted)">Nombre<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.nombre.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.nombre.$errors[0].$message }}</p>
             </div>
 
             <!-- Tipo -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Tipo</label>
-              <select v-model="form.tipo" class="fintech-input" required>
+
+              <FloatLabel variant="on" class="block w-full"><select v-model="form.tipo" id="float-CuentaFormModal-tipo" class="fintech-input" :class="{ 'p-filled': form.tipo !== '' && form.tipo != null }" required @blur="v$.tipo.$touch()">
                 <option value="">Seleccionar tipo</option>
                 <option value="banco">Banco</option>
                 <option value="efectivo">Efectivo</option>
                 <option value="digital">Digital</option>
-              </select>
+              </select><label for="float-CuentaFormModal-tipo" class="text-xs" style="color:var(--color-text-muted)">Tipo<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.tipo.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.tipo.$errors[0].$message }}</p>
             </div>
 
             <!-- Saldo inicial (solo al crear) -->
             <div v-if="!editData">
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Saldo inicial</label>
-              <input
-                v-model.number="form.saldo_inicial"
+
+              <FloatLabel variant="on" class="block w-full"><input
+                v-model.number="form.saldo_inicial" id="float-CuentaFormModal-saldo_inicial"
                 type="number"
                 min="0"
                 step="0.01"
-                class="fintech-input"
-                placeholder="0.00"
-              />
+                class="fintech-input" :class="{ 'p-filled': form.saldo_inicial !== '' && form.saldo_inicial != null }"
+              @blur="v$.saldo_inicial.$touch()" /><label for="float-CuentaFormModal-saldo_inicial" class="text-xs" style="color:var(--color-text-muted)">Saldo inicial</label></FloatLabel>
+            <p v-if="v$.saldo_inicial.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.saldo_inicial.$errors[0].$message }}</p>
               <p class="mt-1 text-[10px]" style="color:var(--color-text-muted)">El saldo actual se calculará sumando los movimientos sobre este valor.</p>
             </div>
 
@@ -59,6 +61,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { ref, watch } from 'vue'
 
 const props = defineProps({
@@ -68,11 +72,14 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'saved'])
 
 const form = ref({ nombre: '', tipo: '', saldo_inicial: 0 })
+const v$ = useVuelidate(buildFormRules(form, { required: { nombre: 'El nombre', tipo: 'El tipo de cuenta' }, optionalRanges: { saldo_inicial: 'El saldo inicial' } }), form)
+
 const saving  = ref(false)
 const errorMsg = ref('')
 
 watch(() => props.modelValue, (v) => {
   if (v) {
+    v$.value.$reset()
     errorMsg.value = ''
     if (props.editData) {
       form.value = { nombre: props.editData.nombre, tipo: props.editData.tipo, saldo_inicial: props.editData.saldo_inicial }
@@ -83,6 +90,7 @@ watch(() => props.modelValue, (v) => {
 })
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   if (!form.value.nombre || !form.value.tipo) { errorMsg.value = 'Nombre y tipo son obligatorios.'; return }
   saving.value  = true
   errorMsg.value = ''

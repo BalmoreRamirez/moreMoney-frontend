@@ -151,31 +151,33 @@
           <div class="relative w-full max-w-sm rounded-2xl p-6 shadow-card" style="background:var(--color-surface);border:1px solid var(--color-border)">
             <h3 class="mb-4 font-semibold" style="color:var(--color-text-primary)">Editar abono</h3>
 
-            <div class="space-y-3">
-              <div>
-                <label class="mb-1 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Monto</label>
-                <input v-model.number="editForm.monto" type="number" min="0.01" step="0.01" class="fintech-input w-full" />
-              </div>
-              <div>
-                <label class="mb-1 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Fecha de pago</label>
-                <input v-model="editForm.fecha_pago" type="date" class="fintech-input w-full" />
-              </div>
-              <div>
-                <label class="mb-1 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-muted)">Nota</label>
-                <input v-model="editForm.nota" type="text" class="fintech-input w-full" placeholder="Opcional" />
-              </div>
-            </div>
+            <form class="space-y-3" novalidate @submit.prevent="guardarEdicion">
 
-            <div v-if="errorEditar" class="mt-3 rounded-lg px-3 py-2 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid var(--color-danger-border)">
-              {{ errorEditar }}
-            </div>
+              <div>
 
-            <div class="mt-5 flex gap-3">
-              <button class="btn-ghost flex-1" :disabled="guardando" @click="abonoEditando = null">Cancelar</button>
-              <button class="btn-brand flex-1 disabled:opacity-50" :disabled="guardando" @click="guardarEdicion">
+                <FloatLabel variant="on" class="block w-full"><input v-model.number="editForm.monto" id="float-PrestamoDetalleView-monto" type="number" min="0.01" step="0.01" class="fintech-input w-full" :class="{ 'p-filled': editForm.monto !== '' && editForm.monto != null }" @blur="vAbono.monto.$touch()" /><label for="float-PrestamoDetalleView-monto" class="text-xs" style="color:var(--color-text-muted)">Monto<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+                <p v-if="vAbono.monto.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ vAbono.monto.$errors[0].$message }}</p>
+              </div>
+              <div>
+
+                <FloatLabel variant="on" class="block w-full"><input v-model="editForm.fecha_pago" id="float-PrestamoDetalleView-fecha_pago" type="date" class="fintech-input w-full" :class="{ 'p-filled': editForm.fecha_pago !== '' && editForm.fecha_pago != null }" @blur="vAbono.fecha_pago.$touch()" /><label for="float-PrestamoDetalleView-fecha_pago" class="text-xs" style="color:var(--color-text-muted)">Fecha de pago<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+                <p v-if="vAbono.fecha_pago.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ vAbono.fecha_pago.$errors[0].$message }}</p>
+              </div>
+              <div>
+
+                <FloatLabel variant="on" class="block w-full"><input v-model="editForm.nota" id="float-PrestamoDetalleView-nota" type="text" class="fintech-input w-full" :class="{ 'p-filled': editForm.nota !== '' && editForm.nota != null }"  /><label for="float-PrestamoDetalleView-nota" class="text-xs" style="color:var(--color-text-muted)">Nota</label></FloatLabel>
+              </div>
+              <div v-if="errorEditar" class="mt-3 rounded-lg px-3 py-2 text-sm" style="background:var(--color-danger-bg);color:var(--color-danger);border:1px solid var(--color-danger-border)">
+                {{ errorEditar }}
+              </div>
+
+              <div class="mt-5 flex gap-3">
+              <button type="button" class="btn-ghost flex-1" :disabled="guardando" @click="abonoEditando = null">Cancelar</button>
+              <button type="submit" class="btn-brand flex-1 disabled:opacity-50" :disabled="guardando">
                 {{ guardando ? 'Guardando…' : 'Guardar' }}
               </button>
             </div>
+            </form>
           </div>
         </div>
       </Transition>
@@ -233,6 +235,8 @@ import { formatCurrency }       from '../utils/currency'
 import { decodeUrlSegment } from '../utils/urlEncoding'
 import AbonoFormModal           from '../components/AbonoFormModal.vue'
 import { useToast } from '../composables/useToast'
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 
 const store  = usePrestamosStore()
 const route  = useRoute()
@@ -259,16 +263,19 @@ function onAbono() {}
 // Editar abono
 const abonoEditando = ref(null)
 const editForm      = ref({ monto: 0, fecha_pago: '', nota: '' })
+const vAbono = useVuelidate(buildFormRules(editForm, { positive: { monto: 'El monto' }, dates: { fecha_pago: 'La fecha de pago' } }), editForm)
 const guardando     = ref(false)
 const errorEditar   = ref('')
 
 function abrirEditar(pago) {
   abonoEditando.value = pago
   editForm.value      = { monto: parseFloat(pago.monto), fecha_pago: pago.fecha_pago, nota: pago.nota || '' }
+  vAbono.value.$reset()
   errorEditar.value   = ''
 }
 
 async function guardarEdicion() {
+  if (!(await vAbono.value.$validate())) return
   guardando.value   = true
   errorEditar.value = ''
   try {

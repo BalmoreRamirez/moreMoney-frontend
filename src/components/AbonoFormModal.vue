@@ -16,20 +16,22 @@
           Saldo pendiente: <span class="font-mono" style="color:var(--color-alert)">{{ formatCurrency(prestamo.saldo_pendiente) }}</span>
         </p>
 
-        <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
+        <form novalidate class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Monto del abono ($)</label>
-            <input v-model.number="form.monto" type="number" min="0.01" step="0.01" placeholder="100.00" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model.number="form.monto" id="float-AbonoFormModal-monto" type="number" min="0.01" step="0.01" required class="fintech-input w-full" :class="{ 'p-filled': form.monto !== '' && form.monto != null }" @blur="v$.monto.$touch()" /><label for="float-AbonoFormModal-monto" class="text-xs" style="color:var(--color-text-muted)">Monto del abono ($)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.monto.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.monto.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de pago</label>
-            <input v-model="form.fecha_pago" type="date" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.fecha_pago" id="float-AbonoFormModal-fecha_pago" type="date" required class="fintech-input w-full" :class="{ 'p-filled': form.fecha_pago !== '' && form.fecha_pago != null }" @blur="v$.fecha_pago.$touch()" /><label for="float-AbonoFormModal-fecha_pago" class="text-xs" style="color:var(--color-text-muted)">Fecha de pago<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha_pago.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha_pago.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nota (opcional)</label>
-            <input v-model="form.nota" type="text" placeholder="Ej. Abono parcial mes de mayo" class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.nota" id="float-AbonoFormModal-nota" type="text" class="fintech-input w-full" :class="{ 'p-filled': form.nota !== '' && form.nota != null }"  /><label for="float-AbonoFormModal-nota" class="text-xs" style="color:var(--color-text-muted)">Nota (opcional)</label></FloatLabel>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
@@ -55,6 +57,8 @@
 </style>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, watch } from 'vue'
 import { formatCurrency }    from '../utils/currency'
@@ -71,11 +75,14 @@ const prestamosStore = usePrestamosStore()
 const toast          = useToast()
 
 const form     = ref({ monto: '', fecha_pago: '', nota: '' })
+const v$ = useVuelidate(buildFormRules(form, { positive: { monto: 'El monto' }, dates: { fecha_pago: 'La fecha de pago' } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   errorMsg.value = ''
   saving.value   = false
   form.value     = { monto: '', fecha_pago: todayDateInput(), nota: '' }
@@ -84,6 +91,7 @@ watch(() => props.modelValue, (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

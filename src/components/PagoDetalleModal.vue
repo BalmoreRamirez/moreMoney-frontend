@@ -96,19 +96,19 @@
 
             <!-- Selector de cuenta -->
             <div v-if="store.detalle.total > 0">
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style="color:var(--color-text-secondary)">
-                ¿Desde qué cuenta pagas?
-              </label>
+              <FloatLabel variant="on" class="block w-full">
               <select
+                id="cuenta-pago-mensual"
                 v-model.number="cuentaId"
                 class="fintech-input w-full"
-                :class="!cuentaId && intentoConfirmar ? 'border-danger' : ''"
+                :class="[!cuentaId && intentoConfirmar ? 'border-danger' : '', { 'p-filled': cuentaId != null }]"
               >
-                <option :value="null" disabled>Selecciona una cuenta</option>
                 <option v-for="c in cuentas" :key="c.id" :value="c.id">
                   {{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }} ({{ c.tipo }})
                 </option>
               </select>
+              <label for="cuenta-pago-mensual" class="text-xs">¿Desde qué cuenta pagas?</label>
+              </FloatLabel>
               <p v-if="!cuentaId && intentoConfirmar" class="mt-1 text-xs" style="color:var(--color-danger)">
                 Debes seleccionar una cuenta para confirmar el pago.
               </p>

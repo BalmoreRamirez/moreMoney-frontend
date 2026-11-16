@@ -20,51 +20,52 @@
             <span>Tiene cuotas pagadas. Solo puedes editar la descripción.</span>
           </div>
 
-          <form @submit.prevent="submit" class="space-y-4">
+          <form novalidate @submit.prevent="submit" class="space-y-4">
             <!-- Tarjeta -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Tarjeta</label>
-              <select v-model="form.tarjeta_id" class="fintech-input" :disabled="isEdit && hasPaidCuotas" required>
-                <option value="" disabled>Selecciona una tarjeta…</option>
+
+              <FloatLabel variant="on" class="block w-full"><select v-model="form.tarjeta_id" id="float-CompraTasaCeroFormModal-tarjeta_id" class="fintech-input" :class="{ 'p-filled': form.tarjeta_id !== '' && form.tarjeta_id != null }" :disabled="isEdit && hasPaidCuotas" required @blur="v$.tarjeta_id.$touch()">
                 <option v-for="t in tarjetas" :key="t.id" :value="t.id">
                   {{ t.nombre }} — {{ t.banco }}
                 </option>
-              </select>
+              </select><label for="float-CompraTasaCeroFormModal-tarjeta_id" class="text-xs" style="color:var(--color-text-muted)">Tarjeta<span v-if="!hasPaidCuotas" aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.tarjeta_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.tarjeta_id.$errors[0].$message }}</p>
               <p v-if="errors.tarjeta_id" class="mt-1 text-xs text-danger">{{ errors.tarjeta_id }}</p>
             </div>
 
             <!-- Nombre -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Descripción del producto</label>
-              <input v-model.trim="form.nombre" type="text" class="fintech-input" placeholder="Ej: Laptop Dell" required />
+
+              <FloatLabel variant="on" class="block w-full"><input v-model.trim="form.nombre" id="float-CompraTasaCeroFormModal-nombre" type="text" class="fintech-input" :class="{ 'p-filled': form.nombre !== '' && form.nombre != null }" required @blur="v$.nombre.$touch()" /><label for="float-CompraTasaCeroFormModal-nombre" class="text-xs" style="color:var(--color-text-muted)">Descripción del producto<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.nombre.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.nombre.$errors[0].$message }}</p>
               <p v-if="errors.nombre" class="mt-1 text-xs text-danger">{{ errors.nombre }}</p>
             </div>
 
             <!-- Monto total + cuotas -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Monto total</label>
+
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm" style="color:var(--color-text-muted)">$</span>
-                  <input
-                    v-model="form.monto_total" type="number" step="0.01" min="0.01"
+                  <FloatLabel variant="on" class="block w-full"><input
+                    v-model="form.monto_total" id="float-CompraTasaCeroFormModal-monto_total" type="number" step="0.01" min="0.01"
                     class="fintech-input pl-7 font-mono"
-                    :class="isEdit && hasPaidCuotas ? 'opacity-40 cursor-not-allowed' : ''"
-                    :disabled="isEdit && hasPaidCuotas"
-                    placeholder="0.00" required
-                  />
+                    :class="[{ 'p-filled': form.monto_total !== '' && form.monto_total != null }, isEdit && hasPaidCuotas ? 'opacity-40 cursor-not-allowed' : '']"
+                    :disabled="isEdit && hasPaidCuotas" required
+                  @blur="v$.monto_total.$touch()" /><label for="float-CompraTasaCeroFormModal-monto_total" class="text-xs" style="color:var(--color-text-muted)">Monto total<span v-if="!hasPaidCuotas" aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.monto_total.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.monto_total.$errors[0].$message }}</p>
                 </div>
                 <p v-if="errors.monto_total" class="mt-1 text-xs text-danger">{{ errors.monto_total }}</p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">N° de cuotas</label>
-                <input
-                  v-model.number="form.total_cuotas" type="number" min="1" max="60"
+
+                <FloatLabel variant="on" class="block w-full"><input
+                  v-model.number="form.total_cuotas" id="float-CompraTasaCeroFormModal-total_cuotas" type="number" min="1" max="60"
                   class="fintech-input"
-                  :class="isEdit && hasPaidCuotas ? 'opacity-40 cursor-not-allowed' : ''"
-                  :disabled="isEdit && hasPaidCuotas"
-                  placeholder="Ej: 12" required
-                />
+                  :class="[{ 'p-filled': form.total_cuotas !== '' && form.total_cuotas != null }, isEdit && hasPaidCuotas ? 'opacity-40 cursor-not-allowed' : '']"
+                  :disabled="isEdit && hasPaidCuotas" required
+                @blur="v$.total_cuotas.$touch()" /><label for="float-CompraTasaCeroFormModal-total_cuotas" class="text-xs" style="color:var(--color-text-muted)">N° de cuotas<span v-if="!hasPaidCuotas" aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.total_cuotas.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.total_cuotas.$errors[0].$message }}</p>
                 <p v-if="errors.total_cuotas" class="mt-1 text-xs text-danger">{{ errors.total_cuotas }}</p>
               </div>
             </div>
@@ -77,14 +78,15 @@
 
             <!-- Fecha -->
             <div>
-              <label class="mb-1.5 block text-xs font-medium" style="color:var(--color-text-muted)">Fecha de compra</label>
-              <input
-                v-model="form.fecha_compra" type="date"
+
+              <FloatLabel variant="on" class="block w-full"><input
+                v-model="form.fecha_compra" id="float-CompraTasaCeroFormModal-fecha_compra" type="date"
                 class="fintech-input"
-                :class="isEdit && hasPaidCuotas ? 'opacity-40 cursor-not-allowed' : ''"
+                :class="[{ 'p-filled': form.fecha_compra !== '' && form.fecha_compra != null }, isEdit && hasPaidCuotas ? 'opacity-40 cursor-not-allowed' : '']"
                 :disabled="isEdit && hasPaidCuotas"
                 required
-              />
+              @blur="v$.fecha_compra.$touch()" /><label for="float-CompraTasaCeroFormModal-fecha_compra" class="text-xs" style="color:var(--color-text-muted)">Fecha de compra<span v-if="!hasPaidCuotas" aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha_compra.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha_compra.$errors[0].$message }}</p>
               <p v-if="errors.fecha_compra" class="mt-1 text-xs text-danger">{{ errors.fecha_compra }}</p>
             </div>
 
@@ -108,6 +110,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { formatCurrency } from '../utils/currency'
@@ -126,6 +130,8 @@ const EMPTY = { tarjeta_id: '', nombre: '', monto_total: '', total_cuotas: '', f
 const form        = ref({ ...EMPTY })
 const errors      = ref({})
 const serverError = ref('')
+const v$ = useVuelidate(buildFormRules(form, { conditionalRequired: { tarjeta_id: { label: 'La tarjeta', when: () => !hasPaidCuotas.value }, nombre: { label: 'La descripción', when: () => true }, fecha_compra: { label: 'La fecha de compra', when: () => !hasPaidCuotas.value } }, conditionalPositive: { monto_total: { label: 'El monto', when: () => !hasPaidCuotas.value } }, conditionalInteger: { total_cuotas: { label: 'El total de cuotas', min: 1, max: 60, when: () => !hasPaidCuotas.value } } }), form)
+
 const saving      = ref(false)
 
 const isEdit        = computed(() => !!props.editData)
@@ -135,6 +141,7 @@ const hasPaidCuotas = computed(() =>
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   errors.value      = {}
   serverError.value = ''
   if (props.editData) {
@@ -159,21 +166,8 @@ const cuotaMensual = computed(() => {
 
 function close() { emit('update:modelValue', false) }
 
-function validate() {
-  const e = {}
-  if (!form.value.tarjeta_id)  e.tarjeta_id  = 'Selecciona una tarjeta'
-  if (!form.value.nombre)       e.nombre       = 'La descripción es requerida'
-  const m = parseFloat(form.value.monto_total)
-  if (!form.value.monto_total || isNaN(m) || m <= 0) e.monto_total = 'El monto debe ser mayor a 0'
-  const n = parseInt(form.value.total_cuotas)
-  if (!form.value.total_cuotas || isNaN(n) || n < 1) e.total_cuotas = 'Mínimo 1 cuota'
-  if (!form.value.fecha_compra) e.fecha_compra = 'La fecha es requerida'
-  errors.value = e
-  return !Object.keys(e).length
-}
-
 async function submit() {
-  if (!validate()) return
+  if (!(await v$.value.$validate())) return
   saving.value      = true
   serverError.value = ''
   try {

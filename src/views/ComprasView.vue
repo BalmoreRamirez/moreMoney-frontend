@@ -8,9 +8,11 @@
       </div>
 
       <div class="flex items-center gap-3">
+        <FloatLabel variant="on" class="block w-56">
         <select
+          id="filtro-tarjeta-compras"
           v-model="filtroTarjeta"
-          class="fintech-input w-56 text-sm"
+          class="fintech-input w-56 text-sm p-filled"
           @change="recargarTodo"
         >
           <option value="">Todas las tarjetas</option>
@@ -18,6 +20,8 @@
             {{ t.nombre }} — {{ t.banco }}
           </option>
         </select>
+        <label for="filtro-tarjeta-compras" class="text-xs">Tarjeta</label>
+        </FloatLabel>
 
         <button
           v-if="comprasStore.normales.length || comprasStore.tasaCero.length"

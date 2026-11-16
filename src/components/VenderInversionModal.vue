@@ -18,26 +18,28 @@
           <span class="font-mono font-semibold" style="color:var(--color-text-secondary)">{{ formatCurrency(inversion.costo_total) }}</span>
         </div>
 
-        <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
+        <form novalidate class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Precio de venta total ($)</label>
-            <input v-model.number="form.precio_venta_total" type="number" min="0.01" step="0.01" placeholder="200.00" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model.number="form.precio_venta_total" id="float-VenderInversionModal-precio_venta_total" type="number" min="0.01" step="0.01" required class="fintech-input w-full" :class="{ 'p-filled': form.precio_venta_total !== '' && form.precio_venta_total != null }" @blur="v$.precio_venta_total.$touch()" /><label for="float-VenderInversionModal-precio_venta_total" class="text-xs" style="color:var(--color-text-muted)">Precio de venta total ($)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.precio_venta_total.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.precio_venta_total.$errors[0].$message }}</p>
             <p v-if="ganancia !== null" class="mt-1 text-xs" :style="{ color: ganancia >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }">
               Ganancia: {{ formatCurrency(ganancia) }}
             </p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Fecha de venta</label>
-            <input v-model="form.fecha_venta" type="date" required class="fintech-input w-full" />
+
+            <FloatLabel variant="on" class="block w-full"><input v-model="form.fecha_venta" id="float-VenderInversionModal-fecha_venta" type="date" required class="fintech-input w-full" :class="{ 'p-filled': form.fecha_venta !== '' && form.fecha_venta != null }" @blur="v$.fecha_venta.$touch()" /><label for="float-VenderInversionModal-fecha_venta" class="text-xs" style="color:var(--color-text-muted)">Fecha de venta<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.fecha_venta.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.fecha_venta.$errors[0].$message }}</p>
           </div>
 
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cuenta de ingreso (donde entra el dinero)</label>
-            <select v-model.number="form.cuenta_ingreso_id" required class="fintech-input w-full">
-              <option value="" disabled>Selecciona una cuenta</option>
+
+            <FloatLabel variant="on" class="block w-full"><select v-model.number="form.cuenta_ingreso_id" id="float-VenderInversionModal-cuenta_ingreso_id" required class="fintech-input w-full" :class="{ 'p-filled': form.cuenta_ingreso_id !== '' && form.cuenta_ingreso_id != null }" @blur="v$.cuenta_ingreso_id.$touch()">
               <option v-for="c in cuentas" :key="c.id" :value="c.id">{{ c.nombre }} — {{ formatCurrency(c.saldo_actual) }}</option>
-            </select>
+            </select><label for="float-VenderInversionModal-cuenta_ingreso_id" class="text-xs" style="color:var(--color-text-muted)">Cuenta de ingreso (donde entra el dinero)<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
+            <p v-if="v$.cuenta_ingreso_id.$error" class="mt-1 text-[11px]" style="color:var(--color-danger)">{{ v$.cuenta_ingreso_id.$errors[0].$message }}</p>
           </div>
 
           <p v-if="errorMsg" class="text-xs text-danger">{{ errorMsg }}</p>
@@ -58,6 +60,8 @@
 </template>
 
 <script setup>
+import { useVuelidate } from '@vuelidate/core'
+import { buildFormRules } from '../utils/formValidation'
 import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
@@ -73,6 +77,8 @@ const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
 
 const form     = ref({ precio_venta_total: '', fecha_venta: '', cuenta_ingreso_id: '' })
+const v$ = useVuelidate(buildFormRules(form, { positive: { precio_venta_total: 'El precio de venta' }, dates: { fecha_venta: 'La fecha de venta' }, required: { cuenta_ingreso_id: 'La cuenta de ingreso' } }), form)
+
 const saving   = ref(false)
 const errorMsg = ref('')
 
@@ -83,6 +89,7 @@ const ganancia = computed(() => {
 
 watch(() => props.modelValue, (open) => {
   if (!open) return
+  v$.value.$reset()
   errorMsg.value = ''
   saving.value   = false
   form.value     = { precio_venta_total: '', fecha_venta: todayDateInput(), cuenta_ingreso_id: '' }
@@ -91,6 +98,7 @@ watch(() => props.modelValue, (open) => {
 function close() { emit('update:modelValue', false) }
 
 async function submit() {
+  if (!(await v$.value.$validate())) return
   saving.value   = true
   errorMsg.value = ''
   try {

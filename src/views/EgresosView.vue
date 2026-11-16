@@ -14,11 +14,17 @@
 
     <!-- Filtros -->
     <div class="mt-6 flex flex-wrap gap-3">
-      <select v-model="filtroCuenta" class="fintech-input w-auto min-w-[160px]">
-        <option value="">Todas las cuentas</option>
-        <option v-for="c in cuentasStore.cuentas" :key="c.id" :value="c.id">{{ c.nombre }}</option>
-      </select>
-      <input v-model="filtroMes" type="month" class="fintech-input w-auto" />
+      <FloatLabel variant="on" class="block min-w-[160px]">
+        <select id="filtro-cuenta-egreso" v-model="filtroCuenta" class="fintech-input w-auto min-w-[160px] p-filled">
+          <option value="">Todas las cuentas</option>
+          <option v-for="c in cuentasStore.cuentas" :key="c.id" :value="c.id">{{ c.nombre }}</option>
+        </select>
+        <label for="filtro-cuenta-egreso" class="text-xs">Cuenta</label>
+      </FloatLabel>
+      <FloatLabel variant="on" class="block w-auto">
+        <input id="filtro-mes-egresos" v-model="filtroMes" type="month" class="fintech-input w-auto" :class="{ 'p-filled': filtroMes }" />
+        <label for="filtro-mes-egresos" class="text-xs">Mes</label>
+      </FloatLabel>
     </div>
 
     <!-- Totalizador -->
