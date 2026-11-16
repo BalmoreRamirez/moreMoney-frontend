@@ -28,8 +28,18 @@
           class="sidebar-logo-mark flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-300"
           :class="sidebarCollapsed ? 'lg:hidden' : ''"
         >
-          <span class="material-symbols-outlined text-[19px]">account_balance</span>
+          <img :src="iconoPlataforma" alt="MoreMoney" class="h-9 w-9 rounded-xl" />
         </div>
+        <button
+          v-if="sidebarCollapsed"
+          class="hidden h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl lg:flex"
+          type="button"
+          title="Expandir menú"
+          aria-label="Expandir menú"
+          @click="toggleSidebar"
+        >
+          <img :src="iconoPlataforma" alt="" class="h-9 w-9 rounded-xl" />
+        </button>
         <div
           class="min-w-0 flex-1 overflow-hidden whitespace-nowrap transition-all duration-300"
           :class="sidebarCollapsed ? 'lg:hidden' : ''"
@@ -39,6 +49,7 @@
         </div>
         <button
           class="sidebar-collapse-btn hidden lg:flex flex-shrink-0"
+          :class="sidebarCollapsed ? 'lg:hidden' : ''"
           :title="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
           :aria-label="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
           @click="toggleSidebar"
@@ -241,6 +252,7 @@ import { useTheme } from '../composables/useTheme'
 import { useInactivityTimeout } from '../composables/useInactivityTimeout'
 import { useToast } from '../composables/useToast'
 import ToastContainer from '../components/ToastContainer.vue'
+import iconoPlataforma from '../assets/moreMoney.svg'
 
 const route     = useRoute()
 const router    = useRouter()
