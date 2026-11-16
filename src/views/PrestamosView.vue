@@ -110,7 +110,7 @@
               </div>
               <div class="min-w-0">
                 <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ p.deudor_nombre }}</p>
-                <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.cliente?.contacto || p.deudor_contacto || '—' }} · {{ etiquetaPago(p.categoria_pago) }}</p>
+                <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.cliente?.contacto || '—' }} · {{ etiquetaPago(p.categoria_pago) }}</p>
               </div>
             </div>
           </template>

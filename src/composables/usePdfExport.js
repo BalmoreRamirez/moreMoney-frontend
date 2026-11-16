@@ -101,11 +101,11 @@ export function exportarEstadoCuentaPrestamosPDF(prestamos) {
     doc.setTextColor(...PALETTE.brand)
     doc.text(p.deudor_nombre, 12, y + 4)
 
-    if (p.deudor_contacto) {
+    if (p.cliente?.contacto) {
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(8)
       doc.setTextColor(...PALETTE.muted)
-      doc.text(`Contacto: ${p.deudor_contacto}`, 12, y + 9.5)
+      doc.text(`Contacto: ${p.cliente.contacto}`, 12, y + 9.5)
     }
 
     y += 15

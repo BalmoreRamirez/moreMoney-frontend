@@ -23,7 +23,7 @@
             </select>
             <template v-if="form.cliente_id === 'nuevo'">
               <input v-model="form.deudor_nombre" type="text" placeholder="Nombre del cliente" required class="fintech-input mt-2 w-full" />
-              <input v-model="form.deudor_contacto" type="text" placeholder="Contacto (opcional)" class="fintech-input mt-2 w-full" />
+              <input v-model="form.cliente_contacto" type="text" placeholder="Contacto (opcional)" class="fintech-input mt-2 w-full" />
             </template>
           </div>
 
@@ -110,7 +110,7 @@ const clientes = ref([])
 
 const form = ref({
   deudor_nombre:   '',
-  deudor_contacto: '',
+  cliente_contacto: '',
   capital:         '',
   tasa_display:    '',
   fecha_inicio:    todayDateInput(),
@@ -139,7 +139,7 @@ watch(() => props.modelValue, (open) => {
   if (props.editData) {
     form.value = {
       deudor_nombre:   props.editData.deudor_nombre,
-      deudor_contacto: props.editData.deudor_contacto || '',
+      cliente_contacto: props.editData.cliente?.contacto || '',
       cliente_id: props.editData.cliente_id || 'nuevo',
       capital:         parseFloat(props.editData.capital),
       tasa_display:    parseFloat((parseFloat(props.editData.tasa_interes_mensual) * 100).toFixed(4)),
@@ -148,7 +148,7 @@ watch(() => props.modelValue, (open) => {
       cuenta_id:       props.editData.cuenta_id,
     }
   } else {
-    form.value = { deudor_nombre: '', deudor_contacto: '', cliente_id: 'nuevo', capital: '', tasa_display: '', fecha_inicio: todayDateInput(), dias_duracion: '', cuenta_id: '' }
+    form.value = { deudor_nombre: '', cliente_contacto: '', cliente_id: 'nuevo', capital: '', tasa_display: '', fecha_inicio: todayDateInput(), dias_duracion: '', cuenta_id: '' }
   }
 })
 
@@ -160,7 +160,7 @@ async function submit() {
   try {
     const payload = {
       deudor_nombre:        form.value.deudor_nombre,
-      deudor_contacto:      form.value.deudor_contacto || null,
+      cliente_contacto:    form.value.cliente_contacto || null,
       cliente_id:           form.value.cliente_id === 'nuevo' ? null : form.value.cliente_id,
       capital:              form.value.capital,
       tasa_interes_mensual: parseFloat((form.value.tasa_display / 100).toFixed(6)),
