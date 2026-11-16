@@ -299,6 +299,7 @@ const navGroups = [
       { to: { name: 'ingresos' },  icon: 'payments',               label: 'Ingresos' },
       { to: { name: 'egresos' },   icon: 'money_off',              label: 'Egresos' },
       { to: { name: 'prestamos' }, icon: 'handshake',              label: 'Préstamos' },
+      { to: { name: 'clientes-prestamo' }, icon: 'group',           label: 'Clientes' },
       { to: { name: 'creditos' },  icon: 'credit_score',           label: 'Créditos' },
     ],
   },

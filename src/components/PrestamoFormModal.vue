@@ -16,13 +16,15 @@
 
         <form class="mt-5 flex flex-col gap-4" @submit.prevent="submit">
           <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Nombre del deudor</label>
-            <input v-model="form.deudor_nombre" type="text" placeholder="Ej. Juan Pérez" required class="fintech-input w-full" />
-          </div>
-
-          <div>
-            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Contacto (opcional)</label>
-            <input v-model="form.deudor_contacto" type="text" placeholder="Teléfono o correo" class="fintech-input w-full" />
+            <label class="mb-1.5 block text-xs" style="color:var(--color-text-muted)">Cliente</label>
+            <select v-model="form.cliente_id" required class="fintech-input w-full">
+              <option value="nuevo">Registrar cliente nuevo…</option>
+              <option v-for="c in clientes" :key="c.id" :value="c.id">{{ c.nombre }}{{ c.contacto ? ` · ${c.contacto}` : '' }}</option>
+            </select>
+            <template v-if="form.cliente_id === 'nuevo'">
+              <input v-model="form.deudor_nombre" type="text" placeholder="Nombre del cliente" required class="fintech-input mt-2 w-full" />
+              <input v-model="form.deudor_contacto" type="text" placeholder="Contacto (opcional)" class="fintech-input mt-2 w-full" />
+            </template>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -94,6 +96,7 @@ import { todayDateInput } from '../utils/dates'
 import { ref, computed, watch } from 'vue'
 import { useCuentasStore } from '../stores/cuentas'
 import { formatCurrency } from '../utils/currency'
+import api from '../utils/api'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -103,6 +106,7 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 
 const cuentasStore = useCuentasStore()
 const cuentas = computed(() => cuentasStore.cuentas)
+const clientes = ref([])
 
 const form = ref({
   deudor_nombre:   '',
@@ -127,10 +131,16 @@ watch(() => props.modelValue, (open) => {
   if (!open) return
   errorMsg.value = ''
   saving.value   = false
+  api.get('/clientes-prestamo', { params: { activo: true } }).then(({ data }) => {
+    clientes.value = data.data || []
+    const ligado = props.editData?.cliente
+    if (ligado && !ligado.activo && !clientes.value.some(c => c.id === ligado.id)) clientes.value.push(ligado)
+  }).catch(() => { clientes.value = [] })
   if (props.editData) {
     form.value = {
       deudor_nombre:   props.editData.deudor_nombre,
       deudor_contacto: props.editData.deudor_contacto || '',
+      cliente_id: props.editData.cliente_id || 'nuevo',
       capital:         parseFloat(props.editData.capital),
       tasa_display:    parseFloat((parseFloat(props.editData.tasa_interes_mensual) * 100).toFixed(4)),
       fecha_inicio:    props.editData.fecha_inicio,
@@ -138,7 +148,7 @@ watch(() => props.modelValue, (open) => {
       cuenta_id:       props.editData.cuenta_id,
     }
   } else {
-    form.value = { deudor_nombre: '', deudor_contacto: '', capital: '', tasa_display: '', fecha_inicio: todayDateInput(), dias_duracion: '', cuenta_id: '' }
+    form.value = { deudor_nombre: '', deudor_contacto: '', cliente_id: 'nuevo', capital: '', tasa_display: '', fecha_inicio: todayDateInput(), dias_duracion: '', cuenta_id: '' }
   }
 })
 
@@ -151,6 +161,7 @@ async function submit() {
     const payload = {
       deudor_nombre:        form.value.deudor_nombre,
       deudor_contacto:      form.value.deudor_contacto || null,
+      cliente_id:           form.value.cliente_id === 'nuevo' ? null : form.value.cliente_id,
       capital:              form.value.capital,
       tasa_interes_mensual: parseFloat((form.value.tasa_display / 100).toFixed(6)),
       fecha_inicio:         form.value.fecha_inicio,

@@ -65,6 +65,7 @@ const router = createRouter({
           name: 'prestamos',
           component: () => import('../views/PrestamosView.vue'),
         },
+        { path: enc('clientes-prestamo'), name: 'clientes-prestamo', component: () => import('../views/ClientesPrestamoView.vue') },
         {
           path: `${enc('prestamos')}/:id`,
           name: 'prestamo-detalle',

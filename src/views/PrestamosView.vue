@@ -102,7 +102,7 @@
         dataKey="id"
       >
         <Column selectionMode="multiple" headerStyle="width:3rem" />
-        <Column field="deudor_nombre" header="Deudor" sortable style="min-width:180px">
+        <Column field="deudor_nombre" header="Cliente" sortable style="min-width:180px">
           <template #body="{ data: p }">
             <div class="flex items-center gap-3 cursor-pointer" @click="goToDetalle(p.id)">
               <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style="background:var(--color-alert-bg)">
@@ -110,7 +110,7 @@
               </div>
               <div class="min-w-0">
                 <p class="font-semibold truncate" style="color:var(--color-text-primary)">{{ p.deudor_nombre }}</p>
-                <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.deudor_contacto || '—' }}</p>
+                <p class="text-[11px] truncate" style="color:var(--color-text-muted)">{{ p.cliente?.contacto || p.deudor_contacto || '—' }} · {{ etiquetaPago(p.categoria_pago) }}</p>
               </div>
             </div>
           </template>
@@ -393,6 +393,7 @@ function setFiltro(val) {
 
 function goToDetalle(id) { router.push({ name: 'prestamo-detalle', params: { id: encodeUrlSegment(id) } }) }
 function pctTasa(t) { return parseFloat((parseFloat(t) * 100).toFixed(2)) }
+function etiquetaPago(k) { return ({ anticipado: 'Pagó antes', puntual: 'Pagó a tiempo', tardio: 'Pagó tarde', vencido: 'Vencido', pendiente: 'En curso', sin_vencimiento: 'Sin vencimiento' })[k] || '' }
 function formatFecha(fecha) {
   if (!fecha) return '—'
   return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-SV', {
