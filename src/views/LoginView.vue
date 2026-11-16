@@ -61,8 +61,8 @@
           <!-- Usuario -->
           <div class="field">
 
-            <div class="input-wrap" :class="{ focused: focusedField === 'usuario' }">
-              <span class="material-symbols-outlined input-icon">person</span>
+            <div class="input-wrap" :class="{ focused: focusedField === 'usuario', invalid: v$.usuario.$error }">
+              <span class="material-symbols-outlined input-icon" aria-hidden="true">person</span>
               <FloatLabel variant="on" class="block w-full"><input
                 v-model="form.usuario"
                 id="login-usuario"
@@ -70,18 +70,20 @@
                 autocomplete="username"
                 class="login-input" :class="{ 'p-filled': form.usuario !== '' && form.usuario != null }"
                 required
+                :aria-invalid="v$.usuario.$error"
+                :aria-describedby="v$.usuario.$error ? 'login-usuario-error' : undefined"
                 @focus="focusedField = 'usuario'"
                 @blur="focusedField = null"
               /><label for="login-usuario" class="text-xs">Usuario<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
             </div>
-            <p v-if="v$.usuario.$error" class="mt-1 text-xs" style="color:var(--color-danger)">{{ v$.usuario.$errors[0].$message }}</p>
+            <p v-if="v$.usuario.$error" id="login-usuario-error" class="field-error" role="alert">{{ v$.usuario.$errors[0].$message }}</p>
           </div>
 
           <!-- Contraseña -->
           <div class="field">
 
-            <div class="input-wrap" :class="{ focused: focusedField === 'contrasena' }">
-              <span class="material-symbols-outlined input-icon">lock</span>
+            <div class="input-wrap has-toggle" :class="{ focused: focusedField === 'contrasena', invalid: v$.contrasena.$error }">
+              <span class="material-symbols-outlined input-icon" aria-hidden="true">lock</span>
               <FloatLabel variant="on" class="block w-full"><input
                 v-model="form.contrasena"
                 id="login-contrasena"
@@ -89,6 +91,8 @@
                 autocomplete="current-password"
                 class="login-input" :class="{ 'p-filled': form.contrasena !== '' && form.contrasena != null }"
                 required
+                :aria-invalid="v$.contrasena.$error"
+                :aria-describedby="v$.contrasena.$error ? 'login-contrasena-error' : undefined"
                 @focus="focusedField = 'contrasena'"
                 @blur="focusedField = null"
               /><label for="login-contrasena" class="text-xs">Contraseña<span aria-hidden="true" style="color:var(--color-danger)"> *</span></label></FloatLabel>
@@ -99,12 +103,12 @@
                 :aria-pressed="showPassword"
                 @click="showPassword = !showPassword"
               >
-                <span class="material-symbols-outlined" style="font-size:18px">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px">
                   {{ showPassword ? 'visibility_off' : 'visibility' }}
                 </span>
               </button>
             </div>
-            <p v-if="v$.contrasena.$error" class="mt-1 text-xs" style="color:var(--color-danger)">{{ v$.contrasena.$errors[0].$message }}</p>
+            <p v-if="v$.contrasena.$error" id="login-contrasena-error" class="field-error" role="alert">{{ v$.contrasena.$errors[0].$message }}</p>
           </div>
 
           <!-- Error -->
@@ -353,7 +357,7 @@ async function handleLogin() {
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 .field-label {
   font-size: 11px;
@@ -364,63 +368,109 @@ async function handleLogin() {
 }
 
 .input-wrap {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0;
-  min-height: 50px;
-  border-radius: 13px;
-  border: 1.5px solid var(--color-border);
+  min-height: 52px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
-  transition: border-color 0.15s, box-shadow 0.15s;
-  overflow: hidden;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
-.input-wrap.focused {
+.input-wrap.focused,
+.input-wrap:focus-within {
   border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px var(--color-brand-focus);
+  box-shadow: 0 0 0 3px var(--color-brand-focus), 0 2px 8px color-mix(in srgb, var(--color-brand) 8%, transparent);
 }
+.input-wrap.invalid:not(.focused) { border-color: var(--color-danger); }
 .input-wrap:focus-within .input-icon { color: var(--color-brand); }
+.input-wrap.invalid .input-icon { color: var(--color-danger); }
 
 .input-icon {
-  font-size: 18px;
+  font-size: 19px;
   color: var(--color-text-muted);
-  padding: 0 0 0 14px;
+  width: 43px;
+  padding-left: 14px;
   flex-shrink: 0;
+  transition: color 0.18s ease;
+}
+.input-wrap > :deep(.p-floatlabel) {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
 }
 
 .login-input {
-  flex: 1;
-  padding: 13px 14px;
+  display: block;
+  width: 100%;
+  height: 52px;
+  padding: 19px 42px 8px 3px;
   font-size: 14px;
+  line-height: 1.35;
   color: var(--color-text-primary);
   background: transparent;
   border: none;
   outline: none;
+  border-radius: inherit;
+  transition: color 0.18s ease;
+}
+.login-input:focus-visible { outline: none; }
+.input-wrap:not(.has-toggle) .login-input { padding-right: 14px; }
+.input-wrap :deep(.p-floatlabel-on > label) {
+  left: 3px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1;
+  transition: color 0.18s ease, top 0.18s ease;
+}
+.input-wrap :deep(.p-floatlabel-on:has(.login-input:focus) > label),
+.input-wrap :deep(.p-floatlabel-on:has(.login-input.p-filled) > label),
+.input-wrap :deep(.p-floatlabel-on:has(.login-input:autofill) > label),
+.input-wrap :deep(.p-floatlabel-on:has(.login-input:-webkit-autofill) > label) {
+  color: var(--color-brand);
 }
 .login-input:-webkit-autofill,
 .login-input:-webkit-autofill:hover,
 .login-input:-webkit-autofill:focus,
-.login-input:autofill {
+.login-input:autofill,
+.login-input:autofill:hover,
+.login-input:autofill:focus {
   -webkit-text-fill-color: var(--color-text-primary);
   -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
   box-shadow: 0 0 0 1000px var(--color-surface) inset;
   caret-color: var(--color-text-primary);
 }
-.login-input::placeholder { color: var(--color-text-muted); }
+.field-error {
+  margin: 0;
+  padding-left: 3px;
+  color: var(--color-danger);
+  font-size: 11px;
+  line-height: 1.4;
+}
 
 .toggle-pw {
-  padding: 0 14px;
+  position: absolute;
+  top: 0;
+  right: 2px;
+  z-index: 1;
+  width: 42px;
+  height: 50px;
+  padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: color 0.18s ease, background-color 0.18s ease;
 }
-.toggle-pw:hover { color: var(--color-text-secondary); }
+.toggle-pw:hover { color: var(--color-brand); background: var(--color-brand-light); }
 .toggle-pw:focus-visible {
-  border-radius: 8px;
   outline: 2px solid var(--color-brand);
-  outline-offset: -3px;
+  outline-offset: -5px;
 }
 
 /* ── Error ──────────────────────────────────────────── */
