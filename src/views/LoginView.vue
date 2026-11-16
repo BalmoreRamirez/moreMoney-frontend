@@ -420,7 +420,7 @@ async function handleLogin() {
 .input-wrap :deep(.p-floatlabel-on > label) {
   left: 3px;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   transition: color 0.18s ease, top 0.18s ease;
 }
@@ -428,7 +428,7 @@ async function handleLogin() {
 .input-wrap :deep(.p-floatlabel-on:has(.login-input.p-filled) > label),
 .input-wrap :deep(.p-floatlabel-on:has(.login-input:autofill) > label),
 .input-wrap :deep(.p-floatlabel-on:has(.login-input:-webkit-autofill) > label) {
-  color: var(--color-brand);
+  color: var(--color-brand-hover);
 }
 .login-input:-webkit-autofill,
 .login-input:-webkit-autofill:hover,
@@ -445,7 +445,7 @@ async function handleLogin() {
   margin: 0;
   padding-left: 3px;
   color: var(--color-danger);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -512,6 +512,8 @@ async function handleLogin() {
   box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 26%, transparent);
   transform: translateY(-1px);
 }
+:global([data-theme="dark"] .submit-btn) { background: #315FC4; }
+:global([data-theme="dark"] .submit-btn:hover:not(:disabled)) { background: #284FA8; }
 .submit-btn:active:not(:disabled) { transform: translateY(0); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
